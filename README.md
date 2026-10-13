@@ -2,18 +2,25 @@
 
 An animated, true-isometric 3D reconstruction of M. C. Escher's lithograph *Waterfall* (1961). Water falls onto a mill wheel, runs away from you down a zigzag aqueduct, and arrives back at the top of the fall without ever climbing.
 
+Alongside it, **Paradoxes on Paper** (`illusions/index.html`) is a gallery of animated illustrations, one or two for each trick behind impossible drawings and optical illusions: the ones Escher used, and the ones that came later.
+
 ## Run it
 
-Open `index.html` in a browser. The page works offline from `file://`: the built bundle (`dist/waterfall.js`) is committed and has no network dependencies.
+Open `index.html` (the Waterfall) or `illusions/index.html` (the gallery) in a browser. Every page works offline from `file://`, because the built bundles are committed and nothing is loaded from the network.
 
 To change the code and rebuild:
 
 ```sh
 npm install
-npm run build      # bundle src/ into dist/waterfall.js
-npm run dev        # rebuild on every change
-npm start          # build, then serve on http://localhost:8080
+npm run build                  # build everything
+node build.mjs waterfall       # just the Waterfall (dist/waterfall.js)
+node build.mjs <slug>          # just one illustration (illusions/<slug>/bundle.js)
+node build.mjs <name> --watch  # rebuild on every change
+node tools/gallery.mjs         # refresh the gallery's card data from each meta.json
+npm start                      # build, then serve on http://localhost:8080
 ```
+
+`node tools/screenshot.cjs <page.html> <out.png> [--frame] [--eval "js"]` takes a headless screenshot of any page and reports console errors.
 
 ## Controls
 
@@ -63,7 +70,7 @@ Every face carries its own outline distances and planar texture coordinates. One
 ## Layout
 
 ```
-index.html           page, styles, controls
+index.html           the Waterfall: page, styles, controls
 src/main.js          renderer, isometric camera, interaction, animation loop
 src/layout.js        the impossible geometry, as numbers
 src/builder.js       geometry builder (outline + texture attributes, view-axis shift)
@@ -76,6 +83,15 @@ src/figures.js       people and limbs
 src/garden.js        giant mosses and lichens
 src/landscape.js     terraced hillside
 dist/waterfall.js    built bundle (committed so the page runs offline)
+
+illusions/index.html         the gallery (cards from illusions/gallery-data.js)
+illusions/<slug>/            one illustration: index.html, src/, bundle.js, thumb.jpg, meta.json
+illusions/shared/            common page style (page.css) and shell helpers (shell.js)
+illusions/_template/         starting point for a new illustration
+vendor/three.min.js          one shared copy of three.js for the illustrations (window.THREE)
+build.mjs                    builds the Waterfall, the shared three.js and every illustration
+tools/                       screenshot checker and gallery data generator
+assets/                      the Waterfall's gallery thumbnail
 ```
 
 ## Credit

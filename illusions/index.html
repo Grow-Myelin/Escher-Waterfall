@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Paradoxes on Paper</title>
+  <meta name="description" content="A gallery of animated illustrations of the tricks behind impossible drawings and optical illusions: the ones M. C. Escher used, and the ones that came after.">
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root {
+      --wall: #1b1a17;
+      --wall-2: #24221e;
+      --card: #23211d;
+      --mat: #f1ebdf;
+      --ink: #1d1b18;
+      --text: #e9e3d6;
+      --muted: #a39c8e;
+      --faint: #6f695e;
+      --line: rgba(233, 227, 214, 0.14);
+      --accent: #d8c9a3;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 50% 0%, var(--wall-2), var(--wall) 60%) fixed;
+      background-color: var(--wall);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .back {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      color: var(--muted);
+      font: 500 12.5px/1 var(--sans);
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+    .back:hover { color: var(--text); border-color: rgba(233, 227, 214, 0.38); }
+    header.top { padding: 64px 0 28px; text-align: center; }
+    header.top h1 {
+      margin: 0;
+      font: 400 clamp(30px, 4.6vw, 48px)/1.1 var(--serif);
+      letter-spacing: 0.04em;
+    }
+    header.top p {
+      margin: 12px auto 0;
+      max-width: 620px;
+      color: var(--muted);
+      font: italic 400 clamp(14px, 1.6vw, 17px)/1.5 var(--serif);
+    }
+
+    /* featured Waterfall */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+      gap: 36px;
+      align-items: center;
+      margin: 18px 0 56px;
+      text-decoration: none;
+    }
+    .hero .print { width: 100%; }
+    .hero .label { color: var(--accent); font: 600 11px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; }
+    .hero h2 { margin: 8px 0 10px; font: 400 32px/1.15 var(--serif); }
+    .hero p { margin: 0 0 14px; color: #d6cfbf; max-width: 520px; }
+    .hero .go {
+      display: inline-block;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: var(--text);
+      color: var(--ink);
+      font: 600 13px/1 var(--sans);
+    }
+    .hero:hover .go { background: var(--accent); }
+
+    /* matted print look, shared by hero and cards */
+    .print {
+      display: block;
+      background: var(--mat);
+      padding: 7px;
+      box-shadow: 0 0 0 1px #0c0b0a, 0 14px 30px rgba(0, 0, 0, 0.45);
+    }
+    .print img, .print .ph {
+      display: block;
+      width: 100%;
+      aspect-ratio: 30 / 38;
+      object-fit: cover;
+      background: #e3dccb;
+    }
+    .print .ph {
+      display: grid;
+      place-items: center;
+      color: #8a8172;
+      font: italic 13px var(--serif);
+    }
+
+    section.group { margin: 0 0 56px; }
+    section.group > h2 {
+      margin: 0 0 6px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      font: 400 24px/1.2 var(--serif);
+      letter-spacing: 0.02em;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 28px;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .row .num { color: var(--faint); font: 400 13px/1 var(--serif); letter-spacing: 0.06em; }
+    .row h3 { margin: 6px 0 6px; font: 400 20px/1.25 var(--serif); }
+    .row .text p { margin: 0; color: var(--muted); font-size: 14px; }
+    .cards { display: flex; flex-wrap: wrap; gap: 22px; }
+    .card {
+      width: 196px;
+      text-decoration: none;
+      transition: transform 0.25s ease;
+    }
+    .card:hover { transform: translateY(-3px); }
+    .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+    .card .t { margin: 12px 0 3px; font: 400 16px/1.25 var(--serif); }
+    .card .b { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+    .card .r { margin: 6px 0 0; color: var(--faint); font: italic 12px/1.4 var(--serif); }
+    .card.pending { pointer-events: none; opacity: 0.55; }
+
+    footer.bottom { padding: 8px 0 48px; color: var(--faint); font-size: 12.5px; text-align: center; }
+    footer.bottom p { margin: 4px 0; }
+
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; gap: 20px; }
+      .hero .print { max-width: 320px; margin: 0 auto; }
+      .row { grid-template-columns: 1fr; gap: 14px; }
+      .card { width: calc(50% - 11px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Waterfall</a>
+  <div class="wrap">
+    <header class="top">
+      <h1>Paradoxes on Paper</h1>
+      <p>Animated illustrations of the tricks behind impossible drawings and optical illusions: the ones M.&nbsp;C.&nbsp;Escher used, and the ones that came after.</p>
+    </header>
+
+    <a class="hero" href="../index.html">
+      <span class="print"><img src="../assets/waterfall-thumb.jpg" alt="The Waterfall, drawn in true isometric"></span>
+      <span>
+        <span class="label">Start here</span>
+        <h2>Waterfall</h2>
+        <p>Escher’s perpetual-motion aqueduct, rebuilt as a real 3D scene seen from the one angle that closes the loop. Water falls, turns the wheel, runs gently downhill, and arrives back at the top of the fall. Press “Reveal the trick” to see what is really there.</p>
+        <span class="go">Open the Waterfall</span>
+      </span>
+    </a>
+
+    <main id="sections"></main>
+
+    <footer class="bottom">
+      <p>Every illustration here is original: each one demonstrates the device rather than copying a picture.</p>
+      <p>An homage to M. C. Escher and to the artists and mathematicians credited on each page.</p>
+    </footer>
+  </div>
+
+  <script src="gallery-data.js"></script>
+  <script>
+    (function () {
+      var root = document.getElementById('sections');
+      var data = window.GALLERY || [];
+      function el(tag, cls, text) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text) e.textContent = text;
+        return e;
+      }
+      var n = 0;
+      data.forEach(function (group) {
+        var sec = el('section', 'group');
+        sec.appendChild(el('h2', null, group.title));
+        group.items.forEach(function (item) {
+          n += 1;
+          var row = el('div', 'row');
+          var text = el('div', 'text');
+          text.appendChild(el('div', 'num', (n < 10 ? '0' : '') + n));
+          text.appendChild(el('h3', null, item.name));
+          text.appendChild(el('p', null, item.text));
+          row.appendChild(text);
+          var cards = el('div', 'cards');
+          item.pages.forEach(function (p) {
+            var a = el('a', 'card' + (p.ready ? '' : ' pending'));
+            a.href = p.href;
+            var print = el('span', 'print');
+            if (p.thumb) {
+              var img = document.createElement('img');
+              img.src = p.thumb;
+              img.alt = p.title;
+              img.loading = 'lazy';
+              print.appendChild(img);
+            } else {
+              print.appendChild(el('span', 'ph', p.ready ? p.title : 'In progress'));
+            }
+            a.appendChild(print);
+            a.appendChild(el('div', 't', p.title));
+            if (p.blurb) a.appendChild(el('p', 'b', p.blurb));
+            if (p.refs && p.refs.length) a.appendChild(el('p', 'r', p.refs.join(' · ')));
+            cards.appendChild(a);
+          });
+          row.appendChild(cards);
+          sec.appendChild(row);
+        });
+        root.appendChild(sec);
+      });
+    })();
+  </script>
+</body>
+</html>

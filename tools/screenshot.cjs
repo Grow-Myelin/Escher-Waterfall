@@ -28,6 +28,7 @@ const path = require('path');
   }
   const browser = await playwright.chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const p = await browser.newPage({ viewport: { width: opt.w, height: opt.h }, deviceScaleFactor: opt.scale });
+  p.setDefaultTimeout(120000);
   const problems = [];
   p.on('console', (m) => { if (m.type() === 'error') problems.push(`[console.error] ${m.text()}`); });
   p.on('pageerror', (e) => problems.push(`[pageerror] ${e.message}`));
@@ -36,8 +37,15 @@ const path = require('path');
   const shoot = async (file) => {
     const type = /\.jpe?g$/i.test(file) ? 'jpeg' : 'png';
     const o = { path: file, type, ...(type === 'jpeg' ? { quality: 82 } : {}) };
-    if (opt.frame && (await p.$('#frame'))) await p.locator('#frame').screenshot(o);
-    else await p.screenshot(o);
+    // clip to the frame's box rather than an element screenshot, which waits
+    // for the element to be "stable" and can time out on a busy machine
+    const box = opt.frame ? await p.evaluate(() => {
+      const el = document.getElementById('frame');
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: Math.max(0, r.x), y: Math.max(0, r.y), width: r.width, height: r.height };
+    }) : null;
+    await p.screenshot(box ? { ...o, clip: box } : o);
   };
   if (!opt.evals.length) await shoot(out);
   else {

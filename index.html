@@ -183,6 +183,22 @@
       font-size: 14px;
     }
     #panel .credit { margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .gallery-link {
+      position: fixed;
+      left: 16px;
+      top: 16px;
+      z-index: 5;
+      color: var(--muted);
+      font: 500 12.5px/1 var(--sans);
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+    .gallery-link:hover { color: var(--text); border-color: rgba(233, 227, 214, 0.38); }
+    .gallery-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     #fallback {
       position: fixed;
       inset: 0;
@@ -200,6 +216,8 @@
       button { padding: 8px 11px; font-size: 12.5px; }
       .seg button { padding: 6px 10px; }
       #hint { display: none; }
+      #masthead { padding-top: 48px; }
+      .gallery-link { top: 10px; left: 10px; }
       #panel { top: auto; bottom: 110px; right: 12px; max-height: 55vh; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -208,6 +226,7 @@
   </style>
 </head>
 <body>
+  <a class="gallery-link" href="illusions/index.html">More illusions →</a>
   <header id="masthead">
     <h1>Waterfall</h1>
     <p>after M. C. Escher’s lithograph of 1961, rebuilt in true isometric 3D</p>
