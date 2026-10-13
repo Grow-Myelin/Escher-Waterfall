@@ -60,32 +60,25 @@ float fill(float d, float px) { return clamp(0.5 - d / px, 0.0, 1.0); }
 float sq(float x) { return x * x; }
 float gauss(float x, float c, float w) { float t = (x - c) / w; return exp(-t * t); }
 
-// ---- the three free edges
+// ---- the three free edges (in tile units; the belly follows from them)
 float edgeT(float x) {               // back: positive is outward
-  float s = (x - 1.20) / 0.78;      // dorsal fin, 0 at its trailing base, 1 at its leading base
+  float s = (x - 1.15) / 0.82;      // dorsal fin: 0 at its trailing base, 1 at its leading base
   float fin = 0.0;
-  if (s > 0.0 && s < 1.0) fin = s < 0.26 ? pow(s / 0.26, 1.7) : 1.0 - pow((s - 0.26) / 0.74, 1.5);
-  float stock = smoothstep(0.06, 0.40, x) * smoothstep(1.12, 0.70, x);
-  float melon = gauss(x, 2.80, 0.13);
-  float win = smoothstep(0.0, 0.06, x) * smoothstep(3.0, 2.94, x);
-  return uAmp * win * (0.46 * fin - 0.17 * stock + 0.05 * melon);
+  if (s > 0.0 && s < 1.0) fin = s < 0.22 ? pow(s / 0.22, 1.9) : 1.0 - pow((s - 0.22) / 0.78, 1.3);
+  float stock = smoothstep(0.0, 0.45, x) * smoothstep(1.05, 0.62, x);
+  float win = smoothstep(0.0, 0.04, x) * smoothstep(3.0, 2.88, x);
+  return uAmp * win * (0.46 * fin - 0.28 * stock + 0.08 * gauss(x, 2.42, 0.28));
 }
-float edgeE(float y) {               // head: positive is forward
-  float win = smoothstep(0.0, 0.05, y) * smoothstep(1.0, 0.95, y);
-  return uAmp * win * (0.42 * gauss(y, 0.30, 0.09) + 0.15 * gauss(y, 0.64, 0.17) - 0.04 * gauss(y, 0.10, 0.05));
+float edgeE(float y) {               // head: positive is forward (beak and melon)
+  float win = smoothstep(0.0, 0.05, y) * smoothstep(1.0, 0.88, y);
+  float b = clamp(1.0 - sq((y - 0.27) / 0.14), 0.0, 1.0);
+  return uAmp * win * (0.34 * pow(b, 0.8) + 0.24 * gauss(y, 0.63, 0.17));
 }
-float edgeL(float y) {               // tail: positive is into the tile
-  float win = smoothstep(0.0, 0.05, y) * smoothstep(1.0, 0.95, y);
-  float b = 0.05 * gSw;
-  return uAmp * win * (0.30 * gauss(y, 0.50 + 0.6 * b, 0.13)
-    - 0.40 * gauss(y, 0.17 + b, 0.075) - 0.40 * gauss(y, 0.83 + b, 0.075));
+float edgeL(float y) {               // tail: positive is into the tile (the notch between the flukes)
+  float apex = 0.36 + 0.05 * gSw;
+  float t = y < apex ? y / apex : (1.0 - y) / (1.0 - apex);
+  return uAmp * (0.38 + 0.03 * gSw) * pow(clamp(t, 0.0, 1.0), 1.15);
 }
-float edgeB(float x) {               // belly, forced by the neighbours
-  if (x < 0.5) return 0.5 * edgeE(1.0 - 2.0 * x);
-  if (x < 2.0) return 0.5 * edgeT(2.0 * x - 1.0);
-  return -edgeL(x - 2.0);
-}
-
 vec2 armLocal(vec2 P, float k, float a) {
   vec2 Q = P * exp2(-k);
   for (int i = 0; i < 3; i++) if (float(i) < a) Q = vec2(-Q.y, Q.x);

@@ -28,8 +28,9 @@ const perp = (a, d) => norm(sub(a, mul(d, dot(a, d)))); // component of a orthog
 // ------------------------------------------------------------------ the pose
 export const POSE = {
   roll: 0.36, // hand rolled onto its little-finger side (rad)
-  pitch: 0.17, // fingers tilted down (rad)
-  flat: [-5.6, -0.6], // L-frame x range over which the arm rises out of the paper
+  pitch: 0.17, // fingers tilted down (rad); solved for in makeHtoL
+  dev: 0.45, // the hand turned towards the thumb at the wrist (rad)
+  ext: -0.42, // the forearm dipping back towards the paper (rad)
 };
 
 // The pencil in the hand frame: it rests in the web between thumb and index
@@ -334,7 +335,10 @@ export function meshSDF(sdf, lo, hi, h) {
 
 // H frame -> L frame: roll onto the little-finger side, pitch the fingers
 // down until the hand rests on the paper at the same height as the pencil
-// tip, then lift everything so both touch the paper.
+// tip, then lift everything so both touch the paper. Two bends at the wrist:
+// the hand turns towards the thumb (radial deviation, POSE.dev) and the
+// forearm dips back down towards the paper (POSE.ext).
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 export function makeHtoL(model, verts) {
   const cr = Math.cos(POSE.roll), sr = Math.sin(POSE.roll);
   const rotP = (p, pitch) => {
@@ -342,9 +346,19 @@ export function makeHtoL(model, verts) {
     const y1 = p[1] * cr - p[2] * sr, z1 = p[1] * sr + p[2] * cr;
     return [p[0] * cp + z1 * sp, y1, -p[0] * sp + z1 * cp];
   };
+  const bend = (q, xh) => {
+    const w = smooth(-2.6, 0.9, xh);
+    // forearm: turn about the y axis through the wrist
+    const e = POSE.ext * (1 - w);
+    const ce = Math.cos(e), se = Math.sin(e);
+    let x = q[0] * ce + q[2] * se, z = -q[0] * se + q[2] * ce, y = q[1];
+    // hand: turn about the z axis through the wrist
+    const d = POSE.dev * w;
+    const cd = Math.cos(d), sd = Math.sin(d);
+    return [x * cd - y * sd, x * sd + y * cd, z];
+  };
   let pitch = POSE.pitch;
   if (verts) {
-    // contact candidates: the hand from the wrist forward
     const cand = [];
     for (let i = 0; i < verts.length; i += 9) if (verts[i] > 1.5) cand.push([verts[i], verts[i + 1], verts[i + 2]]);
     const gap = (pt) => {
@@ -358,8 +372,10 @@ export function makeHtoL(model, verts) {
   }
   const tip = rotP(model.pen.tip, pitch);
   const lift = -tip[2];
-  const rot = (p) => rotP(p, pitch);
-  return { rot, pitch, lift, apply: (p) => { const q = rotP(p, pitch); return [q[0], q[1], q[2] + lift]; } };
+  const apply = (p) => { const q = bend(rotP(p, pitch), p[0]); return [q[0], q[1], q[2] + lift]; };
+  // directions on the hand (the pencil): roll, pitch and the hand's turn
+  const rot = (p) => { const q = rotP(p, pitch); const d = POSE.dev, cd = Math.cos(d), sd = Math.sin(d); return [q[0] * cd - q[1] * sd, q[0] * sd + q[1] * cd, q[2]]; };
+  return { rot, pitch, lift, apply };
 }
 
 // ------------------------------------------------------------------ details
