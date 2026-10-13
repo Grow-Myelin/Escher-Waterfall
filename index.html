@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Waterfall, in Isometric</title>
+  <meta name="description" content="An animated, true-isometric 3D reconstruction of M. C. Escher's lithograph Waterfall (1961): a perpetual-motion aqueduct built from three impossible triangles.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 6 54 19v26L32 58 10 45V19z' fill='%23ece5d5' stroke='%23222' stroke-width='3'/%3E%3Cpath d='M32 6v52M10 19l44 26M54 19 10 45' stroke='%23222' stroke-width='2' opacity='.35'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --wall: #1b1a17;
+      --wall-2: #24221e;
+      --mat: #f1ebdf;
+      --ink: #1d1b18;
+      --text: #e9e3d6;
+      --muted: #a39c8e;
+      --line: rgba(233, 227, 214, 0.16);
+      --accent: #d8c9a3;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 35%, var(--wall-2), var(--wall) 70%);
+      background-color: var(--wall);
+      color: var(--text);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    #masthead {
+      position: fixed;
+      inset: 0 0 auto 0;
+      padding: 14px 20px 6px;
+      text-align: center;
+      pointer-events: none;
+    }
+    #masthead h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(20px, 2.4vw, 28px);
+      letter-spacing: 0.06em;
+    }
+    #masthead p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(12px, 1.2vw, 14px);
+      letter-spacing: 0.02em;
+    }
+    #frame {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--mat);
+      box-shadow:
+        0 0 0 1px #3d372f,
+        0 0 0 12px var(--mat),
+        0 0 0 13px #0c0b0a,
+        0 24px 60px 16px rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    body.ready #frame { opacity: 1; }
+    #scene {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+    #scene:active { cursor: grabbing; }
+    #badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      padding: 4px 8px 5px;
+      border-radius: 3px;
+      background: rgba(29, 27, 24, 0.78);
+      color: var(--text);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.4s, transform 0.4s;
+      pointer-events: none;
+    }
+    body.off-axis #badge { opacity: 1; transform: none; }
+    #controls {
+      position: fixed;
+      inset: auto 0 0 0;
+      padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .seg {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.18);
+      color: var(--text);
+      font: 500 13px/1 var(--sans);
+      letter-spacing: 0.02em;
+      padding: 9px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    button:hover { border-color: rgba(233, 227, 214, 0.38); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .seg button { border: 0; background: transparent; padding: 7px 13px; }
+    .seg button[aria-pressed="true"] { background: var(--text); color: var(--ink); }
+    #btn-reveal[aria-pressed="true"] { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+    .icon { font-size: 9px; letter-spacing: -1px; min-width: 12px; text-align: center; }
+    #hint { color: var(--muted); font-size: 11.5px; letter-spacing: 0.02em; }
+    #panel {
+      position: fixed;
+      right: 18px;
+      top: 70px;
+      width: min(380px, calc(100vw - 36px));
+      max-height: calc(100vh - 170px);
+      overflow: auto;
+      background: rgba(27, 26, 23, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 18px 20px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #ddd6c7;
+      backdrop-filter: blur(6px);
+    }
+    #panel[hidden] { display: none; }
+    #panel h2 {
+      margin: 0 0 8px;
+      font: 400 19px/1.25 var(--serif);
+      color: var(--text);
+    }
+    #panel h3 {
+      margin: 14px 0 4px;
+      font: 600 11px/1.3 var(--sans);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    #panel p { margin: 0 0 8px; }
+    #panel kbd {
+      font: 600 11px/1 var(--sans);
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      color: var(--text);
+    }
+    #panel .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+    #panel-close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      padding: 6px 9px;
+      font-size: 14px;
+    }
+    #panel .credit { margin-top: 12px; color: var(--muted); font-size: 12px; }
+    #fallback {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-family: var(--serif);
+    }
+    @media (max-width: 640px) {
+      #masthead { padding-top: 10px; }
+      #masthead p { display: none; }
+      button { padding: 8px 11px; font-size: 12.5px; }
+      .seg button { padding: 6px 10px; }
+      #hint { display: none; }
+      #panel { top: auto; bottom: 110px; right: 12px; max-height: 55vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #frame, #badge { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header id="masthead">
+    <h1>Waterfall</h1>
+    <p>after M. C. Escher’s lithograph of 1961, rebuilt in true isometric 3D</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Animated isometric reconstruction of Escher's Waterfall"></canvas>
+    <div id="badge">Off Escher’s axis: the illusion is broken</div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How the water climbs</h2>
+    <p>The camera looks straight down the cube diagonal, the true isometric angle. From there, one step back along both horizontal axes looks exactly the same as one step up, because the two differ only along your line of sight.</p>
+    <p>All four reaches of the channel run away from you, so the water seems to drift gently downhill. Yet when it reaches the lip it is two and a half storeys higher in the picture, ready to fall onto the wheel again.</p>
+    <h3>What is really there</h3>
+    <p>In three dimensions the aqueduct is an open spiral. Its top end lies 26 units further from you than its bottom end, measured along your line of sight. Three things bridge gaps that exist only in the picture: the waterfall and the lower storey of each tower. Each is cut once, and its upper half is slid back along the line of sight to meet the part it holds up. These are the three Penrose triangles Escher wove the print from.</p>
+    <p>Press <em>Reveal the trick</em> to turn the camera and see the structure as it really is.</p>
+    <h3>On the towers</h3>
+    <p>On the left tower stands a compound of three cubes. On the right tower stands the first stellation of the rhombic dodecahedron, now known as Escher’s solid.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>R</kbd><span>reveal the trick, or return to Escher’s view</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>0</kbd><span>reset the view</span>
+    </div>
+    <p class="credit">An homage to <em>Waterfall</em> (1961) by M. C. Escher. Every model, texture and shader here is original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-reveal" aria-pressed="false"><span>Reveal the trick</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to pan · scroll to zoom · double-click to reset</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) {
+        document.getElementById('fallback').style.display = 'flex';
+      }
+    })();
+  </script>
+  <script src="dist/waterfall.js"></script>
+</body>
+</html>
