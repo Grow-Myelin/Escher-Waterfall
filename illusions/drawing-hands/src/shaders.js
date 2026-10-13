@@ -119,9 +119,9 @@ ${COMMON}
 float hfam(float s, float w, out float ok) {
   float fw = fwidth(s);
   ok = smoothstep(0.05, 0.12, fw) * (1.0 - smoothstep(0.5, 0.8, fw));
-  float d = abs(fract(s) - 0.5);
+  float d = abs(fract(s) - 0.5);       // distance from the line at the middle of each period
   float aa = fw * 0.75 + 1e-4;
-  float line = 1.0 - smoothstep(0.5 - w - aa, 0.5 - w + aa, d);
+  float line = (1.0 - smoothstep(w - aa, w + aa, d)) * smoothstep(0.0, aa, w);
   return mix(2.0 * w, line, smoothstep(0.55, 0.3, fw));
 }
 
@@ -152,7 +152,7 @@ void main() {
   gloss = mix(gloss, 0.6, nail);
   float nailEdge = (1.0 - smoothstep(0.0, fn * 1.5, abs(vNail + 0.01))) * step(vMat, 0.5);
 
-  float light = (0.12 + 0.88 * mix(wrap * wrap, diff, 0.7)) * ao + 0.05 * rim;
+  float light = (0.1 + 0.9 * mix(wrap * wrap, diff, 0.72)) * ao + 0.05 * rim;
   float spec = pow(max(dot(n, h), 0.0), 26.0) * gloss;
   vec3 colour = alb * (0.22 + 0.86 * light) + spec * vec3(1.0, 0.97, 0.9);
   colour *= 1.0 - 0.45 * nailEdge;
@@ -160,14 +160,14 @@ void main() {
   // ---- lithograph: crayon tone that keeps the paper as its highlight,
   // with hatching that goes round the form in the shadows
   float t = clamp(light * lum(alb) / 0.79 + spec * 0.7, 0.0, 1.0);
-  float tv = smoothstep(0.1, 0.78, t);
+  float tv = smoothstep(0.0, 0.86, t);
   float dk = 1.0 - t;
   vec3 hp = vRest;
   float ok1, ok2, ok3;
   float s1 = dot(hp, normalize(vec3(0.95, 0.2, 0.3))) / 0.11;
   float s2 = dot(hp, normalize(vec3(-0.3, 0.9, 0.35))) / 0.12;
   float s3 = (gl_FragCoord.x * 0.6 - gl_FragCoord.y * 0.8) / 3.6;
-  float w1 = clamp(dk * 0.62 - 0.2, 0.0, 0.4);
+  float w1 = clamp(dk * 0.62 - 0.11, 0.0, 0.4);
   float w2 = clamp(dk * 0.66 - 0.38, 0.0, 0.4);
   float w3 = clamp(dk * 0.7 - 0.52, 0.0, 0.4);
   float h1 = hfam(s1, w1, ok1);

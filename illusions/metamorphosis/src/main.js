@@ -329,7 +329,19 @@ function drawConstruction(visible, s, lw, x0, x1) {
     ['tort', [0.33, 0.43, 0.2]],
     ['cube', [0.35, 0.27, 0.22]],
   ];
-  const top = y0 + 24 * dpr, bot = H - 22 * dpr;
+  // legend layout first: it may need two rows on a narrow screen
+  const names = { fish: 'fish', lat: 'square → hexagon lattice', honey: 'honeycomb', tort: 'tortoise', cube: 'cubes' };
+  ctx.font = `${10.5 * dpr}px system-ui, sans-serif`;
+  const legend = [];
+  let lx = 8 * dpr, row = 0;
+  for (const [key, col] of series) {
+    const wItem = 14 * dpr + ctx.measureText(names[key]).width + 14 * dpr;
+    if (lx + wItem > W - 4 * dpr && lx > 8 * dpr) { lx = 8 * dpr; row++; }
+    legend.push({ key, col, x: lx, row });
+    lx += wItem;
+  }
+  const rowsL = row + 1;
+  const top = y0 + 24 * dpr, bot = H - (8 + 14 * rowsL) * dpr;
   const xs = [];
   for (let px = 0; px <= W; px += 3 * dpr) xs.push([px, tracks(xiOf(x0 + px / s))]);
   for (const [key, col] of series) {
@@ -356,16 +368,12 @@ function drawConstruction(visible, s, lw, x0, x1) {
   }
   ctx.textAlign = 'left';
   ctx.font = `${10.5 * dpr}px system-ui, sans-serif`;
-  let lx = 8 * dpr;
-  for (const [key, col] of series) {
-    const name = { fish: 'fish', lat: 'square → hexagon lattice', honey: 'honeycomb', tort: 'tortoise', cube: 'cubes' }[key];
-    ctx.fillStyle = css(col);
-    ctx.fillRect(lx, H - 10 * dpr, 10 * dpr, 2.5 * dpr);
+  for (const it of legend) {
+    const y = H - (6.5 + 14 * (rowsL - 1 - it.row)) * dpr;
+    ctx.fillStyle = css(it.col);
+    ctx.fillRect(it.x, y - 3.5 * dpr, 10 * dpr, 2.5 * dpr);
     ctx.fillStyle = css(INK, 0.8);
-    lx += 14 * dpr;
-    ctx.fillText(name, lx, H - 6.5 * dpr);
-    lx += ctx.measureText(name).width + 14 * dpr;
-    if (lx > W * 0.9) break;
+    ctx.fillText(names[it.key], it.x + 14 * dpr, y);
   }
   ctx.globalAlpha = 1;
 }

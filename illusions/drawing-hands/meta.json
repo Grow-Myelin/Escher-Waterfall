@@ -1,0 +1,11 @@
+{
+  "slug": "drawing-hands",
+  "title": "Drawing Hands",
+  "subtitle": "A picture that draws itself",
+  "technique": "Self-reference: a strange loop between flat drawing and solid form",
+  "refs": [
+    "M. C. Escher, Drawing Hands, 1948",
+    "Douglas Hofstadter, Gödel, Escher, Bach, 1979"
+  ],
+  "blurb": "Two hands rise out of a sheet of paper, each pencil drawing the other's cuff, so neither hand is ever drawn first."
+}

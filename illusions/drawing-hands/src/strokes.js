@@ -47,76 +47,85 @@ const arc = (c, rx, ry, sgn, a0 = -Math.PI / 2, a1 = Math.PI / 2) => (t) => {
 export function buildDrawing(fp) {
   const rand = rng(11);
   const S = [];
-  const add = (pts, o = {}) => S.push({ pts, w: (o.w ?? 0.05) * 1.45, dark: Math.min(1, (o.dark ?? 0.85) * 1.15), speed: o.speed ?? 12, kind: o.kind ?? 'line' });
+  const add = (pts, o = {}) => S.push({ pts, w: o.w ?? 0.075, dark: o.dark ?? 1, speed: (o.speed ?? 16) * 1.3, kind: o.kind ?? 'line' });
+  const hatch = (pts, o = {}) => add(pts, { w: 0.042, dark: 0.75, speed: 32, kind: 'hatch', ...o });
   const XW = -4.1; // where the drawn wrist meets the rising form
   const XC = -5.4; // the cuff's opening
-  const XB = -7.5; // the cuff's far edge
+  const XB = -7.7; // the cuff's far edge
+  const XS = -9.2; // where the sleeve trails off
   const W = (x) => fp.at(x); // [lo, hi] of the arm's outline
-  const rimY = Math.max(-W(XC)[0], W(XC)[1]) + 0.55;
+  const rimY = Math.max(-W(XC)[0], W(XC)[1]) + 0.5;
   const RX = 0.5;
+  const sideY = (x, sgn) => sgn * (rimY + 0.18 * Math.sin(Math.PI * (XC - x) / (XC - XB)) + 0.1 * (XC - x) / (XC - XB));
+  const sleeveY = (x, sgn) => sgn * (rimY + 0.1 + 0.75 * Math.sin(0.5 * Math.PI * Math.min(1, (XB - x) / (XB - XS))));
 
-  // 1. the wrist: two contours from the hand back to the cuff
-  add(curve(line([XW, W(XW)[1]], [XC + 0.15, W(XC)[1]]), 0.12, 0.02, rand), { w: 0.055 });
-  add(curve(line([XW, W(XW)[0]], [XC + 0.15, W(XC)[0]]), 0.12, 0.02, rand), { w: 0.055 });
-  // 2. the cuff's opening: the near side of its rim, then the far side
-  //    beside the wrist
-  add(curve(arc([XC, 0], RX, rimY, 1, -Math.PI / 2, Math.PI / 2), 0.12, 0.02, rand), { w: 0.055 });
+  // 1. the wrist: two contours from the hand back into the cuff
+  add(curve(line([XW, W(XW)[1]], [XC + 0.2, W(XC)[1] - 0.02]), 0.12, 0.02, rand));
+  add(curve(line([XW, W(XW)[0]], [XC + 0.2, W(XC)[0] + 0.02]), 0.12, 0.02, rand));
+  // 2. the cuff's rim: the near side, then the far side beside the wrist
+  add(curve(arc([XC, 0], RX, rimY, 1, -Math.PI / 2, Math.PI / 2), 0.12, 0.018, rand));
   const wl = W(XC);
   const aLo = Math.asin(Math.max(-1, wl[0] / rimY)), aHi = Math.asin(Math.min(1, wl[1] / rimY));
-  add(curve((t) => { const a = lerp(Math.PI * 0.5, Math.PI - aHi, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.045, dark: 0.75 });
-  add(curve((t) => { const a = lerp(-Math.PI * 0.5, -Math.PI - aLo, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.045, dark: 0.75 });
-  // 3. the cuff's sides and far edge
-  add(curve(line([XC, rimY], [XB, rimY + 0.12]), 0.14, 0.025, rand), { w: 0.055 });
-  add(curve(line([XC, -rimY], [XB, -rimY - 0.12]), 0.14, 0.025, rand), { w: 0.055 });
-  add(curve(arc([XB, 0], RX * 0.9, rimY + 0.12, 1), 0.14, 0.02, rand), { w: 0.05 });
-  // 4. a stitched seam inside the rim, and two buttons
-  add(curve(arc([XC - 0.42, 0], RX * 0.9, rimY - 0.12, 1, -Math.PI * 0.46, Math.PI * 0.46), 0.12, 0.01, rand), { w: 0.03, dark: 0.55 });
-  for (const [bx, by] of [[-6.55, rimY - 0.75], [-7.45, rimY - 0.72]]) {
-    add(curve((t) => [bx + 0.21 * Math.cos(t * 6.6), by + 0.21 * Math.sin(t * 6.6)], 0.06, 0.004, rand), { w: 0.038, speed: 7 });
+  add(curve((t) => { const a = lerp(Math.PI * 0.5, Math.PI - aHi, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.06, dark: 0.85 });
+  add(curve((t) => { const a = lerp(-Math.PI * 0.5, -Math.PI - aLo, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.06, dark: 0.85 });
+  // 3. the cuff's sides and its seam with the sleeve
+  add(curve((t) => { const x = lerp(XC, XB, t); return [x, sideY(x, 1)]; }, 0.14, 0.02, rand));
+  add(curve((t) => { const x = lerp(XC, XB, t); return [x, sideY(x, -1)]; }, 0.14, 0.02, rand));
+  add(curve(arc([XB, 0], RX * 0.85, sideY(XB, 1), 1), 0.14, 0.018, rand), { w: 0.065 });
+  // 4. stitching inside the rim, two buttons and a buttonhole
+  add(curve(arc([XC - 0.4, 0], RX * 0.85, rimY - 0.1, 1, -Math.PI * 0.47, Math.PI * 0.47), 0.12, 0.01, rand), { w: 0.035, dark: 0.6 });
+  for (const [bx, by] of [[-6.2, rimY - 0.68], [-7.0, rimY - 0.64]]) {
+    add(curve((t) => [bx + 0.2 * Math.cos(t * 6.7), by + 0.2 * Math.sin(t * 6.7)], 0.05, 0.004, rand), { w: 0.045, speed: 8 });
   }
-  // 5. the sleeve beyond the cuff, left unfinished
-  add(curve(line([XB - 0.05, rimY + 0.14], [XB - 1.0, rimY + 0.3]), 0.14, 0.02, rand), { w: 0.045, dark: 0.6 });
-  add(curve(line([XB - 0.05, -rimY - 0.14], [XB - 1.0, -rimY - 0.32]), 0.14, 0.02, rand), { w: 0.045, dark: 0.6 });
-  add(curve((t) => [XB - 0.35 - 0.2 * t, lerp(-1.4, 0.6, t) + 0.15 * Math.sin(t * 3.0)], 0.12, 0.02, rand), { w: 0.035, dark: 0.5 });
+  add(curve(line([-6.25, -rimY + 0.55], [-6.95, -rimY + 0.52]), 0.08, 0.004, rand), { w: 0.04, dark: 0.8 });
+  // 5. the sleeve, puffing out above the cuff and left unfinished
+  add(curve((t) => { const x = lerp(XB - 0.05, XS, t); return [x, sleeveY(x, 1)]; }, 0.14, 0.03, rand), { w: 0.06, dark: 0.85 });
+  add(curve((t) => { const x = lerp(XB - 0.05, XS, t); return [x, sleeveY(x, -1)]; }, 0.14, 0.03, rand), { w: 0.06, dark: 0.85 });
+  add(curve((t) => [lerp(XB - 0.5, XB - 1.1, t), lerp(-rimY + 0.4, 0.5, t) + 0.25 * Math.sin(t * 3.1)], 0.12, 0.02, rand), { w: 0.05, dark: 0.7 });
+  add(curve((t) => [lerp(XB - 0.9, XS + 0.15, t), lerp(0.9, rimY + 0.6, t) - 0.2 * Math.sin(t * 2.6)], 0.12, 0.02, rand), { w: 0.05, dark: 0.65 });
 
-  // 6. shading: the inside of the cuff beside the wrist (the darkest part)
+  // 6. shading: the inside of the cuff beside the wrist, the darkest part
   for (const sgn of [1, -1]) {
     const yIn = sgn > 0 ? wl[1] : wl[0];
     const yOut = sgn * rimY;
-    for (let k = 0; k < 6; k++) {
-      const t = (k + 0.5) / 6;
+    for (let k = 0; k < 7; k++) {
+      const t = (k + 0.5) / 7;
       const y = lerp(yIn, yOut, t);
       const xr = XC + RX * Math.sqrt(Math.max(0, 1 - (y / rimY) ** 2));
-      add(curve(line([xr - 0.05, y], [XC - 0.32, y + sgn * 0.12]), 0.08, 0.004, rand), { w: 0.032, dark: 0.8, speed: 26, kind: 'hatch' });
+      hatch(curve(line([xr - 0.04, y], [XC - 0.3, y + sgn * 0.1]), 0.08, 0.004, rand), { dark: 0.9 });
     }
   }
-  // 7. the little-finger side of the wrist, in diagonal strokes
-  for (let k = 0; k < 9; k++) {
-    const x = lerp(XW - 0.25, XC + 0.35, k / 8);
-    const y0 = W(x)[0] + 0.06;
-    add(curve(line([x + 0.22, y0], [x - 0.12, y0 + 0.95 - 0.35 * (k % 2)]), 0.08, 0.004, rand), { w: 0.03, dark: 0.7, speed: 26, kind: 'hatch' });
+  // 7. the little-finger side of the wrist, in short diagonal strokes
+  for (let k = 0; k < 7; k++) {
+    const x = lerp(XW - 0.15, XC + 0.4, k / 6);
+    const y0 = W(x)[0] + 0.07;
+    hatch(curve(line([x + 0.2, y0], [x - 0.1, y0 + 0.75 - 0.3 * (k % 2)]), 0.08, 0.004, rand));
   }
-  // 8. the cuff, shaded along its lower side, then cross-hatched in the corner
+  // 8. the cuff, shaded along its lower side, cross-hatched in the corner
   for (let k = 0; k < 6; k++) {
-    const y = -rimY + 0.16 + k * 0.2;
-    const x0 = XC - 0.55 - 0.05 * k, x1 = XB + 0.2 + 0.35 * k;
-    add(curve(line([x0, y], [x1, y - 0.05]), 0.12, 0.006, rand), { w: 0.03, dark: 0.65, speed: 28, kind: 'hatch' });
+    const y = -rimY + 0.14 + k * 0.19;
+    hatch(curve(line([XC - 0.6 - 0.05 * k, y], [XB + 0.2 + 0.3 * k, y - 0.04]), 0.12, 0.006, rand), { dark: 0.7 });
   }
   for (let k = 0; k < 5; k++) {
-    const x = XB + 0.45 + k * 0.36;
-    add(curve(line([x, -rimY + 0.08], [x + 0.32, -rimY + 0.9 - 0.1 * k]), 0.08, 0.004, rand), { w: 0.028, dark: 0.6, speed: 26, kind: 'hatch' });
+    const x = XB + 0.35 + k * 0.33;
+    hatch(curve(line([x, -rimY + 0.06], [x + 0.3, -rimY + 0.85 - 0.1 * k]), 0.08, 0.004, rand), { dark: 0.6 });
   }
-  // 9. a few strokes of shade under the rim on the thumb side
-  for (let k = 0; k < 5; k++) {
-    const y = rimY - 0.12 - k * 0.17;
-    add(curve(line([XC - 0.5, y], [XC - 1.4 + 0.12 * k, y + 0.03]), 0.1, 0.004, rand), { w: 0.026, dark: 0.55, speed: 28, kind: 'hatch' });
+  // 9. the sleeve's folds, shaded
+  for (let k = 0; k < 6; k++) {
+    const x = XB - 0.35 - k * 0.22;
+    const yb = sleeveY(x, -1);
+    hatch(curve(line([x, yb + 0.1], [x - 0.25, yb + 0.9 - 0.08 * k]), 0.08, 0.004, rand), { dark: 0.55 });
+  }
+  for (let k = 0; k < 4; k++) {
+    const x = XB - 0.7 - k * 0.2;
+    hatch(curve(line([x, 0.95 + 0.05 * k], [x - 0.2, 1.7 + 0.1 * k]), 0.08, 0.004, rand), { dark: 0.5 });
   }
   return { strokes: S, XW, XC, XB, rimY };
 }
 
 // Timeline: strokes one after another, with the pencil lifted between them.
 export function makeTimeline(strokes, opts = {}) {
-  const travelSpeed = opts.travel ?? 34;
+  const travelSpeed = opts.travel ?? 50;
   const events = [];
   let t = opts.start ?? 0.4;
   let prev = null;
@@ -125,7 +134,7 @@ export function makeTimeline(strokes, opts = {}) {
     const p0 = s.pts[0];
     if (prev) {
       const d = Math.hypot(p0[0] - prev[0], p0[1] - prev[1]);
-      const dur = 0.12 + d / travelSpeed;
+      const dur = 0.09 + d / travelSpeed;
       events.push({ type: 'move', from: prev, to: p0, t0: t, t1: t + dur });
       t += dur;
     }

@@ -136,7 +136,7 @@ function markings(g, T, cls, mode, px, a) {
   }
   g.stroke();
   // mouth: along the side of the head from the snout
-  const m0 = T([1.24, -0.64]), m1 = T([1.12, -0.68]), m2 = T([1.02, -0.74]);
+  const m0 = T([1.17, -0.77]), m1 = T([1.06, -0.84]), m2 = T([0.95, -0.87]);
   g.beginPath(); g.moveTo(m0[0], m0[1]); g.quadraticCurveTo(m1[0], m1[1], m2[0], m2[1]); g.stroke();
   // eyes
   for (const e of EYES) {

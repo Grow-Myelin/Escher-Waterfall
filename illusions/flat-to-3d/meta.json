@@ -1,0 +1,8 @@
+{
+  "slug": "flat-to-3d",
+  "title": "Flat to Solid",
+  "subtitle": "A drawn creature that becomes three-dimensional",
+  "technique": "A p3 tessellation whose tile is inflated into a solid along its exact outline, then bent along a path over real objects and returned to its hole",
+  "refs": ["Reptiles, 1943"],
+  "blurb": "A lizard in a drawn tessellation swells into a solid animal, climbs a book and a dodecahedron, crosses a dish and slides back into its place in the drawing."
+}

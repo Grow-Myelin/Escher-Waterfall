@@ -323,5 +323,5 @@ export function buildLizard(spineStep) {
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geo.setAttribute('aDist', new THREE.Float32BufferAttribute(dist, 1));
   geo.setIndex(index);
-  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, tailW, tailA, tailL, legRange, spine: sp, tris };
+  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, tailW, tailA, tailL, legRange, TAIL_BASE, spine: sp, tris };
 }

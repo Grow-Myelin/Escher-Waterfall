@@ -39,7 +39,7 @@ const PEN_W = v(7.2, 3.4, 1.2);
 const PEN_C = v(10.3, 3.85, -2.9);
 const PEN_D = norm(sub(PEN_C, PEN_W)); // towards the tip
 export const PEN = { r: 0.37, tipLen: 0.35, coneLen: 2.1, back: 10.5 };
-const PEN_TIP_S = 3.4; // pinch point to tip
+const PEN_TIP_S = 4.0; // pinch point to tip
 const PEN_TIP = add(PEN_C, mul(PEN_D, PEN_TIP_S));
 
 // ------------------------------------------------------------------ SDF
@@ -166,7 +166,9 @@ export function buildHandModel() {
     prims.palm.push(cone(BASE[f], MCP[f], 0.62, MCR[f]));
   }
   // palm body and muscle pads
-  prims.pads.push(makeEllipsoid(v(4.7, 0.0, -0.2), [3.7, 3.0, 0.78]));
+  prims.pads.push(makeEllipsoid(v(4.7, 0.0, -0.2), [3.7, 3.0, 0.7]));
+  // the web between thumb and index finger (first dorsal interosseous)
+  prims.pads.push(makeEllipsoid(v(5.4, 3.05, -0.25), [2.3, 1.05, 0.8]));
   prims.pads.push(makeEllipsoid(v(3.2, 2.15, -0.75), [2.4, 1.35, 1.0])); // thenar
   prims.pads.push(makeEllipsoid(v(4.0, -2.05, -0.6), [2.9, 0.82, 0.85])); // hypothenar
   prims.pads.push(makeEllipsoid(v(8.0, 0.0, -0.55), [1.1, 2.9, 0.6])); // pads under the knuckles
@@ -188,14 +190,14 @@ export function buildHandModel() {
     pinky: [3.3, 2.0, 1.65],
   };
   const RAD = {
-    index: [0.9, 0.82, 0.73, 0.6],
-    middle: [0.93, 0.85, 0.75, 0.62],
-    ring: [0.88, 0.8, 0.7, 0.58],
-    pinky: [0.78, 0.7, 0.62, 0.5],
+    index: [0.84, 0.76, 0.68, 0.56],
+    middle: [0.87, 0.79, 0.7, 0.58],
+    ring: [0.82, 0.74, 0.65, 0.54],
+    pinky: [0.72, 0.65, 0.57, 0.47],
   };
   const fingers = {};
   fingers.index = solveFinger(MCP.index, LEN.index, onPen(0.25, -0.25, 0.62), 0.55);
-  fingers.middle = solveFinger(MCP.middle, LEN.middle, onPen(1.25, Math.PI * 0.82, 0.55), 0.7);
+  fingers.middle = solveFinger(MCP.middle, LEN.middle, onPen(0.65, Math.PI * 0.85, 0.55), 0.7);
   // ring and little finger curl under, resting on the paper
   fingers.ring = { pts: chain(MCP.ring, norm([0.97, -0.1, 0]), LEN.ring, [0.9, 1.9, 0.9]) };
   fingers.pinky = { pts: chain(MCP.pinky, norm([0.96, -0.22, 0]), LEN.pinky, [0.95, 1.85, 0.85]) };
@@ -203,6 +205,11 @@ export function buildHandModel() {
     const p = fingers[f].pts, r = RAD[f];
     const segs = [];
     for (let i = 0; i < 3; i++) segs.push(cone(p[i], p[i + 1], r[i], r[i + 1]));
+    // a knuckle on the back of the middle joint
+    const dirA = norm(sub(p[1], p[0])), dirB = norm(sub(p[2], p[1]));
+    const back = norm(add(perp([0, 0, 1], dirA), perp([0, 0, 1], dirB)));
+    const kn = add(p[1], mul(back, r[1] * 0.42));
+    segs.push(cone(kn, add(kn, mul(dirB, 0.01)), r[1] * 0.62, r[1] * 0.6));
     prims.fingers.push({ name: f, segs, pts: p, rad: r });
   }
   // thumb: carpometacarpal joint, metacarpal, then two phalanges reaching the

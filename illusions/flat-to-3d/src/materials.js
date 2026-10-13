@@ -370,9 +370,9 @@ void main() {
   if (uContours > 0.001) {
     float cl = vDist / uContourStep;
     float dc = abs(fract(cl + 0.5) - 0.5);
-    float w = fwidth(cl) * 1.2;
+    float w = fwidth(cl) * 0.8;
     float m = (1.0 - smoothstep(w * 0.5, w * 1.5, dc)) * step(0.5, cl);
-    outc = mix(outc, vec3(0.64, 0.23, 0.16), m * uContours * 0.85);
+    outc = mix(outc, vec3(0.64, 0.23, 0.16), m * uContours * 0.7);
   }
   gl_FragColor = vec4(outc, a * uFade);
 }

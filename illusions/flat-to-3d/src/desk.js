@@ -10,8 +10,8 @@ export const P = { ...PAT, DESK: 14, PAGES: 15, CLOTH: 16, PEWTER: 17, STONE: 18
 export const PAGE_Y = 0.12; // top of the sketchbook's page
 export const SKETCH = { x0: -4.5, x1: 0.35, z0: 0.3, z1: 3.9 };
 export const BOOK = { x0: 1.0, x1: 3.9, z0: 0.45, z1: 2.75, h: 0.55 };
-export const DODECA = { c: [2.45, 0, 1.6], a: 0.5 }; // centre (x, -, z), edge length
-export const DISH = { c: [2.45, 0, 4.55], r: 0.92, h: 0.38 };
+export const DODECA = { c: [2.45, 0, 1.6], a: 0.56 }; // centre (x, -, z), edge length
+export const DISH = { c: [2.35, 0, 4.45], r: 0.92, h: 0.38 };
 export const BOTTLE = { c: [1.5, 0, -0.55] };
 export const DESK = { x0: -7.5, x1: 7.2, z0: -5.2, z1: 6.4 };
 

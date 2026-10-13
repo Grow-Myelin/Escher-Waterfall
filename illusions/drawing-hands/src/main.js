@@ -13,6 +13,7 @@ import * as SH from './shaders.js';
 import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady } from '../../shared/shell.js';
 
 // ------------------------------------------------------------------ the hand
+const T0 = performance.now();
 const model = buildHandModel();
 const mesh = meshSDF(model.sdf, [-13, -4.6, -6.6], [14, 7, 3.6], 0.15);
 const X = makeHtoL(model, mesh.positions);
@@ -45,14 +46,14 @@ function handGeometry() {
 
 // A hexagonal pencil, sharpened: lacquered body, bare wood cone, graphite.
 function pencilGeometry(tip, axis) {
-  const L = 13.0, segA = 36;
+  const L = 10.5, segA = 36;
   const apo = PEN.r * Math.cos(Math.PI / 6);
   const rHex = (a) => apo / Math.cos(((a % (Math.PI / 3)) + Math.PI / 3) % (Math.PI / 3) - Math.PI / 6);
   const rCone = (s) => (s < PEN.tipLen ? 0.012 + (0.09 - 0.012) * (s / PEN.tipLen) : 0.09 + (PEN.r - 0.09) * Math.min(1, (s - PEN.tipLen) / PEN.coneLen));
   const ax = new THREE.Vector3(...axis).normalize();
   const u = new THREE.Vector3(0, 0, 1).cross(ax).normalize();
   const w = new THREE.Vector3().crossVectors(ax, u).normalize();
-  const rings = [0, 0.05, 0.12, 0.2, 0.28, PEN.tipLen, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 1.95, 2.1, 2.25, 2.4, 2.6, 3.2, 5, 7, 9, 11, L];
+  const rings = [0, 0.05, 0.12, 0.2, 0.28, PEN.tipLen, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 1.95, 2.1, 2.25, 2.4, 2.6, 3.2, 5, 7, 9, L];
   const pos = [], nor = [], mat = [], idx = [];
   for (const s of rings) {
     for (let k = 0; k <= segA; k++) {
@@ -100,6 +101,7 @@ const handGeo = handGeometry();
 const tipL = X.apply(model.pen.tip);
 const penGeo = pencilGeometry(tipL, X.rot(model.pen.D).map((v) => -v));
 const fp = footprint(handGeo.attributes.position.array, -11, 0, 0.2);
+const BUILD_MS = performance.now() - T0;
 
 // ------------------------------------------------------------------ layout
 // Each hand sits in its own paper frame (x along the arm). Hand B is hand A
@@ -109,7 +111,7 @@ const drawing = buildDrawing(fp);
 const FLAT_CENTRE = (() => {
   let x = 0, y = 0, n = 0;
   for (const s of drawing.strokes) for (const p of s.pts) { x += p[0]; y += p[1]; n++; }
-  return [x / n, y / n + 1.3];
+  return [x / n - 0.9, y / n + 1.3];
 })();
 const PHI = -Math.PI / 2 - 0.66;
 const placeA = new THREE.Matrix4();
@@ -126,7 +128,7 @@ const FLAT = new THREE.Vector2(-5.0, -0.3);
 
 // ------------------------------------------------------------------ drawing
 const tl = makeTimeline(drawing.strokes);
-const HOLD = 1.6, FADE = 1.4, BACK = 0.9;
+const HOLD = 1.8, FADE = 1.3, BACK = 0.9;
 const PERIOD = tl.end + HOLD + FADE + BACK;
 
 // ------------------------------------------------------------------ renderer
@@ -138,7 +140,7 @@ renderer.autoClear = false;
 
 const PAPER = new THREE.Vector3(0.93, 0.905, 0.845);
 const INK = new THREE.Vector3(0.11, 0.1, 0.09);
-const LIGHT = new THREE.Vector3(-0.45, 0.55, 0.72).normalize();
+const LIGHT = new THREE.Vector3(-0.62, 0.55, 0.56).normalize();
 const PEN_W = new THREE.Vector3(...X.apply(model.pen.W));
 const PEN_T = new THREE.Vector3(...tipL);
 const shared = {
@@ -164,7 +166,7 @@ function addHand(place) {
   const body = new THREE.Mesh(handGeo, new THREE.ShaderMaterial({ uniforms: u, vertexShader: SH.HAND_VS, fragmentShader: SH.HAND_FS, side: THREE.DoubleSide }));
   const pen = new THREE.Mesh(penGeo, body.material);
   const hullMat = new THREE.ShaderMaterial({
-    uniforms: { ...u, uWidth: { value: 1.6 }, uRes: { value: res }, uInkC: { value: new THREE.Vector3(0.12, 0.1, 0.09) } },
+    uniforms: { ...u, uWidth: { value: 1.8 }, uRes: { value: res }, uInkC: { value: new THREE.Vector3(0.12, 0.1, 0.09) } },
     vertexShader: SH.HULL_VS, fragmentShader: SH.HULL_FS, side: THREE.BackSide,
   });
   const hull = new THREE.Mesh(handGeo, hullMat);
@@ -191,7 +193,7 @@ addHand(placeB);
 // paper and its shadow map
 const SHEET = new THREE.Vector2(15.4, 19.6);
 const SH_RECT = new THREE.Vector4(-16, -20, 32, 40);
-const shadowRT = new THREE.WebGLRenderTarget(640, 800, { depthBuffer: false, type: THREE.HalfFloatType });
+const shadowRT = new THREE.WebGLRenderTarget(640, 800, { depthBuffer: false });
 const shadowCam = new THREE.OrthographicCamera(SH_RECT.x, SH_RECT.x + SH_RECT.z, SH_RECT.y + SH_RECT.w, SH_RECT.y, -100, 100);
 shadowCam.position.set(0, 0, 50);
 shadowCam.lookAt(0, 0, 0);
@@ -231,12 +233,40 @@ const strokeU = { uNow: { value: 0 }, uFade: { value: 1 }, uGraphite: { value: n
   }
 }
 
+// ------------------------------------------------------------------ guides
+// In the tilted view a dashed loop runs from each pencil to the cuff it is
+// drawing, through that hand and on to its pencil: A draws B draws A.
+const guides = new THREE.Group();
+const guideMat = new THREE.LineDashedMaterial({ color: 0xa23b2a, dashSize: 0.55, gapSize: 0.35, transparent: true, opacity: 0, depthTest: false });
+const arrowMat = new THREE.MeshBasicMaterial({ color: 0xa23b2a, transparent: true, opacity: 0, depthTest: false });
+{
+  const W = (p, place) => new THREE.Vector3(p[0], p[1], p[2] ?? 0).applyMatrix4(place);
+  const handTop = (place) => W([4.5, 3.5, 9.5], place);
+  const pts = [
+    W(tipL, placeA).setZ(0.3), handTop(placeB), W(tipL, placeB).setZ(0.3), handTop(placeA),
+  ];
+  const curve = new THREE.CatmullRomCurve3(pts, true, 'centripetal');
+  const g = new THREE.BufferGeometry().setFromPoints(curve.getPoints(160));
+  const line = new THREE.Line(g, guideMat);
+  line.computeLineDistances();
+  guides.add(line);
+  for (const u of [0.13, 0.63]) {
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.2, 14), arrowMat);
+    cone.position.copy(curve.getPointAt(u));
+    cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), curve.getTangentAt(u));
+    guides.add(cone);
+  }
+  guides.renderOrder = 30;
+  guides.visible = false;
+  scene.add(guides);
+}
+
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
 const VIEW_H = 14.6; // half height of the sheet in view
 const TOP = { az: -Math.PI / 2, el: Math.PI / 2, zoom: 1 };
-const SIDE = { az: -Math.PI / 2 + 0.75, el: 0.42, zoom: 0.92 };
-const view = { ...TOP };
+const SIDE = { az: -Math.PI / 2 + 0.7, el: 0.56, zoom: 0.95 };
+const view = { ...TOP, px: 0, py: 0 };
 let aspect = 30 / 38;
 function updateCamera() {
   const ce = Math.cos(view.el), se = Math.sin(view.el);
@@ -245,7 +275,8 @@ function updateCamera() {
   // "up" on screen: the top of the sheet, blending to world up as it tilts
   const up = new THREE.Vector3(0, 1, 0).lerp(new THREE.Vector3(0, 0, 1), Math.min(1, ce * 1.5)).normalize();
   camera.up.copy(up);
-  camera.lookAt(0, 0, 1.5 * ce);
+  camera.position.x += view.px; camera.position.y += view.py;
+  camera.lookAt(view.px, view.py, 1.5 * ce);
   const h = VIEW_H / view.zoom;
   camera.left = -h * aspect; camera.right = h * aspect; camera.top = h; camera.bottom = -h;
   camera.updateProjectionMatrix();
@@ -264,6 +295,7 @@ setupPanel();
 const state = { t: 0, playing: true, litho: 1, lithoTarget: 1, revealed: false, tween: null };
 segmented([[document.getElementById('btn-litho'), 1], [document.getElementById('btn-colour'), 0]], (v) => { state.lithoTarget = v; }, 1);
 const setPlaying = playButton((on) => { state.playing = on; });
+if (!state.playing) state.t = tl.end + 0.2; // reduced motion: show the drawing finished
 const btnReveal = document.getElementById('btn-reveal');
 function setRevealed(on) {
   state.revealed = on;
@@ -296,7 +328,7 @@ function pencilTarget(T) {
 // The fingers can move the pencil tip a little way (REACH) by tilting and
 // sliding the pencil where it rests in the hand; the hand itself follows,
 // smoothly, only as far as it must.
-const REACH = 1.7;
+const REACH = 2.3;
 const handState = { turn: 0, slide: 0, vTurn: 0, vSlide: 0, init: false };
 const qTmp = new THREE.Quaternion(), d0 = new THREE.Vector3(), d1 = new THREE.Vector3(), m4 = new THREE.Matrix4();
 function handFor(px, py) {
@@ -368,6 +400,9 @@ function frame(now) {
     if (tw.k >= 1) state.tween = null;
     updateCamera();
   }
+  const tilt = Math.min(1, Math.max(0, (Math.PI / 2 - view.el) / (Math.PI / 2 - SIDE.el)));
+  guideMat.opacity = arrowMat.opacity = Math.max(0, tilt * 1.4 - 0.4);
+  guides.visible = guideMat.opacity > 0.01;
 
   renderer.setRenderTarget(shadowRT);
   renderer.setClearColor(0x000000, 1);
@@ -383,4 +418,4 @@ function frame(now) {
 markReady();
 requestAnimationFrame(frame);
 
-window.__page = { state, view, updateCamera, setRevealed, setPlaying, shared, tl, PERIOD, solveMotion, fp, drawing, strokeU, scene, placeA, placeB };
+window.__page = { pencilTarget, BUILD_MS, state, view, updateCamera, setRevealed, setPlaying, shared, tl, PERIOD, solveMotion, fp, drawing, strokeU, scene, placeA, placeB };

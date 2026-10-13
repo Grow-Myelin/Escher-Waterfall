@@ -196,50 +196,54 @@ function turn(c, d0, d1, r) {
 
 export const ROUTE = {
   zA: DODECA.c[2],
-  xA0: -0.35,
-  xC1: 4.75,
+  xC1: 4.35,
   zC: DISH.c[2],
-  xD: -1.05,
-  zD1: 3.2,
-  r: 0.55,
+  r: 0.45,
 };
 
-// spine: world samples [x, z] of the resting spine (tail tip → snout)
-export function buildPath(spine) {
+// spine: world samples [x, z] of the resting spine (tail tip → snout), STEP
+// apart; iTail: the sample where the trunk begins. The path starts and ends
+// with the trunk exactly in its drawn place. Behind it at the start is a
+// straight run where the tail trails until it uncurls; at the end the lizard
+// arrives along the trunk's own axis.
+export function buildPath(spine, iTail) {
   const R = ROUTE;
+  const nS = spine.length;
   const pieces = [];
   const marks = {};
-  pieces.push(flat(spine, PAGE_Y));
-  const snout = spine[spine.length - 1], beforeSnout = spine[spine.length - 6];
-  const dS = nrm(sub(snout, beforeSnout));
-  const A0 = [R.xA0, R.zA];
-  pieces.push(flat(bezier(snout, add(snout, mul(dS, 0.35)), sub(A0, [0.35, 0]), A0), PAGE_Y));
-  // run A: +x
+  const trunk0 = spine[iTail];
+  const dT = nrm(sub(spine[iTail + 5], trunk0));
+  const ext = [];
+  for (let k = iTail; k > 0; k--) ext.push(sub(trunk0, mul(dT, k * STEP)));
+  pieces.push(flat(ext.concat(spine.slice(iTail)), PAGE_Y));
+  // out of the drawing, turning right towards the book
+  const snout = spine[nS - 1];
+  const dS = nrm(sub(snout, spine[nS - 6]));
+  const turnR = Math.max(0.3, snout[1] - R.zA);
+  const A0 = [snout[0] + turnR, R.zA];
+  pieces.push(flat(bezier(snout, add(snout, mul(dS, turnR * 0.56)), sub(A0, [turnR * 0.56, 0]), A0), PAGE_Y));
+  // run A: +x over the sketchbook's edge, the book and the dodecahedron
   const C1 = [R.xC1, R.zA];
-  const pa = profileA(R.xA0, R.xC1 - R.r);
-  const runA = runSamples([R.xA0, R.zA], [1, 0], pa.P);
+  const pa = profileA(A0[0], R.xC1 - R.r);
+  pieces.push(runSamples(A0, [1, 0], pa.P));
   marks.topY = pa.top;
-  pieces.push(runA);
   pieces.push(flat(turn(C1, [1, 0], [0, 1], R.r), 0));
   // run B: +z on the desk
   const C2 = [R.xC1, R.zC];
   pieces.push(flat([[C1[0], C1[1] + R.r], [C2[0], C2[1] - R.r]], 0));
   pieces.push(flat(turn(C2, [0, 1], [-1, 0], R.r), 0));
   // run C: −x through the dish
-  const C3 = [R.xD, R.zC];
+  const xD = trunk0[0];
+  const C3 = [xD, R.zC];
   const pc = profileC(C2[0] - R.r, C3[0] + R.r);
   pieces.push(runSamples([C2[0] - R.r, R.zC], [-1, 0], pc, 0.05, 0.12));
   pieces.push(flat(turn(C3, [-1, 0], [0, -1], R.r), 0));
-  // run D: −z, up the front edge of the sketchbook onto the page
-  const D1 = [R.xD, R.zD1];
+  // run D: −z, up the front edge of the sketchbook and into its place
   const z0 = C3[1] - R.r;
-  const pd = [[0, 0], [z0 - SKETCH.z1, 0], [z0 - SKETCH.z1, PAGE_Y], [z0 - D1[1], PAGE_Y]];
-  pieces.push(runSamples([R.xD, z0], [0, -1], pd));
-  // back into the drawing, arriving along the tail
-  const tip = spine[0], afterTip = spine[5];
-  const dT = nrm(sub(afterTip, tip));
-  pieces.push(flat(bezier(D1, add(D1, [0, -0.6]), sub(tip, mul(dT, 0.6)), tip), PAGE_Y));
-  pieces.push(flat(spine, PAGE_Y));
+  const pd = [[0, 0], [z0 - SKETCH.z1, 0], [z0 - SKETCH.z1, PAGE_Y], [z0 - trunk0[1], PAGE_Y]];
+  pieces.push(runSamples([xD, z0], [0, -1], pd));
+  const nT = nS - iTail;
+  pieces.push(flat(spine.slice(iTail), PAGE_Y));
 
   // join, resample evenly, and build frames
   const all = [];
@@ -248,10 +252,9 @@ export function buildPath(spine) {
     if (last && Math.hypot(q[0] - last[0], q[1] - last[1], q[2] - last[2]) < 1e-6) continue;
     all.push(q);
   }
-  // keep the resting spine exactly: resample only between the two copies
-  const nSpine = spine.length;
-  const head = all.slice(0, nSpine), tail = all.slice(all.length - nSpine);
-  const mid = resample(all.slice(nSpine - 1, all.length - nSpine + 1), STEP, 3, false);
+  // keep both copies of the resting trunk exactly; resample between them
+  const head = all.slice(0, nS), tail = all.slice(all.length - nT);
+  const mid = resample(all.slice(nS - 1, all.length - nT + 1), STEP, 3, false);
   const S = head.concat(mid.slice(1, mid.length - 1), tail);
   const n = S.length;
   const pos = new Float32Array(n * 3), T = new Float32Array(n * 3), B = new Float32Array(n * 3), N = new Float32Array(n * 3);

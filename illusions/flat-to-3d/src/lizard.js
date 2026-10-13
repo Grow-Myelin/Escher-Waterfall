@@ -5,9 +5,9 @@
 // and H4, are centres of three-fold rotation: the edge leaving each of them
 // on one side is the edge on the other side turned by 120° about it. So only
 // three curves are free (c from H0, d from H2, e from H4); the other three are
-// copies. Three lizards meet at each of these corners — at H0 their heads, at
-// H2 their left hind legs, at H4 their right hind legs — and copies of the
-// tile turned by 0°, 120° and 240° fill the plane with no gaps (wallpaper
+// copies. Three lizards meet at each of these corners — at H0 their left
+// front feet, at H2 their left hind feet, at H4 their flanks — and copies of
+// the tile turned by 0°, 120° and 240° fill the plane with no gaps (wallpaper
 // group p3, the symmetry of Escher's Reptiles; the creature itself is new).
 
 const S3 = Math.sqrt(3) / 2;
@@ -18,19 +18,19 @@ export const H = [[1, 0], [0.5, S3], [-0.5, S3], [-1, 0], [-0.5, -S3], [0.5, -S3
 // the offset outward (to the right of travel), both in units of the edge.
 // A bump on one of these edges is the same lizard's limb; its turned copy on
 // the partner edge is a dent that holds a neighbour's limb.
-const C = [ // H0 → H1: the left front leg, a neighbour's head, the left flank
-  [0, 0], [0.035, 0.07], [0.045, 0.15], [0.025, 0.23], [-0.025, 0.28], [-0.05, 0.33], [-0.015, 0.36],
-  [0.0, 0.41], [0.05, 0.41], [0.09, 0.44], [0.13, 0.4], [0.15, 0.32], [0.17, 0.22], [0.21, 0.12],
-  [0.26, 0.04], [0.29, -0.06], [0.28, -0.18], [0.28, -0.32], [0.33, -0.45], [0.42, -0.54],
-  [0.52, -0.57], [0.62, -0.53], [0.68, -0.43], [0.69, -0.3], [0.68, -0.18], [0.69, -0.07],
-  [0.74, 0.02], [0.82, 0.06], [0.9, 0.06], [0.96, 0.03], [1, 0],
+const C = [ // H0 → H1: the left front leg, then a neighbour's head
+  [0, 0], [0.06, 0.02], [0.1, 0.06], [0.13, 0.15], [0.12, 0.24], [0.08, 0.3], [0.06, 0.36],
+  [0.1, 0.39], [0.12, 0.44], [0.17, 0.44], [0.2, 0.48], [0.25, 0.44], [0.26, 0.36], [0.28, 0.26],
+  [0.31, 0.15], [0.35, 0.06], [0.39, 0.0], [0.42, -0.08], [0.41, -0.2], [0.41, -0.33], [0.45, -0.45],
+  [0.53, -0.53], [0.62, -0.55], [0.71, -0.51], [0.76, -0.41], [0.76, -0.29], [0.75, -0.17],
+  [0.76, -0.07], [0.81, 0.0], [0.9, 0.03], [1, 0],
 ];
 const D = [ // H2 → H3: a neighbour's left hind leg, then the tail
   [0, 0], [0.04, -0.07], [0.06, -0.16], [0.05, -0.25], [0.02, -0.3], [0.03, -0.35], [0.08, -0.36],
   [0.11, -0.4], [0.15, -0.37], [0.19, -0.37], [0.2, -0.3], [0.21, -0.21], [0.24, -0.11],
-  [0.29, -0.03], [0.34, 0.04], [0.37, 0.14], [0.44, 0.24], [0.55, 0.31], [0.68, 0.35],
-  [0.82, 0.35], [0.94, 0.31], [1.03, 0.25], [1.07, 0.2], [0.99, 0.19], [0.87, 0.2],
-  [0.76, 0.17], [0.68, 0.11], [0.65, 0.03], [0.72, 0.0], [0.86, 0.0], [1, 0],
+  [0.29, -0.03], [0.34, 0.04], [0.37, 0.14], [0.43, 0.24], [0.52, 0.31], [0.63, 0.35],
+  [0.75, 0.36], [0.86, 0.33], [0.94, 0.28], [0.97, 0.23], [0.91, 0.2], [0.81, 0.2],
+  [0.72, 0.17], [0.66, 0.11], [0.64, 0.03], [0.72, 0.0], [0.86, 0.0], [1, 0],
 ];
 const E = [ // H4 → H5: the right front leg, then a neighbour's right hind leg
   [0, 0], [0.1, 0.04], [0.2, 0.06], [0.29, 0.05], [0.35, 0.03],
@@ -133,13 +133,13 @@ export function tessellate(radius) {
 // tail to the snout, the joints its legs swing about and their feet, and the
 // eyes.
 export const SPINE = [
-  [-1.215, 0.06], [-1.2, 0.22], [-1.13, 0.42], [-0.98, 0.55], [-0.76, 0.52], [-0.5, 0.36],
-  [-0.2, 0.16], [0.1, -0.03], [0.43, -0.24], [0.68, -0.37], [0.9, -0.48], [1.1, -0.58], [1.24, -0.66],
+  [-1.18, 0.15], [-1.16, 0.3], [-1.09, 0.45], [-0.96, 0.55], [-0.76, 0.52], [-0.5, 0.36],
+  [-0.2, 0.16], [0.1, -0.03], [0.4, -0.24], [0.62, -0.42], [0.82, -0.57], [1.0, -0.67], [1.17, -0.75],
 ];
 export const LEGS = [
-  { name: 'left front', joint: [0.74, 0.0], foot: [1.33, 0.3], phase: 0 },
+  { name: 'left front', joint: [0.7, 0.1], foot: [1.28, 0.39], phase: 0 },
   { name: 'right front', joint: [0.2, -0.68], foot: [0.18, -1.22], phase: Math.PI },
   { name: 'left hind', joint: [-0.3, 0.68], foot: [-0.42, 1.22], phase: Math.PI },
   { name: 'right hind', joint: [-0.7, -0.06], foot: [-1.24, -0.33], phase: 0 },
 ];
-export const EYES = [[1.06, -0.46], [0.95, -0.69]];
+export const EYES = [[0.98, -0.57], [0.9, -0.76]];

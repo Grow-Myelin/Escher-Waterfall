@@ -13,12 +13,9 @@ import { buildLizard } from './lizard3d.js';
 import { buildPath, frameAt, STEP } from './path.js';
 import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady } from '../../shared/shell.js';
 
-const T0 = performance.now();
-const TIMES = {};
-const mark = (k) => { TIMES[k] = Math.round(performance.now() - T0); };
-const ASPECT = 1.4;
-const K = 0.42; // world units per tile unit
-const SNOUT = [-0.95, 1.7]; // where the hero's snout lies on the page (x, z)
+const ASPECT = 1.25;
+const K = 0.48; // world units per tile unit
+const SNOUT = [-0.78, 2.1]; // where the hero's snout lies on the page (x, z)
 
 // ------------------------------------------------------------------ renderer
 const canvas = document.getElementById('scene');
@@ -43,27 +40,30 @@ add(buildDodecahedron().b);
 add(buildDish());
 add(buildPencil());
 add(buildBottle());
-mark('desk');
 
 // ------------------------------------------------------------------ the drawing
-// Choose the hero: a lizard near the edge of the patch whose head, once the
-// patch is turned by ψ, points along +x towards the book.
+// The solid lizard is built first: its trunk direction decides how the
+// drawing is turned on the page.
+const L = buildLizard(STEP / K);
+const LS = L.spine.length; // spine length, tile units
+const iTail = Math.round(L.TAIL_BASE / L.spine.step);
+const TRUNK_DIR = Math.atan2(L.spine.T[iTail][1], L.spine.T[iTail][0]);
+// Turn the patch so the hero's trunk points to the back of the desk (−z);
+// choose a grey lizard on the right-hand edge of the patch.
 const tiles = tessellate(9).map((pl) => ({ pl, c: apply(pl, [0, 0]) }));
-const HEAD_DIR = -32 * (Math.PI / 180); // the head's direction in the base tile
+const psiFor = (r) => Math.PI / 2 - TRUNK_DIR - r * (2 * Math.PI / 3);
 let hero = null, best = Infinity;
 for (const t of tiles) {
   if (t.pl.r !== 1) continue; // a grey lizard: its fill and its shading both show
-  const want = t.pl.r * (2 * Math.PI / 3) + HEAD_DIR; // centre should lie this way from the patch's middle
-  const d = Math.hypot(t.c[0], t.c[1]);
-  let da = Math.atan2(t.c[1], t.c[0]) - want;
-  da = Math.atan2(Math.sin(da), Math.cos(da));
-  const score = Math.abs(d - 4.3) + Math.abs(da) * 2.5;
+  const p = psiFor(1);
+  const wx = Math.cos(p) * t.c[0] - Math.sin(p) * t.c[1], wz = -(Math.sin(p) * t.c[0] + Math.cos(p) * t.c[1]);
+  const score = Math.abs(Math.hypot(wx, wz) - 4.3) + Math.abs(Math.atan2(wz, wx) - 0.25) * 2.5;
   if (score < best) { best = score; hero = t; }
 }
-const PSI = -HEAD_DIR - hero.pl.r * (2 * Math.PI / 3);
+const PSI = psiFor(hero.pl.r);
 const cP = Math.cos(PSI), sP = Math.sin(PSI);
 const rotTile = (t) => [cP * t[0] - sP * t[1], -(sP * t[0] + cP * t[1])]; // tile → (x, z) offset
-const snoutTile = apply(hero.pl, [1.24, -0.66]);
+const snoutTile = apply(hero.pl, L.spine.pts[L.spine.pts.length - 1]);
 const PC = [SNOUT[0] - K * rotTile(snoutTile)[0], SNOUT[1] - K * rotTile(snoutTile)[1]];
 const toWorld = (t) => { const r = rotTile(t); return [PC[0] + K * r[0], PC[1] + K * r[1]]; };
 const heroWorld = (p) => toWorld(apply(hero.pl, p));
@@ -94,11 +94,8 @@ function texture(c) {
   t.minFilter = THREE.LinearMipmapLinearFilter;
   return t;
 }
-mark('layout');
 const pageL = drawPage('L', layout);
-mark('pageL');
 const pageC = drawPage('C', layout);
-mark('pageC');
 const pageMat = makeDrawingMaterial(uniforms, texture(pageL), texture(pageC));
 {
   const g = new THREE.BufferGeometry();
@@ -114,13 +111,12 @@ const pageMat = makeDrawingMaterial(uniforms, texture(pageL), texture(pageC));
 }
 
 // ------------------------------------------------------------------ the lizard
-const L = buildLizard(STEP / K);
-mark('lizard');
-const LS = L.spine.length; // spine length, tile units
 const spineWorld = L.spine.pts.map((p) => heroWorld(p));
-const path = buildPath(spineWorld);
-mark('path');
-const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.pl.r)), texture(drawHero('C', ring, hero.pl.r)), { contourStep: 0.05, uvScale: 2 * HERO_SPAN * K });
+const path = buildPath(spineWorld, iTail);
+// where every vertex lies in the drawing (the tail returns there)
+const restXZ = new Float32Array(L.n * 2);
+for (let i = 0; i < L.n; i++) restXZ.set(heroWorld(L.pts[i]), i * 2);
+const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.pl.r)), texture(drawHero('C', ring, hero.pl.r)), { contourStep: 0.09, uvScale: 2 * HERO_SPAN * K });
 {
   // the outline-only state must match the pencil outline drawn on the page
   const sm = (a, b, x) => smoothstep(a, b, x);
@@ -131,14 +127,13 @@ const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.p
   heroMat.uniforms.uSketchPaper.value.set(...PAPER);
   heroMat.uniforms.uLineW.value = (0.011 + 0.006 * heroQ) / 2;
 }
-mark('hero');
 const lizard = new THREE.Mesh(L.geo, heroMat);
 lizard.frustumCulled = false;
 lizard.renderOrder = 2;
 scene.add(lizard);
 
 // ------------------------------------------------------------------ timeline
-const V = 0.62; // walking speed, world units per second
+const V = 0.78; // walking speed, world units per second
 const STRIDE = 0.42;
 const PAUSE = 3.2; // seconds spent on top of the dodecahedron
 const U0 = LS * K, U1 = path.length;
@@ -228,6 +223,8 @@ function deform(s) {
   const headA = s.pauseT >= 0 ? 0.55 * Math.sin((s.pauseT / PAUSE) * Math.PI * 2) * smoothstep(0, 0.5, s.pauseT) * smoothstep(PAUSE, PAUSE - 0.5, s.pauseT) : 0;
   const headLift = s.pauseT >= 0 ? 0.12 * Math.sin((s.pauseT / PAUSE) * Math.PI) : 0;
   const kap = s.relief;
+  // near both ends of the walk the tail curls back into its drawn pose
+  const home = Math.max(smoothstep(U0 + 0.5, U0, u), smoothstep(U1 - 0.5, U1, u));
   // per leg: swing angle, lift and the frame at its joint
   for (let k = 0; k < LEGS.length; k++) {
     const ph = phi + LEGS[k].phase;
@@ -262,10 +259,16 @@ function deform(s) {
       // the tail rides on its own part of the spine
       frameAt(path, u - (LS - L.S[i]) * K, fr2);
       const ta = L.tailA[i], tl = L.tailL[i];
-      x += (fr2.pos[0] + (fr2.T[0] * ta + fr2.B[0] * tl) * K - x) * tw;
-      y += (fr2.pos[1] + (fr2.T[1] * ta + fr2.B[1] * tl) * K - y) * tw;
-      z += (fr2.pos[2] + (fr2.T[2] * ta + fr2.B[2] * tl) * K - z) * tw;
-      nx += (fr2.N[0] - nx) * tw; ny += (fr2.N[1] - ny) * tw; nz += (fr2.N[2] - nz) * tw;
+      let tx = fr2.pos[0] + (fr2.T[0] * ta + fr2.B[0] * tl) * K;
+      let ty = fr2.pos[1] + (fr2.T[1] * ta + fr2.B[1] * tl) * K;
+      let tz = fr2.pos[2] + (fr2.T[2] * ta + fr2.B[2] * tl) * K;
+      let mx = fr2.N[0], my = fr2.N[1], mz = fr2.N[2];
+      if (home > 0) {
+        tx += (restXZ[i * 2] - tx) * home; ty += (PAGE_Y - ty) * home; tz += (restXZ[i * 2 + 1] - tz) * home;
+        mx -= mx * home; my += (1 - my) * home; mz -= mz * home;
+      }
+      x += (tx - x) * tw; y += (ty - y) * tw; z += (tz - z) * tw;
+      nx += (mx - nx) * tw; ny += (my - ny) * tw; nz += (mz - nz) * tw;
     }
     const k = L.legIdx[i];
     if (k >= 0) {
@@ -356,7 +359,12 @@ function flatLine(pts2, closed, w, dash, gap) {
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
-const VIEW = { H: 5.9, target: new THREE.Vector3(0.15, 0.3, 2.35) };
+const VIEW = { H: 5.45, target: new THREE.Vector3(0.75, 0.3, 2.1) };
+const WIDE = { H: VIEW.H, target: VIEW.target.clone() };
+// on a narrow screen, come closer and follow the lizard
+const CLOSE = { H: 3.3 };
+let follow = false;
+const followAt = new THREE.Vector3();
 let fw = 1, fh = 1;
 function updateCamera() {
   const t = VIEW.target;
@@ -370,7 +378,25 @@ function updateCamera() {
   camera.bottom = -hh;
   camera.updateProjectionMatrix();
 }
-fitFrame(ASPECT, (w, h) => { fw = w; fh = h; renderer.setSize(w, h); updateCamera(); });
+// The print is 1.25 : 1; on a narrow screen it becomes square and the
+// camera comes closer and follows the lizard.
+function layoutFrame() {
+  const narrow = window.innerWidth < 640;
+  fitFrame(narrow ? 1.0 : ASPECT, (w, h) => {
+    fw = w; fh = h;
+    renderer.setSize(w, h);
+    follow = narrow;
+    if (!follow) { VIEW.H = WIDE.H; VIEW.target.copy(WIDE.target); }
+    updateCamera();
+  });
+}
+let lastNarrow = null;
+window.addEventListener('resize', () => {
+  const narrow = window.innerWidth < 640;
+  if (narrow !== lastNarrow) { lastNarrow = narrow; layoutFrame(); }
+});
+lastNarrow = window.innerWidth < 640;
+layoutFrame();
 
 // ------------------------------------------------------------------ ui
 setupPanel();
@@ -420,6 +446,15 @@ function frame(now) {
   uniforms.uTime.value = now / 1000;
   const s = stateAt(state.t);
   deform(s);
+  if (follow) {
+    // aim between the lizard and the middle of the scene, eased
+    frameAt(path, s.u - LS * K * 0.5, fr2);
+    followAt.set(fr2.pos[0], 0.3, fr2.pos[2]).lerp(WIDE.target, 0.25);
+    const far = VIEW.target.distanceTo(followAt);
+    VIEW.target.lerp(followAt, drag || far > 1.2 ? 1 : Math.min(1, dt * 2.5));
+    VIEW.H = CLOSE.H;
+    updateCamera();
+  }
   heroMat.uniforms.uContours.value = state.reveal * Math.min(1, s.relief * 3);
   guideMat.opacity = state.reveal * 0.9;
   guides.visible = state.reveal > 0.01;
@@ -428,7 +463,6 @@ function frame(now) {
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
-mark('ready');
 markReady();
 requestAnimationFrame(frame);
 
@@ -437,8 +471,14 @@ window.__page = {
   setLitho: (v) => { setLitho(v ? 1 : 0); state.litho = v ? 1 : 0; },
   setReveal: (v) => { setReveal(v); state.reveal = v ? 1 : 0; },
   at: (name, f = 0) => { const p = PHASES.find((q) => q[0] === name); state.t = p.start + p[1] * f; },
-  path, hero, L, TIMES,
+  path, hero, L,
   get frames() { return frames; },
+  bench(n = 30) {
+    const P = PHASES.find((q) => q[0] === 'walk');
+    const t0 = performance.now();
+    for (let k = 0; k < n; k++) deform(stateAt(P.start + 3 + k * 0.1));
+    return (performance.now() - t0) / n;
+  },
   // jump to the moment the head reaches distance u along the walk
   atU(u) {
     const p = PHASES.find((q) => q[0] === 'walk');
