@@ -46,6 +46,7 @@ const state = {
   reveal: false,
   revealK: 0,
   strips: true, // strips need rebuilding
+  dirty: true,
 };
 
 // ------------------------------------------------------------------ shapes
@@ -295,6 +296,7 @@ function drawGrid(yb) {
 setupPanel();
 const setLitho = segmented([[document.getElementById('btn-litho'), 1], [document.getElementById('btn-colour'), 0]], (v) => {
   state.lithoTarget = v;
+  state.dirty = true;
 }, 1);
 const setPlaying = playButton((on) => { state.playing = on; });
 const revealBtn = document.getElementById('btn-reveal');
@@ -303,6 +305,7 @@ function setReveal(on) {
   revealBtn.setAttribute('aria-pressed', String(on));
   revealBtn.querySelector('span').textContent = on ? 'Hide the tiling' : 'Show the tiling';
   setBadge(on, 'One tiling: every bird and every fish is a tile, top to bottom');
+  state.dirty = true;
 }
 revealBtn.addEventListener('click', () => setReveal(!state.reveal));
 slider.addEventListener('input', () => {
@@ -336,8 +339,14 @@ function frame(now) {
     state.strips = true;
   }
   const rg = state.reveal ? 1 : 0;
-  if (state.revealK !== rg) state.revealK += Math.sign(rg - state.revealK) * Math.min(Math.abs(rg - state.revealK), dt * 1.5);
-  draw();
+  if (state.revealK !== rg) {
+    state.revealK += Math.sign(rg - state.revealK) * Math.min(Math.abs(rg - state.revealK), dt * 1.5);
+    state.dirty = true;
+  }
+  if (state.playing || state.dirty || state.strips) {
+    state.dirty = false;
+    draw();
+  }
   requestAnimationFrame(frame);
 }
 
@@ -351,6 +360,7 @@ fitFrame(30 / 38, (w, h) => {
   OX = w / 2; OY = h / 2;
   base = new DOMMatrix([DPR * S, 0, 0, -DPR * S, DPR * OX, DPR * OY]);
   state.strips = true;
+  state.dirty = true;
 });
 buildGrain();
 setReveal(false);
@@ -361,7 +371,7 @@ requestAnimationFrame(frame);
 
 window.__page = {
   state, setLitho, setPlaying, setReveal,
-  setTime(t) { setPlaying(false); state.time = t; },
+  setTime(t) { setPlaying(false); state.time = t; state.dirty = true; },
   setBand(v) { slider.value = String(v); slider.dispatchEvent(new Event('input')); },
   zoom(a) { state.across = a; window.dispatchEvent(new Event('resize')); },
 };
