@@ -159,13 +159,13 @@ const caption = document.getElementById('caption');
 const CAPTIONS = {
   arcade: {
     above: 'Lit from above: the left half is seen from above, the right half (the same lines) from below.',
-    side: 'With the light from the side, the shading takes neither side.',
+    side: 'With the light from the side, the habit of assuming light from above has nothing to work with.',
     below: 'Lit from below, the readings swap: the right half looks solid, the left half hollow.',
     none: 'Without shading the drawing is symmetric, and either half reads either way.',
   },
   stairs: {
     above: 'Lit from above: steps seen from above, climbing to the left against a wall.',
-    side: 'With the light from the side, the shading no longer decides.',
+    side: 'With the light from the side, the habit of assuming light from above has nothing to work with.',
     below: 'Lit from below: the same lines become steps hanging from a ceiling.',
     none: 'Schröder’s stairs (1858): unshaded, the drawing flips between both readings by itself.',
   },
