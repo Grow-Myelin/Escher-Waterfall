@@ -47,7 +47,7 @@ const arc = (c, rx, ry, sgn, a0 = -Math.PI / 2, a1 = Math.PI / 2) => (t) => {
 export function buildDrawing(fp) {
   const rand = rng(11);
   const S = [];
-  const add = (pts, o = {}) => S.push({ pts, w: o.w ?? 0.05, dark: o.dark ?? 0.85, speed: o.speed ?? 12, kind: o.kind ?? 'line' });
+  const add = (pts, o = {}) => S.push({ pts, w: (o.w ?? 0.05) * 1.45, dark: Math.min(1, (o.dark ?? 0.85) * 1.15), speed: o.speed ?? 12, kind: o.kind ?? 'line' });
   const XW = -4.1; // where the drawn wrist meets the rising form
   const XC = -5.4; // the cuff's opening
   const XB = -7.5; // the cuff's far edge

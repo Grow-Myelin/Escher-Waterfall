@@ -147,7 +147,7 @@ function project(sp, x, y) {
   const p = [sp.pts[i][0] + (sp.pts[i + 1][0] - sp.pts[i][0]) * u, sp.pts[i][1] + (sp.pts[i + 1][1] - sp.pts[i][1]) * u];
   const nn = [sp.N[i][0] + (sp.N[i + 1][0] - sp.N[i][0]) * u, sp.N[i][1] + (sp.N[i + 1][1] - sp.N[i][1]) * u];
   const l = (x - p[0]) * nn[0] + (y - p[1]) * nn[1];
-  return [s, l];
+  return [s, l, Math.sqrt(bd)];
 }
 
 // position of the spine and its frame at arc length s
@@ -191,20 +191,8 @@ export function buildLizard(spineStep) {
 
   // spine coordinates (the nearest point on the whole spine)
   const sp = spineSamples(spineStep);
-  const S = new Float32Array(n), Lat = new Float32Array(n);
-  for (let i = 0; i < n; i++) { const [s, l] = project(sp, pts[i][0], pts[i][1]); S[i] = s; Lat[i] = l; }
-  // Attachments for the animation. Only the tail itself rides on the curled
-  // part of the spine; everything else hangs from the trunk (s ≥ TAIL_BASE),
-  // offset along it by a and across it by l.
-  const TAIL_BASE = project(sp, -0.62, 0.46)[0];
-  const sAtt = new Float32Array(n), along = new Float32Array(n), across = new Float32Array(n);
-  for (let i = 0; i < n; i++) {
-    const tail = S[i] < TAIL_BASE && Math.abs(Lat[i]) < 0.2;
-    sAtt[i] = tail ? S[i] : Math.max(TAIL_BASE, S[i]);
-    const [a, l] = decompose(sp, sAtt[i], pts[i][0], pts[i][1]);
-    along[i] = a; across[i] = l;
-  }
-
+  const S = new Float32Array(n), Lat = new Float32Array(n), Dsp = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const [s, l, d] = project(sp, pts[i][0], pts[i][1]); S[i] = s; Lat[i] = l; Dsp[i] = d; }
   // heights: inflation, a ridge down the back, bulging eyes; then smoothed
   let h = new Float32Array(n);
   for (let i = 0; i < n; i++) {
@@ -229,6 +217,7 @@ export function buildLizard(spineStep) {
   }
 
   // legs: vertices nearer a leg's axis than the spine swing about its joint
+  const TAIL_BASE = project(sp, -0.62, 0.46)[0];
   const legIdx = new Int8Array(n).fill(-1), legW = new Float32Array(n);
   const joints = LEGS.map((L) => {
     const s = Math.max(TAIL_BASE, project(sp, L.joint[0], L.joint[1])[0]);
@@ -247,11 +236,32 @@ export function buildLizard(spineStep) {
       const d = Math.hypot(L.joint[0] + dx * tc - x, L.joint[1] + dy * tc - y);
       if (d < bd) { bd = d; best = k; bt = t; }
     });
-    if (best >= 0 && bt > -0.12 && bd < Math.abs(Lat[i]) * 0.95 + 0.02 && bd < 0.32) {
+    if (best >= 0 && bt > -0.12 && bd < Dsp[i] + 0.02 && bd < 0.3) {
       legIdx[i] = best;
-      legW[i] = Math.min(1, Math.max(0, (bt + 0.1) / 0.5)) ** 1.5;
+      const t = Math.min(1, Math.max(0, (bt + 0.08) / 0.53));
+      const r = Math.min(1, Math.max(0, (0.3 - bd) / 0.13));
+      legW[i] = t * t * (3 - 2 * t) * r * r * (3 - 2 * r);
       const [a, l] = decompose(sp, joints[best].s, x, y);
       legA[i] = a; legL[i] = l;
+    }
+  }
+
+  // Attachments for the animation. The tail rides on the curled part of the
+  // spine; everything else hangs from the trunk (s ≥ TAIL_BASE), offset along
+  // it by a and across it by l. Near the root of the tail the two are blended.
+  // Each is exact in the resting pose, so the blend is too.
+  const sAtt = new Float32Array(n), along = new Float32Array(n), across = new Float32Array(n);
+  const tailW = new Float32Array(n), tailA = new Float32Array(n), tailL = new Float32Array(n);
+  const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  for (let i = 0; i < n; i++) {
+    sAtt[i] = Math.max(TAIL_BASE, S[i]);
+    const [a, l] = decompose(sp, sAtt[i], pts[i][0], pts[i][1]);
+    along[i] = a; across[i] = l;
+    if (legIdx[i] < 0 && S[i] < TAIL_BASE) {
+      // the tail follows the path but keeps a little of its curl
+      tailW[i] = 0.75 * sm(0.42, 0.1, Dsp[i]) * sm(TAIL_BASE, TAIL_BASE - 0.5, S[i]);
+      const [ta, tl] = decompose(sp, S[i], pts[i][0], pts[i][1]);
+      tailA[i] = ta; tailL[i] = tl;
     }
   }
 
@@ -272,5 +282,5 @@ export function buildLizard(spineStep) {
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geo.setAttribute('aDist', new THREE.Float32BufferAttribute(dist, 1));
   geo.setIndex(index);
-  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, spine: sp, tris };
+  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, tailW, tailA, tailL, spine: sp, tris };
 }

@@ -44,6 +44,7 @@ uniform vec4 uMotion;   // hand: turn (rad), slide (cm), lift (cm), unused
 uniform vec2 uPivot;    // pivot of the turn, hand frame
 uniform vec2 uFlat;     // the arm rises out of the paper between these x
 uniform mat4 uPlace;    // hand frame -> world
+vec3 nRound; // the normal before pressing flat: the arm still shades as round
 vec3 handMotion(vec3 p, inout vec3 n, out float f) {
   // fingers move the pencil
   vec3 pf = uPenW + uPenR * (p - uPenW) + uPenS;
@@ -56,6 +57,7 @@ vec3 handMotion(vec3 p, inout vec3 n, out float f) {
   q.xy = uPivot + vec2(cs * r.x - sn * r.y, sn * r.x + cs * r.y);
   n.xy = vec2(cs * n.x - sn * n.y, sn * n.x + cs * n.y);
   q.z += uMotion.z * smoothstep(uFlat.x, uFlat.y + 2.0, q.x);
+  nRound = n;
   // press flat: z -> z·f(x); the normal follows the inverse transpose
   float w = uFlat.y - uFlat.x;
   float t = clamp((q.x - uFlat.x) / w, 0.0, 1.0);
@@ -86,7 +88,7 @@ void main() {
   float f;
   vec3 q = handMotion(position, n, f);
   vec4 wp = uPlace * vec4(q, 1.0);
-  vN = normalize(mat3(uPlace) * n);
+  vN = normalize(mat3(uPlace) * nRound);
   vRest = position;
   vW = wp.xyz;
   vF = f;
@@ -124,59 +126,65 @@ float hfam(float s, float w, out float ok) {
 }
 
 void main() {
-  if (vF < 0.035) discard;
+  // Where the arm sinks into the paper the solid breaks up into lines that
+  // go round its form, like a sketch, and the lines thin out to nothing.
+  float solidity = smoothstep(0.07, 0.4, vF);
+  float sc = dot(vRest, normalize(vec3(0.95, 0.2, 0.3))) / 0.2;
+  float band = abs(fract(sc) - 0.5) * 2.0;
+  float keep = mix(0.14 * smoothstep(0.02, 0.08, vF), 1.05, solidity * solidity);
+  if (vMat < 0.5 && band > keep) discard;
   vec3 n = normalize(vN);
   if (!gl_FrontFacing) n = -n;
   float ndl = dot(n, uLight);
-  float diff = clamp(ndl * 0.8 + 0.22, 0.0, 1.0);
-  float ao = mix(1.0, vAO, 0.8);
+  float wrap = clamp(ndl * 0.5 + 0.5, 0.0, 1.0);
+  float diff = clamp(ndl, 0.0, 1.0);
+  float ao = mix(1.0, vAO, 0.75);
   vec3 h = normalize(uLight + uView);
   float rim = pow(1.0 - clamp(dot(n, uView), 0.0, 1.0), 3.0);
 
   vec3 alb;
   float gloss = 0.0;
-  if (vMat < 0.5) { alb = vec3(0.90, 0.74, 0.62); gloss = 0.12; }
-  else if (vMat < 1.5) { alb = vec3(0.20, 0.36, 0.30); gloss = 0.5; }
-  else if (vMat < 2.5) { alb = vec3(0.86, 0.71, 0.52); }
-  else { alb = vec3(0.18, 0.18, 0.2); gloss = 0.35; }
-  // nails: lighter, a little pink, with a fine edge
+  if (vMat < 0.5) { alb = vec3(0.91, 0.76, 0.64); gloss = 0.14; }
+  else if (vMat < 1.5) { alb = vec3(0.84, 0.64, 0.27); gloss = 0.55; }
+  else if (vMat < 2.5) { alb = vec3(0.88, 0.75, 0.56); }
+  else { alb = vec3(0.2, 0.2, 0.22); gloss = 0.4; }
   float fn = max(fwidth(vNail), 1e-3);
   float nail = (1.0 - smoothstep(-fn, fn, vNail)) * step(vMat, 0.5);
-  alb = mix(alb, vec3(0.95, 0.8, 0.74), nail * 0.8);
-  gloss = mix(gloss, 0.5, nail);
+  alb = mix(alb, vec3(0.96, 0.84, 0.79), nail * 0.85);
+  gloss = mix(gloss, 0.6, nail);
   float nailEdge = (1.0 - smoothstep(0.0, fn * 1.5, abs(vNail + 0.01))) * step(vMat, 0.5);
 
-  float light = (0.2 + 0.8 * diff) * ao + 0.06 * rim;
-  float spec = pow(max(dot(n, h), 0.0), 28.0) * gloss;
-  vec3 colour = alb * light + spec * vec3(1.0, 0.97, 0.9);
-  colour *= 1.0 - 0.5 * nailEdge;
+  float light = (0.12 + 0.88 * mix(wrap * wrap, diff, 0.7)) * ao + 0.05 * rim;
+  float spec = pow(max(dot(n, h), 0.0), 26.0) * gloss;
+  vec3 colour = alb * (0.22 + 0.86 * light) + spec * vec3(1.0, 0.97, 0.9);
+  colour *= 1.0 - 0.45 * nailEdge;
 
-  // ---- lithograph: graphite tone, with hatching that follows the form
-  float t = clamp(lum(alb) / 0.78 * light + spec * 0.8, 0.0, 1.0);
+  // ---- lithograph: crayon tone that keeps the paper as its highlight,
+  // with hatching that goes round the form in the shadows
+  float t = clamp(light * lum(alb) / 0.79 + spec * 0.7, 0.0, 1.0);
+  float tv = smoothstep(0.1, 0.78, t);
   float dk = 1.0 - t;
   vec3 hp = vRest;
   float ok1, ok2, ok3;
-  float s1 = dot(hp, normalize(vec3(0.95, 0.25, 0.35))) / 0.14;
-  float s2 = dot(hp, normalize(vec3(-0.35, 0.9, 0.3))) / 0.15;
-  float s3 = (gl_FragCoord.x * 0.6 - gl_FragCoord.y * 0.8) / 4.2;
-  float w1 = clamp(dk * 0.55 - 0.05, 0.0, 0.42);
-  float w2 = clamp(dk * 0.6 - 0.22, 0.0, 0.42);
-  float w3 = clamp(dk * 0.7 - 0.42, 0.0, 0.42);
+  float s1 = dot(hp, normalize(vec3(0.95, 0.2, 0.3))) / 0.11;
+  float s2 = dot(hp, normalize(vec3(-0.3, 0.9, 0.35))) / 0.12;
+  float s3 = (gl_FragCoord.x * 0.6 - gl_FragCoord.y * 0.8) / 3.6;
+  float w1 = clamp(dk * 0.62 - 0.2, 0.0, 0.4);
+  float w2 = clamp(dk * 0.66 - 0.38, 0.0, 0.4);
+  float w3 = clamp(dk * 0.7 - 0.52, 0.0, 0.4);
   float h1 = hfam(s1, w1, ok1);
   float h2 = hfam(s2, w2, ok2);
   float h3 = hfam(s3, w3, ok3);
-  // where a form-following family is too sparse, the other takes over
   float hh = 1.0 - (1.0 - h1 * ok1 - (1.0 - ok1) * 2.0 * w1) * (1.0 - h2 * ok2 - (1.0 - ok2) * 2.0 * w2) * (1.0 - h3);
   float g = grain();
-  float v = mix(1.0, t, 0.62) * (1.0 - 0.55 * hh) + g * 1.4;
+  float v = mix(1.0, tv, 0.86) * (1.0 - 0.42 * hh) + g * 1.3;
   v *= 1.0 - 0.6 * nailEdge;
   vec3 litho = mix(uInk, uPaper, clamp(v, 0.0, 1.0));
-
   vec3 col = mix(colour + g * 0.6, litho, uLitho);
-  // the arm fades into the paper where it is pressed flat
-  float solid = smoothstep(0.035, 0.55, vF);
-  vec3 paper = paperColour(vW.xy, uPaper) + g;
-  gl_FragColor = vec4(mix(paper, col, solid), 1.0);
+  // the thinnest sketch lines are graphite; as they widen they take on the form's own tone
+  vec3 graphite = mix(vec3(0.4, 0.39, 0.39), uInk * 3.4, uLitho);
+  col = mix(graphite, col, smoothstep(0.12, 0.5, solidity) * step(vMat, 0.5) + step(0.5, vMat));
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 
@@ -197,7 +205,7 @@ void main() {
   vec2 dir = cn.xy / cn.w - c.xy / c.w;
   float l = length(dir);
   dir = l > 1e-6 ? dir / l : vec2(0.0);
-  float wpx = uWidth * smoothstep(0.12, 0.7, f);
+  float wpx = uWidth * (0.45 + 0.55 * smoothstep(0.3, 0.85, f)) * smoothstep(0.08, 0.3, f);
   c.xy += dir * wpx * 2.0 / uRes * c.w;
   vF = f;
   gl_Position = c;
@@ -208,7 +216,7 @@ export const HULL_FS = /* glsl */ `
 uniform vec3 uInkC;
 varying float vF;
 void main() {
-  if (vF < 0.12) discard;
+  if (vF < 0.08) discard;
   gl_FragColor = vec4(uInkC, 1.0);
 }
 `;
@@ -240,9 +248,9 @@ uniform float uMode;
 varying float vH;
 varying float vF;
 void main() {
-  if (vF < 0.06) discard;
-  float shCast = (0.85 - 0.55 * smoothstep(0.0, 9.0, vH)) * smoothstep(0.06, 0.4, vF);
-  float contact = (1.0 - smoothstep(0.0, 1.1, vH)) * smoothstep(0.06, 0.6, vF);
+  if (vF < 0.5) discard;
+  float shCast = (0.8 - 0.5 * smoothstep(0.0, 9.0, vH)) * smoothstep(0.5, 0.9, vF);
+  float contact = (1.0 - smoothstep(0.0, 1.1, vH)) * smoothstep(0.5, 0.9, vF);
   gl_FragColor = uMode < 0.5 ? vec4(shCast, 0.0, 0.0, 1.0) : vec4(0.0, contact, 0.0, 1.0);
 }
 `;
@@ -323,8 +331,8 @@ void main() {
   float fs = fwidth(vSide);
   float edge = 1.0 - smoothstep(1.0 - fs * 1.5, 1.0 + fs * 0.5, abs(vSide));
   // graphite catches on the paper's tooth
-  float tooth = vnoise(vWxy * 38.0) * 0.6 + vnoise(vWxy * 90.0) * 0.4;
-  float a = edge * vWeight * (0.55 + 0.6 * tooth) * shown * uFade;
+  float tooth = vnoise(vWxy * 22.0) * 0.6 + vnoise(vWxy * 61.0) * 0.4;
+  float a = edge * vWeight * (0.72 + 0.4 * tooth) * shown * uFade;
   a *= 0.85 + 0.15 * sin(vArc * 7.0);
   gl_FragColor = vec4(uGraphite, clamp(a, 0.0, 1.0));
 }

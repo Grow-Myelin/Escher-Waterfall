@@ -113,7 +113,7 @@ function layer(kind, d) {
 let strips = [null, null, null], grain = null;
 function buildStrips() {
   const h = canvas.height;
-  const period = Math.max(3, 4.4 * DPR);
+  const period = Math.max(2.6, Math.min(4.4, S * 0.05)) * DPR; // device px, scaled with the creatures
   const yb = bandY();
   for (let kind = 0; kind < 3; kind++) {
     const c = document.createElement('canvas');

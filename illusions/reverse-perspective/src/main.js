@@ -11,7 +11,8 @@ import { inkMaterial } from './ink.js';
 import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady } from '../../shared/shell.js';
 import { D, EYE, BOARD, BLOCKS, HMAX, heightFor } from './homology.js';
 import { buildIntended } from './intended.js';
-import { buildRelief, guideSegments } from './relief.js';
+import { buildRelief } from './relief.js';
+import { drawPlan } from './plan.js';
 
 // ------------------------------------------------------------------ renderer
 const canvas = document.getElementById('scene');
@@ -22,7 +23,7 @@ renderer.setClearColor(PAPER, 1);
 
 const roomU = createSharedUniforms();
 roomU.uHatch = { value: 14 };
-roomU.uLight.value.set(-0.38, 0.72, 0.58).normalize();
+roomU.uLight.value.set(-0.3, 0.55, 0.78).normalize();
 const paintU = { ...createSharedUniforms(), uLitho: roomU.uLitho, uHatch: { value: 5 } };
 paintU.uLight.value.set(-0.45, 0.7, 0.55).normalize();
 
@@ -33,7 +34,7 @@ function patch(src, from, to) {
 
 // ------------------------------------------------------------------ the painting
 // The intended scene, rendered from the design eye onto the board's rectangle.
-const PW = 1024, PH = Math.round((PW * (BOARD.y1 - BOARD.y0)) / (BOARD.x1 - BOARD.x0));
+const PW = 1400, PH = Math.round((PW * (BOARD.y1 - BOARD.y0)) / (BOARD.x1 - BOARD.x0));
 const paintRT = new THREE.WebGLRenderTarget(PW, PH, {
   samples: 4, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter,
 });
@@ -104,11 +105,13 @@ const FLOOR = -1.6; // the eye is at the board's centre, 1.6 m up
 const ink = inkMaterial(roomU);
 {
   const b = new Builder();
-  const plaster = st(0xe8e1d2, PAT.PLASTER);
+  const plaster = st(0xf1ebde, PAT.PLASTER);
   const { x0, x1, y0, y1 } = BOARD;
-  b.box(-6, FLOOR - 0.1, -0.5, 6, 4, -0.045, plaster, {});
-  b.box(-6, FLOOR, -0.045, 6, FLOOR + 0.12, -0.02, st(0xcfc5b0, PAT.PLAIN), {});
-  b.box(-6, FLOOR - 0.1, -0.045, 6, FLOOR, 7, st(0xc7ab83, PAT.WOOD), {});
+  // the wall is cut off just above the picture, like an architect's model,
+  // so the view from above can look over it
+  b.box(-6, FLOOR, -0.3, 6, 1.3, -0.045, plaster, {});
+  b.box(-6, FLOOR, -0.045, 6, FLOOR + 0.12, -0.02, st(0xddd4c2, PAT.PLAIN), {});
+  b.box(-6, FLOOR - 0.1, -7, 6, FLOOR, 7, st(0xd2bb97, PAT.WOOD), {});
   // the board's edges and a slim frame
   b.box(x0, y0, -0.04, x1, y1, -0.002, st(0xd9d1c0, PAT.PLAIN), { skip: ['pz'] });
   const f = 0.04, fs = st(0x7a6248, PAT.WOOD);
@@ -126,69 +129,28 @@ const ink = inkMaterial(roomU);
   scene.add(m);
 }
 
-// guides for the view from above
-const guides = new THREE.Group();
-const guideMats = [];
-{
-  const { ghost, sight } = guideSegments(EYE);
-  const red = new THREE.LineDashedMaterial({ color: 0xa23b2a, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0, depthTest: false });
-  const faint = new THREE.LineDashedMaterial({ color: 0x7d6a55, dashSize: 0.03, gapSize: 0.04, transparent: true, opacity: 0, depthTest: false });
-  guideMats.push([red, 0.95], [faint, 0.7]);
-  for (const [segs, mat] of [[ghost, red], [sight, faint]]) {
-    for (const [a, b] of segs) {
-      const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), mat);
-      l.computeLineDistances();
-      l.renderOrder = 30;
-      guides.add(l);
-    }
-  }
-  const eyeMat = new THREE.MeshBasicMaterial({ color: 0xa23b2a, transparent: true, opacity: 0, depthTest: false });
-  guideMats.push([eyeMat, 1]);
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 16, 10), eyeMat);
-  eye.position.copy(EYE);
-  eye.renderOrder = 31;
-  guides.add(eye);
-  guides.visible = false;
-  scene.add(guides);
-}
-// the visitor, as seen from above
-const visitor = new THREE.Group();
-{
-  const b = new Builder();
-  const coat = st(0x55504a, PAT.CLOTH);
-  b.cyl(0, FLOOR, 0, 0.16, FLOOR + 0.85, 10, st(0x3e3a35, PAT.CLOTH), { r1: 0.14 });
-  b.cyl(0, FLOOR + 0.85, 0, 0.19, -0.14, 10, coat, { r1: 0.15 });
-  b.blob(0, -0.05, 0, 0.1, 0.12, 0.1, st(0xd8b89c, PAT.PLAIN), { sub: 1 });
-  b.blob(0, 0.03, 0.02, 0.105, 0.07, 0.1, st(0x3a2f27, PAT.PLAIN), { sub: 1 });
-  const m = new THREE.Mesh(b.build(), ink);
-  m.frustumCulled = false;
-  visitor.add(m);
-  visitor.visible = false;
-  scene.add(visitor);
-}
-
 // ------------------------------------------------------------------ camera
 const camera = new THREE.PerspectiveCamera(50, 30 / 38, 0.03, 60);
-const TOP = { pos: new THREE.Vector3(2.15, 3.15, 3.55), target: new THREE.Vector3(-0.05, -0.35, -0.2), fov: 50 };
 const SWAY = 0.8; // metres either side of the design point
-const view = { sway: 0, top: 0 };
+const view = { sway: 0 };
 function placeCamera() {
-  const e = view.top < 0.5 ? 4 * view.top ** 3 : 1 - (-2 * view.top + 2) ** 3 / 2;
-  const eye = new THREE.Vector3(view.sway, EYE.y, D);
-  camera.position.copy(eye).lerp(TOP.pos, e);
-  const target = new THREE.Vector3(0, 0, 0).lerp(TOP.target, e);
-  camera.up.set(0, 1, 0);
-  camera.lookAt(target);
-  camera.fov = 50 + (TOP.fov - 50) * e;
-  camera.updateProjectionMatrix();
-  visitor.position.set(view.sway, 0, D + 0.02);
-  visitor.visible = e > 0.02;
-  guides.visible = e > 0.02;
-  for (const [m, o] of guideMats) m.opacity = o * Math.max(0, (e - 0.3) / 0.7);
+  camera.position.set(view.sway, EYE.y, D);
+  camera.lookAt(0, 0, 0);
 }
+// the view from above: an exact plan on a 2D canvas over the picture
+const planCanvas = document.createElement('canvas');
+Object.assign(planCanvas.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', opacity: '0', transition: 'opacity 0.7s ease', pointerEvents: 'none' });
+planCanvas.setAttribute('aria-hidden', 'true');
+document.getElementById('frame').appendChild(planCanvas);
+const planCtx = planCanvas.getContext('2d');
+let planDpr = 1;
 fitFrame(30 / 38, (w, h) => {
   renderer.setSize(w, h);
   camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  planDpr = Math.min(window.devicePixelRatio || 1, 2);
+  planCanvas.width = Math.round(w * planDpr);
+  planCanvas.height = Math.round(h * planDpr);
   placeCamera();
 });
 
@@ -219,7 +181,7 @@ function setTop(on) {
   state.topTarget = on ? 1 : 0;
   btnTop.setAttribute('aria-pressed', String(on));
   document.getElementById('hint').textContent = on
-    ? 'Red: the rooms as painted, behind the board · dotted: sight lines from the design eye'
+    ? 'Plan at eye level · red: the rooms as painted · grey lines: where the tops appear to you now'
     : 'Drag sideways to step left or right · the rooms seem to turn to follow you';
 }
 btnPaint.addEventListener('click', () => setPaint(state.paintTarget < 0.5));
@@ -261,9 +223,12 @@ function frame(now) {
   if (state.playing) state.phase += dt;
   const target = state.manual !== null ? state.manual : SWAY * Math.sin(state.phase * OMEGA);
   view.sway = state.manual !== null ? step(view.sway, target, dt * 2.5) : target;
-  state.top = step(state.top, state.topTarget, dt / 1.8);
-  view.top = state.top;
   placeCamera();
+  planCanvas.style.opacity = String(state.topTarget);
+  if (state.topTarget > 0 || planCanvas.style.opacity !== '0') {
+    planCtx.setTransform(planDpr, 0, 0, planDpr, 0, 0);
+    drawPlan(planCtx, planCanvas.width / planDpr, planCanvas.height / planDpr, { sway: view.sway, litho: state.litho });
+  }
 
   if (state.litho !== state.lithoTarget) {
     state.litho = step(state.litho, state.lithoTarget, dt * 2.2);
@@ -274,7 +239,7 @@ function frame(now) {
   reliefU.uPaintAmt.value = state.paint;
   if (state.paintDirty) { renderPainting(); state.paintDirty = false; }
 
-  const atDesign = Math.abs(view.sway) < 0.03 && state.top < 0.01 && state.paint > 0.99;
+  const atDesign = Math.abs(view.sway) < 0.03 && state.topTarget < 0.5 && state.paint > 0.99;
   setBadge(atDesign && !state.noBadge, 'Design point: from here the painting is exact');
 
   renderer.setClearColor(PAPER, 1);
@@ -295,7 +260,7 @@ setText('n-room', Math.round(heightFor(BLOCKS[1].F) * 100));
 window.__page = {
   state, view,
   setSway(x) { setPlaying(false); state.manual = x; view.sway = x; },
-  setTop(on) { setTop(on); state.top = on ? 1 : 0; },
+  setTop(on) { setTop(on); planCanvas.style.transition = 'none'; },
   setPaint(on) { setPaint(on); state.paint = on ? 1 : 0; },
   setLitho(on) { document.getElementById(on ? 'btn-litho' : 'btn-colour').click(); state.litho = on ? 1 : 0; state.paintDirty = true; },
 };

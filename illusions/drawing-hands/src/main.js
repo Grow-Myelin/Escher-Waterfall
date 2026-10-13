@@ -76,7 +76,7 @@ function pencilGeometry(tip, axis) {
   const nr = segA + 1;
   for (let i = 0; i < rings.length - 1; i++) for (let k = 0; k < segA; k++) {
     const a = i * nr + k, b = a + 1, c = a + nr, d = c + 1;
-    idx.push(a, c, b, b, c, d);
+    idx.push(a, b, c, b, d, c);
   }
   const capC = pos.length / 3;
   const end = new THREE.Vector3(...tip).addScaledVector(ax, L);
@@ -111,7 +111,7 @@ const FLAT_CENTRE = (() => {
   for (const s of drawing.strokes) for (const p of s.pts) { x += p[0]; y += p[1]; n++; }
   return [x / n, y / n + 1.3];
 })();
-const PHI = -Math.PI / 2 + 0.42;
+const PHI = -Math.PI / 2 + 0.12;
 const placeA = new THREE.Matrix4();
 {
   const c = Math.cos(PHI), s = Math.sin(PHI);
@@ -189,7 +189,7 @@ addHand(placeA);
 addHand(placeB);
 
 // paper and its shadow map
-const SHEET = new THREE.Vector2(14.6, 18.2);
+const SHEET = new THREE.Vector2(15.4, 19.6);
 const SH_RECT = new THREE.Vector4(-16, -20, 32, 40);
 const shadowRT = new THREE.WebGLRenderTarget(640, 800, { depthBuffer: false, type: THREE.HalfFloatType });
 const shadowCam = new THREE.OrthographicCamera(SH_RECT.x, SH_RECT.x + SH_RECT.z, SH_RECT.y + SH_RECT.w, SH_RECT.y, -100, 100);
@@ -219,7 +219,7 @@ const strokeU = { uNow: { value: 0 }, uFade: { value: 1 }, uGraphite: { value: n
   g.setAttribute('aArc', new THREE.Float32BufferAttribute(r.arcl, 1));
   g.setAttribute('aWeight', new THREE.Float32BufferAttribute(r.weight, 1));
   g.setIndex(r.index);
-  const mat = new THREE.ShaderMaterial({ uniforms: strokeU, vertexShader: SH.STROKE_VS, fragmentShader: SH.STROKE_FS, transparent: true, depthWrite: false });
+  const mat = new THREE.ShaderMaterial({ uniforms: strokeU, vertexShader: SH.STROKE_VS, fragmentShader: SH.STROKE_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
   for (const place of [placeA, placeB]) {
     const m = new THREE.Mesh(g, mat);
     m.matrixAutoUpdate = false;
@@ -233,7 +233,7 @@ const strokeU = { uNow: { value: 0 }, uFade: { value: 1 }, uGraphite: { value: n
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
-const VIEW_H = 15.2; // half height of the sheet in view
+const VIEW_H = 14.6; // half height of the sheet in view
 const TOP = { az: -Math.PI / 2, el: Math.PI / 2, zoom: 1 };
 const SIDE = { az: -Math.PI / 2 + 0.75, el: 0.42, zoom: 0.92 };
 const view = { ...TOP };

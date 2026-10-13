@@ -1,8 +1,7 @@
 // The relief: the board with the five truncated pyramids that the
 // collineation H makes of the five recesses.
 
-import * as THREE from 'three';
-import { BLOCKS, BOARD, pyramid, recess } from './homology.js';
+import { BLOCKS, BOARD, pyramid } from './homology.js';
 
 // Each recess face, carried over by H, keeps its winding as seen from the
 // eye (H moves points only along sight lines), so it faces the right way.
@@ -23,19 +22,3 @@ export function buildRelief(b, s) {
   }
 }
 
-// Dashed guides for the view from above: each recess as it is meant to be
-// seen (behind the board), and the sight lines from the eye through the
-// corners of each top to the far corners they stand for.
-export function guideSegments(eye) {
-  const ghost = [], sight = [];
-  for (const blk of BLOCKS) {
-    const r = recess(blk), p = pyramid(blk);
-    for (let i = 0; i < 4; i++) {
-      ghost.push([r.far[i], r.far[(i + 1) % 4]]);
-      ghost.push([r.near[i], r.far[i]]);
-      sight.push([eye.clone(), r.far[i]]);
-    }
-    void p;
-  }
-  return { ghost, sight };
-}

@@ -16,7 +16,7 @@ import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady 
 const T0 = performance.now();
 const TIMES = {};
 const mark = (k) => { TIMES[k] = Math.round(performance.now() - T0); };
-const ASPECT = 39 / 31;
+const ASPECT = 1.4;
 const K = 0.42; // world units per tile unit
 const SNOUT = [-0.95, 1.7]; // where the hero's snout lies on the page (x, z)
 
@@ -247,6 +247,16 @@ function deform(s) {
     let y = fr.pos[1] + (fr.T[1] * av + fr.B[1] * lv) * K;
     let z = fr.pos[2] + (fr.T[2] * av + fr.B[2] * lv) * K;
     let nx = fr.N[0], ny = fr.N[1], nz = fr.N[2];
+    const tw = L.tailW[i];
+    if (tw > 0) {
+      // the tail rides on its own part of the spine
+      frameAt(path, u - (LS - L.S[i]) * K, fr2);
+      const ta = L.tailA[i], tl = L.tailL[i];
+      x += (fr2.pos[0] + (fr2.T[0] * ta + fr2.B[0] * tl) * K - x) * tw;
+      y += (fr2.pos[1] + (fr2.T[1] * ta + fr2.B[1] * tl) * K - y) * tw;
+      z += (fr2.pos[2] + (fr2.T[2] * ta + fr2.B[2] * tl) * K - z) * tw;
+      nx += (fr2.N[0] - nx) * tw; ny += (fr2.N[1] - ny) * tw; nz += (fr2.N[2] - nz) * tw;
+    }
     const k = L.legIdx[i];
     if (k >= 0) {
       // legs hang rigidly from the frame at their joint and swing about it
@@ -280,7 +290,7 @@ function deform(s) {
 // hexagon and rotation centres it was cut from, and the path walked.
 const RED = 0xa23b2a;
 const guides = new THREE.Group();
-const guideMat = new THREE.MeshBasicMaterial({ color: RED, transparent: true, opacity: 0, depthWrite: false });
+const guideMat = new THREE.MeshBasicMaterial({ color: RED, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
 function ribbon(points, width, dash = 0, gap = 0) {
   // points: [x, y, z, ux, uy, uz] with u the side direction
   const pos = [], idx = [];
@@ -334,7 +344,7 @@ function flatLine(pts2, closed, w, dash, gap) {
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
-const VIEW = { H: 5.6, target: new THREE.Vector3(0.2, 0.3, 2.0) };
+const VIEW = { H: 5.9, target: new THREE.Vector3(0.15, 0.3, 2.35) };
 let fw = 1, fh = 1;
 function updateCamera() {
   const t = VIEW.target;
@@ -384,7 +394,9 @@ canvas.addEventListener('pointercancel', endDrag);
 // ------------------------------------------------------------------ loop
 let last = performance.now();
 let lastLabel = '';
+let frames = 0;
 function frame(now) {
+  frames++;
   const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
   last = now;
   if (state.playing && !drag) state.t += dt;
@@ -414,4 +426,6 @@ window.__page = {
   setReveal: (v) => { setReveal(v); state.reveal = v ? 1 : 0; },
   at: (name, f = 0) => { const p = PHASES.find((q) => q[0] === name); state.t = p.start + p[1] * f; },
   path, hero, L, TIMES,
+  get frames() { return frames; },
+  get label() { return lastLabel; },
 };

@@ -247,7 +247,7 @@ function buildPatterns() {
   hg.fillRect(0, period / 2 - 0.45 * DPR, 8, 0.9 * DPR);
   hatch = ctx.createPattern(hc, 'repeat');
   // crossed: the same lines both ways, a little closer
-  const p2 = Math.max(4, Math.round(4.1 * DPR));
+  const p2 = Math.max(4, Math.round(4.8 * DPR));
   const cc = document.createElement('canvas');
   cc.width = cc.height = p2;
   const cg = cc.getContext('2d');
@@ -640,6 +640,7 @@ function frame(now) {
     shape.crosses = drag || state.edited ? selfCrosses(shape.outline) : null;
     draw();
     // narrate the construction
+    if (state.quiet) { setBadge(false); requestAnimationFrame(frame); return; }
     let step = -1;
     if (shape.crosses) setBadge(true, 'The outline crosses itself (ringed), so copies would overlap');
     else if (state.edited) setBadge(true, 'Your tile: each copy of an edge moves with it, so the plane stays filled');

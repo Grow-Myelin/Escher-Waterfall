@@ -1,0 +1,8 @@
+{
+  "slug": "tessellation",
+  "title": "Regular Division of the Plane",
+  "subtitle": "Bending a hexagon into a lizard that still fills the plane",
+  "technique": "Edge pairing on a regular hexagon: each edge is bent together with its partner, turned 120° about their shared corner (Heesch type C3C3C3C3C3C3), so every copy under the plane group p3 fits its neighbours exactly",
+  "refs": ["M. C. Escher, Reptiles, 1943", "M. C. Escher, notebook on the regular division of the plane, 1941–42", "H. Heesch, Aufbau der Ebene aus kongruenten Bereichen, 1935"],
+  "blurb": "Watch a field of hexagons bend, one pair of edges at a time, into walking lizards in three colours, then drag the outline yourself and the whole plane follows."
+}

@@ -231,13 +231,15 @@ export function buildHandModel() {
       d = i === 0 ? di : smin(d, di, i >= 4 ? 1.8 : 0.9);
     }
     for (const e of prims.pads) d = smin(d, sdEllipsoid(x, y, z, e), 0.9);
-    // fingers: phalanges joined tightly, finger to palm more softly
+    // fingers: phalanges joined tightly; each finger blends into the palm,
+    // but fingers never blend into each other
+    const dp = d;
     for (const f of prims.fingers) {
       const ex = Math.max(f.lo[0] - x, 0, x - f.hi[0]), ey = Math.max(f.lo[1] - y, 0, y - f.hi[1]), ez = Math.max(f.lo[2] - z, 0, z - f.hi[2]);
       if (ex * ex + ey * ey + ez * ez > (d + 1.0) * (d + 1.0) && d > 0) continue;
       let df = sdRoundCone(x, y, z, f.segs[0]);
       for (let i = 1; i < f.segs.length; i++) df = smin(df, sdRoundCone(x, y, z, f.segs[i]), 0.22);
-      d = smin(d, df, f.name === 'thumb' ? 0.8 : 0.3);
+      d = Math.min(d, smin(dp, df, f.name === 'thumb' ? 0.8 : 0.3));
     }
     return d;
   }

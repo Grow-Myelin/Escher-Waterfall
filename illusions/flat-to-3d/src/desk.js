@@ -11,8 +11,8 @@ export const PAGE_Y = 0.12; // top of the sketchbook's page
 export const SKETCH = { x0: -4.5, x1: 0.35, z0: 0.3, z1: 3.9 };
 export const BOOK = { x0: 1.0, x1: 3.9, z0: 0.45, z1: 2.75, h: 0.55 };
 export const DODECA = { c: [2.45, 0, 1.6], a: 0.5 }; // centre (x, -, z), edge length
-export const DISH = { c: [2.45, 0, 4.55], r: 0.95, h: 0.26 };
-export const BOTTLE = { c: [3.5, 0, -0.9] };
+export const DISH = { c: [2.45, 0, 4.55], r: 0.92, h: 0.38 };
+export const BOTTLE = { c: [1.5, 0, -0.55] };
 export const DESK = { x0: -7.5, x1: 7.2, z0: -5.2, z1: 6.4 };
 
 // ------------------------------------------------------------------ dodecahedron
@@ -154,10 +154,11 @@ export function buildDodecahedron() {
 
 // a shallow pewter dish: a lathe with a foot ring, a rolled rim and a well
 export const DISH_PROFILE = [
-  [0, 0.03], [0.6, 0.035], [0.78, 0.04], [0.8, 0.0], [0.86, 0.0], [0.92, 0.09], [0.98, 0.18],
-  [1.02, 0.25], [1.01, 0.275], [0.97, 0.255], [0.9, 0.2], [0.8, 0.13], [0.65, 0.085], [0.4, 0.065], [0, 0.06],
+  [0, 0.03], [0.55, 0.035], [0.7, 0.04], [0.72, 0.0], [0.8, 0.0], [0.88, 0.12], [0.96, 0.25],
+  [1.02, 0.33], [1.03, 0.36], [1.0, 0.378], [0.95, 0.36], [0.9, 0.3], [0.8, 0.2], [0.62, 0.11],
+  [0.35, 0.075], [0, 0.07],
 ];
-export const DISH_RIM = 8; // index of the top of the rim
+export const DISH_RIM = 9; // index of the top of the rim
 export function buildDish() {
   const b = new Builder();
   const [cx, , cz] = DISH.c;
@@ -167,7 +168,7 @@ export function buildDish() {
   const inner = prof.slice(DISH_RIM);
   // (a lathe's normals point to the right of the profile's direction)
   b.lathe(cx, 0, cz, outer, 48, st(0xb8b5ad, P.PEWTER), { edges: outer.map((_, i) => i === 4 || i === DISH_RIM) });
-  b.lathe(cx, 0, cz, inner.slice().reverse(), 48, st(0xc4c1b9, P.PEWTER), { edges: inner.map(() => false) });
+  b.lathe(cx, 0, cz, inner, 48, st(0xc9c6be, P.PEWTER), { edges: inner.map((_, i) => i === 2) });
   return b;
 }
 
