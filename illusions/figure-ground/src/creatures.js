@@ -24,7 +24,7 @@ export const DESIGN = {
 // level: how far from the band (0 … 1 of the detail ramp) the mark appears.
 // Birds are marked in ink; fish in pale lines, like white-line engraving.
 export const BIRD_MARKS = [
-  { level: 0, width: 1.1, dots: [[-0.6, 0.065, 0.024], [-0.6, -0.055, 0.024]] },
+  { level: 0.04, width: 1.1, dots: [[-0.6, 0.065, 0.024], [-0.6, -0.055, 0.024]] },
   { level: 0.22, width: 1.1, strokes: [
     [[-0.37, 0.16], [-0.12, 0.175], [0.16, 0.13], [0.3, 0.08]],
     [[-0.34, -0.17], [-0.1, -0.17], [0.18, -0.12], [0.36, -0.06]],
@@ -64,9 +64,9 @@ function scales() {
 }
 
 export const FISH_MARKS = [
-  { level: 0, width: 1, dots: [[-0.63, 0.06, 0.06]], light: true },
-  { level: 0, width: 1.1, circles: [[-0.63, 0.06, 0.06]], strokes: [[[-0.875, 0.0], [-0.78, -0.02]]] },
-  { level: 0, width: 1, dots: [[-0.622, 0.062, 0.028]], dark: true },
+  { level: 0.04, width: 1, dots: [[-0.63, 0.06, 0.06]], light: true },
+  { level: 0.04, width: 1.1, circles: [[-0.63, 0.06, 0.06]], strokes: [[[-0.875, 0.0], [-0.78, -0.02]]] },
+  { level: 0.04, width: 1, dots: [[-0.622, 0.062, 0.028]], dark: true },
   { level: 0.2, width: 1.2, strokes: [[[-0.5, 0.2], [-0.42, 0.04], [-0.5, -0.16]]] },
   { level: 0.42, width: 0.85, strokes: scales() },
   { level: 0.62, width: 0.85, strokes: [

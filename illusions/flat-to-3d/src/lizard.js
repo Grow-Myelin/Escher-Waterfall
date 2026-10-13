@@ -137,9 +137,9 @@ export const SPINE = [
   [-0.2, 0.16], [0.1, -0.03], [0.43, -0.24], [0.68, -0.37], [0.9, -0.48], [1.1, -0.58], [1.24, -0.66],
 ];
 export const LEGS = [
-  { name: 'left front', joint: [0.6, -0.02], foot: [1.33, 0.3], phase: 0 },
-  { name: 'right front', joint: [0.3, -0.5], foot: [0.18, -1.22], phase: Math.PI },
-  { name: 'left hind', joint: [-0.28, 0.6], foot: [-0.42, 1.22], phase: Math.PI },
-  { name: 'right hind', joint: [-0.62, -0.02], foot: [-1.24, -0.33], phase: 0 },
+  { name: 'left front', joint: [0.74, 0.0], foot: [1.33, 0.3], phase: 0 },
+  { name: 'right front', joint: [0.2, -0.68], foot: [0.18, -1.22], phase: Math.PI },
+  { name: 'left hind', joint: [-0.3, 0.68], foot: [-0.42, 1.22], phase: Math.PI },
+  { name: 'right hind', joint: [-0.7, -0.06], foot: [-1.24, -0.33], phase: 0 },
 ];
 export const EYES = [[1.06, -0.46], [0.95, -0.69]];

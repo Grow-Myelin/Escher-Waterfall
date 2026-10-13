@@ -218,16 +218,26 @@ const posAttr = L.geo.getAttribute('position');
 const SNECK = LS * 0.79;
 const legSide = L.joints.map((j) => (j.l > 0 ? -1 : 1));
 const fr2 = { pos: [0, 0, 0], T: [0, 0, 0], B: [0, 0, 0], N: [0, 0, 0] };
+const legState = LEGS.map(() => ({ ang: 0, lift: 0, f: { pos: [0, 0, 0], T: [0, 0, 0], B: [0, 0, 0], N: [0, 0, 0] } }));
 function deform(s) {
   const u = s.u >= U1 - 1e-6 ? U1 : s.u;
   const walked = Math.max(0, u - U0);
   const phi = (2 * Math.PI * walked) / STRIDE;
   // gait fades in after the first steps and out before the last
   const gait = smoothstep(0, 0.3, walked) * smoothstep(0, 0.35, U1 - u) * (s.pauseT >= 0 ? 0 : 1);
-  const legA = 0.38 * gait;
   const headA = s.pauseT >= 0 ? 0.55 * Math.sin((s.pauseT / PAUSE) * Math.PI * 2) * smoothstep(0, 0.5, s.pauseT) * smoothstep(PAUSE, PAUSE - 0.5, s.pauseT) : 0;
   const headLift = s.pauseT >= 0 ? 0.12 * Math.sin((s.pauseT / PAUSE) * Math.PI) : 0;
   const kap = s.relief;
+  // per leg: swing angle, lift and the frame at its joint
+  for (let k = 0; k < LEGS.length; k++) {
+    const ph = phi + LEGS[k].phase;
+    // swing within the range this leg can turn without folding its skin
+    const [lo, hi] = L.legRange[k];
+    const mid = (lo + hi) * 0.4, amp = Math.min(0.26, (hi - lo) * 0.4);
+    legState[k].ang = (mid + legSide[k] * amp * Math.sin(ph)) * gait;
+    legState[k].lift = 0.09 * Math.max(0, Math.cos(ph)) * gait;
+    frameAt(path, u - (LS - L.joints[k].s) * K, legState[k].f);
+  }
   const P = posAttr.array;
   for (let i = 0; i < L.n; i++) {
     let sv = L.sAtt[i], av = L.along[i], lv = L.across[i], hv = L.h[i];
@@ -260,19 +270,16 @@ function deform(s) {
     const k = L.legIdx[i];
     if (k >= 0) {
       // legs hang rigidly from the frame at their joint and swing about it
-      const leg = LEGS[k], j = L.joints[k], w = L.legW[i];
-      const ph = phi + leg.phase;
-      const ang = legSide[k] * legA * Math.sin(ph);
+      const j = L.joints[k], w = L.legW[i], ls = legState[k], f = ls.f;
       const da = L.legA[i] - j.a, dl = L.legL[i] - j.l;
-      const ca = Math.cos(ang), sa = Math.sin(ang);
+      const ca = Math.cos(ls.ang), sa = Math.sin(ls.ang);
       const ra = j.a + da * ca - dl * sa, rl = j.l + da * sa + dl * ca;
-      frameAt(path, u - (LS - j.s) * K, fr2);
-      const jx = fr2.pos[0] + (fr2.T[0] * ra + fr2.B[0] * rl) * K;
-      const jy = fr2.pos[1] + (fr2.T[1] * ra + fr2.B[1] * rl) * K;
-      const jz = fr2.pos[2] + (fr2.T[2] * ra + fr2.B[2] * rl) * K;
+      const jx = f.pos[0] + (f.T[0] * ra + f.B[0] * rl) * K;
+      const jy = f.pos[1] + (f.T[1] * ra + f.B[1] * rl) * K;
+      const jz = f.pos[2] + (f.T[2] * ra + f.B[2] * rl) * K;
       x += (jx - x) * w; y += (jy - y) * w; z += (jz - z) * w;
-      nx += (fr2.N[0] - nx) * w; ny += (fr2.N[1] - ny) * w; nz += (fr2.N[2] - nz) * w;
-      hv += 0.09 * w * Math.max(0, Math.cos(ph)) * gait;
+      nx += (f.N[0] - nx) * w; ny += (f.N[1] - ny) * w; nz += (f.N[2] - nz) * w;
+      hv += ls.lift * w;
     }
     const h = hv * K * kap + 0.0015;
     P[i * 3] = x + nx * h;

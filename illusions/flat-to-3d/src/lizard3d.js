@@ -238,7 +238,7 @@ export function buildLizard(spineStep) {
     });
     if (best >= 0 && bt > -0.12 && bd < Dsp[i] + 0.02 && bd < 0.3) {
       legIdx[i] = best;
-      const t = Math.min(1, Math.max(0, (bt + 0.08) / 0.53));
+      const t = Math.min(1, Math.max(0, (bt - 0.02) / 0.62));
       const r = Math.min(1, Math.max(0, (0.3 - bd) / 0.13));
       legW[i] = t * t * (3 - 2 * t) * r * r * (3 - 2 * r);
       const [a, l] = decompose(sp, joints[best].s, x, y);
@@ -265,6 +265,33 @@ export function buildLizard(spineStep) {
     }
   }
 
+  // How far can each leg swing either way before its skin folds over? Test
+  // rotations of the leg about its joint in the resting layout and keep the
+  // largest range in which no triangle turns over.
+  const legRange = LEGS.map((Lg, k) => {
+    const J = Lg.joint;
+    const tris2 = tris.filter((t) => t.some((v) => legIdx[v] === k));
+    const ok = (ang) => {
+      const c = Math.cos(ang), sn = Math.sin(ang);
+      const P = (v) => {
+        const w = legIdx[v] === k ? legW[v] : 0;
+        const dx = pts[v][0] - J[0], dy = pts[v][1] - J[1];
+        return [pts[v][0] + (J[0] + dx * c - dy * sn - pts[v][0]) * w, pts[v][1] + (J[1] + dx * sn + dy * c - pts[v][1]) * w];
+      };
+      for (const [a, b, d] of tris2) {
+        const A = P(a), B = P(b), D = P(d);
+        const s1 = (B[0] - A[0]) * (D[1] - A[1]) - (B[1] - A[1]) * (D[0] - A[0]);
+        const s0 = (pts[b][0] - pts[a][0]) * (pts[d][1] - pts[a][1]) - (pts[b][1] - pts[a][1]) * (pts[d][0] - pts[a][0]);
+        if (Math.sign(s1) !== Math.sign(s0) || Math.abs(s1) < Math.abs(s0) * 0.15) return false;
+      }
+      return true;
+    };
+    let hi = 0, lo = 0;
+    while (hi < 0.4 && ok(hi + 0.02)) hi += 0.02;
+    while (lo > -0.4 && ok(lo - 0.02)) lo -= 0.02;
+    return [lo, hi];
+  });
+
   const uv = new Float32Array(n * 2);
   for (let i = 0; i < n; i++) {
     uv[i * 2] = (pts[i][0] + HERO_SPAN) / (2 * HERO_SPAN);
@@ -282,5 +309,5 @@ export function buildLizard(spineStep) {
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geo.setAttribute('aDist', new THREE.Float32BufferAttribute(dist, 1));
   geo.setIndex(index);
-  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, tailW, tailA, tailL, spine: sp, tris };
+  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, tailW, tailA, tailL, legRange, spine: sp, tris };
 }

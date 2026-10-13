@@ -347,7 +347,7 @@ void main() {
   float shade = mix(1.0, diff / up, uSolid);
   vec3 vd = normalize(cameraPosition - vW);
   float rim = 1.0 - smoothstep(0.08, 0.42, abs(dot(n, vd)));
-  float spec = pow(max(dot(n, normalize(vd + uLight)), 0.0), 24.0) * 0.35 * uSolid;
+  float spec = pow(max(dot(n, normalize(vd + uLight)), 0.0), 10.0) * 0.12 * uSolid;
   vec3 col = base * shade + spec;
   // lithograph: hatching that follows the surface where it turns from the light
   float L = dot(col, vec3(0.30, 0.59, 0.11));

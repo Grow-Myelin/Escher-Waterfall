@@ -126,19 +126,17 @@ float hfam(float s, float w, out float ok) {
 }
 
 void main() {
-  // Where the arm sinks into the paper the solid breaks up into lines that
-  // go round its form, like a sketch, and the lines thin out to nothing.
-  float solidity = smoothstep(0.07, 0.4, vF);
-  float sc = dot(vRest, normalize(vec3(0.95, 0.2, 0.3))) / 0.2;
-  float band = abs(fract(sc) - 0.5) * 2.0;
-  float keep = mix(0.14 * smoothstep(0.02, 0.08, vF), 1.05, solidity * solidity);
-  if (vMat < 0.5 && band > keep) discard;
+  // Where the arm sinks into the paper the solid thins out into the paper
+  // like crayon, in a fine stipple.
+  float solidity = smoothstep(0.06, 0.42, vF);
+  float st = hash12(floor(gl_FragCoord.xy)) * 0.7 + hash12(floor(gl_FragCoord.xy * 0.5) + 7.0) * 0.3;
+  if (vMat < 0.5 && st > solidity * 1.02) discard;
   vec3 n = normalize(vN);
   if (!gl_FrontFacing) n = -n;
   float ndl = dot(n, uLight);
   float wrap = clamp(ndl * 0.5 + 0.5, 0.0, 1.0);
   float diff = clamp(ndl, 0.0, 1.0);
-  float ao = mix(1.0, vAO, 0.75);
+  float ao = mix(1.0, vAO, 0.6);
   vec3 h = normalize(uLight + uView);
   float rim = pow(1.0 - clamp(dot(n, uView), 0.0, 1.0), 3.0);
 
@@ -181,9 +179,6 @@ void main() {
   v *= 1.0 - 0.6 * nailEdge;
   vec3 litho = mix(uInk, uPaper, clamp(v, 0.0, 1.0));
   vec3 col = mix(colour + g * 0.6, litho, uLitho);
-  // the thinnest sketch lines are graphite; as they widen they take on the form's own tone
-  vec3 graphite = mix(vec3(0.4, 0.39, 0.39), uInk * 3.4, uLitho);
-  col = mix(graphite, col, smoothstep(0.12, 0.5, solidity) * step(vMat, 0.5) + step(0.5, vMat));
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -215,8 +210,12 @@ void main() {
 export const HULL_FS = /* glsl */ `
 uniform vec3 uInkC;
 varying float vF;
+${COMMON}
 void main() {
-  if (vF < 0.08) discard;
+  // the outline thins out with the form, in the same stipple
+  float solidity = smoothstep(0.06, 0.42, vF);
+  float st = hash12(floor(gl_FragCoord.xy)) * 0.7 + hash12(floor(gl_FragCoord.xy * 0.5) + 7.0) * 0.3;
+  if (st > solidity * 1.02) discard;
   gl_FragColor = vec4(uInkC, 1.0);
 }
 `;

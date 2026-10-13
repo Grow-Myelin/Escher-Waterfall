@@ -450,7 +450,7 @@ export function vertexExtras(model, pos, normals, sdf) {
       occ += w * Math.max(0, dd - s);
       w *= 0.55;
     }
-    ao[i] = Math.max(0, 1 - occ * 0.9);
+    ao[i] = Math.max(0, 1 - occ * 0.55);
   }
   return { nail, ao, fing };
 }

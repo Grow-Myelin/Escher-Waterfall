@@ -111,7 +111,7 @@ const FLAT_CENTRE = (() => {
   for (const s of drawing.strokes) for (const p of s.pts) { x += p[0]; y += p[1]; n++; }
   return [x / n, y / n + 1.3];
 })();
-const PHI = -Math.PI / 2 + 0.12;
+const PHI = -Math.PI / 2 - 0.66;
 const placeA = new THREE.Matrix4();
 {
   const c = Math.cos(PHI), s = Math.sin(PHI);

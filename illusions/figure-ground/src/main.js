@@ -31,8 +31,8 @@ const COL = {
   mid: [118, 128, 136], groundTop: [24, 33, 58], groundBottom: [214, 229, 226],
   birdMid: [214, 206, 184], birdTop: [246, 238, 216], fishMid: [72, 96, 104], fishBottom: [22, 48, 58],
 };
-const BAND = 2.5; // rows over which a creature turns from tile into figure or ground
-const FREE = [1.5, 1.6]; // creatures start to leave the tiling this far out, over this distance
+const BAND = 1.7; // rows over which a creature turns from tile into figure or ground
+const FREE = [1.75, 1.5]; // creatures start to leave the tiling this far out, over this distance
 const DRIFT = 0.16; // world units per second, to the left
 const PERIOD = A[0] + B[0]; // the tiling repeats every 2·W horizontally
 
@@ -245,7 +245,7 @@ function draw() {
     const marks = c.isFish ? fishMarks : birdMarks;
     if (amount > 0.01) {
       for (const mk of marks) {
-        const a = smooth((amount - mk.level) / 0.18);
+        const a = smooth((amount - mk.level) / 0.12);
         if (a <= 0.01) continue;
         const pale = c.isFish ? (L > 0.5 ? 'rgb(240,234,220)' : 'rgb(196,214,214)') : 'rgb(28,26,23)';
         ctx.globalAlpha = a;
