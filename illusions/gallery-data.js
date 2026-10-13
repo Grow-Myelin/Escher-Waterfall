@@ -22,12 +22,15 @@ window.GALLERY = [
           {
             "slug": "penrose-stairs",
             "href": "penrose-stairs/index.html",
-            "thumb": null,
-            "title": "penrose-stairs",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "penrose-stairs/thumb.jpg",
+            "title": "The Endless Stair",
+            "subtitle": "the Penrose stairs, as a real spiral in true isometric",
+            "refs": [
+              "L. S. Penrose and R. Penrose, Impossible Objects: A Special Type of Visual Illusion, 1958",
+              "M. C. Escher, Ascending and Descending, 1960"
+            ],
+            "blurb": "Two files of hooded figures climb and descend a closed loop of stairs on a roof for ever; turn the camera and the loop opens into a spiral.",
+            "ready": true
           }
         ]
       },
@@ -38,12 +41,15 @@ window.GALLERY = [
           {
             "slug": "impossible-cube",
             "href": "impossible-cube/index.html",
-            "thumb": null,
-            "title": "impossible-cube",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "impossible-cube/thumb.jpg",
+            "title": "The Impossible Cube",
+            "subtitle": "Front and back under parallel projection",
+            "refs": [
+              "L. A. Necker, rhomboid figure, 1832",
+              "M. C. Escher, Belvedere, 1958"
+            ],
+            "blurb": "A wire cube flips between two readings, an impossible cube swaps one overlap, and an isometric belvedere stands on pillars that join the front of one floor to the back of the next.",
+            "ready": true
           }
         ]
       },
@@ -54,12 +60,15 @@ window.GALLERY = [
           {
             "slug": "convex-concave",
             "href": "convex-concave/index.html",
-            "thumb": null,
-            "title": "convex-concave",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "convex-concave/thumb.jpg",
+            "title": "Convex and Concave",
+            "subtitle": "The light decides which way round you see it",
+            "refs": [
+              "M. C. Escher, Convex and Concave, 1955",
+              "H. Schröder, reversible staircase, 1858"
+            ],
+            "blurb": "A symmetric isometric cloister seen from above on the left and from below on the right; swing the light round and the two halves change places.",
+            "ready": true
           }
         ]
       },
@@ -70,12 +79,14 @@ window.GALLERY = [
           {
             "slug": "relativity",
             "href": "relativity/index.html",
-            "thumb": null,
-            "title": "relativity",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "relativity/thumb.jpg",
+            "title": "Three Gravities",
+            "subtitle": "multiple gravities in one building, after M. C. Escher’s Relativity (1953)",
+            "refs": [
+              "M. C. Escher, Relativity, 1953"
+            ],
+            "blurb": "A hall whose floor and two walls are each a floor for a different world; turn the print and each world in turn stands upright.",
+            "ready": true
           }
         ]
       },
@@ -86,12 +97,15 @@ window.GALLERY = [
           {
             "slug": "curved-perspective",
             "href": "curved-perspective/index.html",
-            "thumb": null,
-            "title": "curved-perspective",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "curved-perspective/thumb.jpg",
+            "title": "Zenith and Nadir",
+            "subtitle": "curvilinear perspective, after M. C. Escher’s High and Low (1947) and House of Stairs (1951)",
+            "refs": [
+              "M. C. Escher, High and Low, 1947",
+              "M. C. Escher, House of Stairs, 1951"
+            ],
+            "blurb": "Drift up and down an open stairwell whose walls bow from the zenith at the top of the picture to the nadir at the bottom; slide to straighten it back into ordinary perspective.",
+            "ready": true
           }
         ]
       },
@@ -107,7 +121,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           }
         ]
       },
@@ -134,12 +148,16 @@ window.GALLERY = [
           {
             "slug": "metamorphosis",
             "href": "metamorphosis/index.html",
-            "thumb": null,
-            "title": "metamorphosis",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "metamorphosis/thumb.jpg",
+            "title": "Metamorphosis",
+            "subtitle": "A tiling that changes along its length",
+            "refs": [
+              "Metamorphosis I, 1937",
+              "Metamorphosis II, 1939–40",
+              "Metamorphosis III, 1967–68"
+            ],
+            "blurb": "An endless printed strip in which a checkerboard grows into fish, hexagons, honeycomb, tortoises and cubes, and back again, without ever leaving a gap.",
+            "ready": true
           }
         ]
       },
@@ -155,7 +173,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           }
         ]
       },
@@ -171,17 +189,20 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           },
           {
             "slug": "print-gallery",
             "href": "print-gallery/index.html",
             "thumb": null,
-            "title": "print-gallery",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "title": "Print Gallery",
+            "subtitle": "A picture that contains itself, twisted round its centre",
+            "refs": [
+              "M. C. Escher, Print Gallery, 1956",
+              "B. de Smit and H. W. Lenstra Jr., The Mathematical Structure of Escher's Print Gallery, 2003"
+            ],
+            "blurb": "A gallery print that contains the gallery, twisted so one turn round the centre takes you down a whole level, with the centre filled in and an endless zoom.",
+            "ready": true
           }
         ]
       },
@@ -192,12 +213,18 @@ window.GALLERY = [
           {
             "slug": "circle-limit",
             "href": "circle-limit/index.html",
-            "thumb": null,
-            "title": "circle-limit",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "circle-limit/thumb.jpg",
+            "title": "Circle Limit",
+            "subtitle": "Infinity inside a circle: a hyperbolic tiling",
+            "refs": [
+              "M. C. Escher, Circle Limit I, 1958",
+              "M. C. Escher, Circle Limit II, 1959",
+              "M. C. Escher, Circle Limit III, 1959",
+              "M. C. Escher, Circle Limit IV, 1960",
+              "H. S. M. Coxeter, Crystal Symmetry and Its Generalizations, 1957"
+            ],
+            "blurb": "Fish circle starfish in a disk that never ends: drag to glide through the hyperbolic plane, switch between five tilings, and reveal Coxeter's triangles underneath.",
+            "ready": true
           },
           {
             "slug": "smaller-and-smaller",
@@ -223,7 +250,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           },
           {
             "slug": "three-worlds",
@@ -233,7 +260,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           }
         ]
       },
@@ -244,12 +271,14 @@ window.GALLERY = [
           {
             "slug": "moebius-strip",
             "href": "moebius-strip/index.html",
-            "thumb": null,
-            "title": "moebius-strip",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "moebius-strip/thumb.jpg",
+            "title": "Möbius Lattice",
+            "subtitle": "Ants on a one-sided surface",
+            "refs": [
+              "M. C. Escher, Möbius Strip II (Red Ants), 1963"
+            ],
+            "blurb": "Nine ants walk a latticed Möbius band in single file; the red one needs two full laps, 720°, to come home the right way up.",
+            "ready": true
           }
         ]
       },
@@ -283,12 +312,15 @@ window.GALLERY = [
           {
             "slug": "reutersvard",
             "href": "reutersvard/index.html",
-            "thumb": null,
-            "title": "reutersvard",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "reutersvard/thumb.jpg",
+            "title": "Triangle of Cubes",
+            "subtitle": "Oscar Reutersvärd’s impossible triangle of nine cubes, assembled in true isometric",
+            "refs": [
+              "Oscar Reutersvärd, Opus 1 (triangle of nine cubes), 1934",
+              "L. S. Penrose and R. Penrose, Impossible Objects: A Special Type of Visual Illusion, 1958"
+            ],
+            "blurb": "Nine cubes drop into place one by one, each in front of the last, until the ninth slips behind the first and closes a triangle that cannot exist.",
+            "ready": true
           }
         ]
       },
@@ -299,12 +331,14 @@ window.GALLERY = [
           {
             "slug": "devils-fork",
             "href": "devils-fork/index.html",
-            "thumb": null,
-            "title": "devils-fork",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "devils-fork/thumb.jpg",
+            "title": "The Devil’s Fork",
+            "subtitle": "the impossible fork, or blivet, engraved stroke by stroke",
+            "refs": [
+              "D. H. Schuster, A New Ambiguous Figure: A Three-Stick Clevis, American Journal of Psychology, 1964"
+            ],
+            "blurb": "Six engraved lines make three round prongs at one end and two square bars at the other; slide a card over either half and each is a perfectly good object.",
+            "ready": true
           }
         ]
       },
@@ -320,7 +354,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           },
           {
             "slug": "sugihara",
@@ -357,12 +391,16 @@ window.GALLERY = [
           {
             "slug": "street-art",
             "href": "street-art/index.html",
-            "thumb": null,
-            "title": "street-art",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "street-art/thumb.jpg",
+            "title": "The Cistern Stair",
+            "subtitle": "Anamorphic pavement art",
+            "refs": [
+              "Kurt Wenner, pavement anamorphoses, from 1984",
+              "Julian Beever, pavement drawings, from the 1990s",
+              "Edgar Mueller, Lava Burst and The Crevasse, 2008"
+            ],
+            "blurb": "From the chalk footprints a flooded cistern opens in the paving and a broken column rises out of it; walk round, and it is a long, stretched drawing lying flat on the stones.",
+            "ready": true
           }
         ]
       },
@@ -373,12 +411,15 @@ window.GALLERY = [
           {
             "slug": "mirror-anamorphosis",
             "href": "mirror-anamorphosis/index.html",
-            "thumb": null,
-            "title": "mirror-anamorphosis",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "mirror-anamorphosis/thumb.jpg",
+            "title": "The Island and the Mirror",
+            "subtitle": "Cylindrical-mirror anamorphosis with a double image",
+            "refs": [
+              "Catoptric anamorphoses of the 17th century, after Jean-François Niceron, La Perspective curieuse, 1638",
+              "István Orosz, mirror anamorphoses, from the 1990s"
+            ],
+            "blurb": "An engraved island fortress lies on the sheet; stand the steel cylinder on its tower and its curved walls straighten into an impossible triangle of stone.",
+            "ready": true
           }
         ]
       },
@@ -389,22 +430,27 @@ window.GALLERY = [
           {
             "slug": "penrose-tiling",
             "href": "penrose-tiling/index.html",
-            "thumb": null,
-            "title": "penrose-tiling",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "penrose-tiling/thumb.jpg",
+            "title": "Penrose Tiling",
+            "subtitle": "Two rhombs that cover the plane but never repeat",
+            "refs": [
+              "Roger Penrose, rhomb tiling (P3), 1974"
+            ],
+            "blurb": "An endless zoom into Penrose's rhombs: deflate by the golden ratio twice, turn 36°, and the picture comes back exactly, yet it never repeats.",
+            "ready": true
           },
           {
             "slug": "hat-tiling",
             "href": "hat-tiling/index.html",
-            "thumb": null,
-            "title": "hat-tiling",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "hat-tiling/thumb.jpg",
+            "title": "The Hat",
+            "subtitle": "One tile that covers the plane but never repeats",
+            "refs": [
+              "D. Smith, J. S. Myers, C. S. Kaplan and C. Goodman-Strauss, An aperiodic monotile, 2023",
+              "D. Smith, J. S. Myers, C. S. Kaplan and C. Goodman-Strauss, A chiral aperiodic monotile, 2023"
+            ],
+            "blurb": "Thousands of copies of a single 13-sided shape, generated exactly, zooming out through the nested clusters that stop it from ever repeating.",
+            "ready": true
           }
         ]
       },
@@ -416,11 +462,14 @@ window.GALLERY = [
             "slug": "print-gallery",
             "href": "print-gallery/index.html",
             "thumb": null,
-            "title": "print-gallery",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "title": "Print Gallery",
+            "subtitle": "A picture that contains itself, twisted round its centre",
+            "refs": [
+              "M. C. Escher, Print Gallery, 1956",
+              "B. de Smit and H. W. Lenstra Jr., The Mathematical Structure of Escher's Print Gallery, 2003"
+            ],
+            "blurb": "A gallery print that contains the gallery, twisted so one turn round the centre takes you down a whole level, with the centre filled in and an endless zoom.",
+            "ready": true
           }
         ]
       },
@@ -431,12 +480,15 @@ window.GALLERY = [
           {
             "slug": "rotating-puzzle",
             "href": "rotating-puzzle/index.html",
-            "thumb": null,
-            "title": "rotating-puzzle",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "rotating-puzzle/thumb.jpg",
+            "title": "The Turning Bridge",
+            "subtitle": "A rotating-world puzzle in true isometric projection",
+            "refs": [
+              "Echochrome, 2008",
+              "Monument Valley, 2014"
+            ],
+            "blurb": "Turn the crank until the bridge lines up with a tower in the picture, and a traveller walks across a gap that only your line of sight hides.",
+            "ready": true
           }
         ]
       },
@@ -447,12 +499,18 @@ window.GALLERY = [
           {
             "slug": "circle-limit",
             "href": "circle-limit/index.html",
-            "thumb": null,
-            "title": "circle-limit",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "circle-limit/thumb.jpg",
+            "title": "Circle Limit",
+            "subtitle": "Infinity inside a circle: a hyperbolic tiling",
+            "refs": [
+              "M. C. Escher, Circle Limit I, 1958",
+              "M. C. Escher, Circle Limit II, 1959",
+              "M. C. Escher, Circle Limit III, 1959",
+              "M. C. Escher, Circle Limit IV, 1960",
+              "H. S. M. Coxeter, Crystal Symmetry and Its Generalizations, 1957"
+            ],
+            "blurb": "Fish circle starfish in a disk that never ends: drag to glide through the hyperbolic plane, switch between five tilings, and reveal Coxeter's triangles underneath.",
+            "ready": true
           }
         ]
       }

@@ -1,0 +1,8 @@
+{
+  "slug": "hat-tiling",
+  "title": "The Hat",
+  "subtitle": "One tile that covers the plane but never repeats",
+  "technique": "Aperiodic monotile, built by metatile substitution",
+  "refs": ["D. Smith, J. S. Myers, C. S. Kaplan and C. Goodman-Strauss, An aperiodic monotile, 2023", "D. Smith, J. S. Myers, C. S. Kaplan and C. Goodman-Strauss, A chiral aperiodic monotile, 2023"],
+  "blurb": "Thousands of copies of a single 13-sided shape, generated exactly, zooming out through the nested clusters that stop it from ever repeating."
+}

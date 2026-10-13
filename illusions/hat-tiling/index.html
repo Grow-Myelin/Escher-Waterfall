@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Hat</title>
+  <meta name="description" content="The 2023 aperiodic monotile: one shape, the hat, that tiles the plane but never periodically, generated exactly by substitution. With the spectre, its chiral cousin.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -3 8 7'%3E%3Cpath d='M0 0-1.5-.87-1-1.73 1-1.73 1.5-.87 3-1.73 4.5-.87 4 0 3 0 3 1.73 1.5 2.6 1 1.73 0 1.73z' fill='%23ece5d5' stroke='%23222' stroke-width='.3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #panel .report { color: var(--muted); font-size: 12.5px; border-left: 2px solid var(--line); padding-left: 10px; }
+    @media (max-width: 640px) {
+      #badge { font-size: 10px; max-width: calc(100% - 20px); }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Hat</h1>
+    <p>one tile that covers the plane but never repeats, after Smith, Myers, Kaplan and Goodman-Strauss (2023)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A slow zoom out over thousands of hat tiles, each made of eight kites, with the reflected hats picked out and the nested clusters of the substitution outlined"></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">One tile, never repeating</h2>
+    <p>The hat is a polygon with 13 corners, made of eight kites cut from a grid of hexagons. Copies of it, turned and sometimes flipped over, cover the whole plane with no gaps and no overlaps. But no arrangement of them ever repeats. It is the first single shape known to force that by its outline alone. David Smith found it in 2022 and proved it with Joseph Myers, Craig Kaplan and Chaim Goodman-Strauss.</p>
+    <p>The tiling here is built by their substitution rules. Hats come in four small clusters, called H, T, P and F. Each kind of cluster is replaced by a fixed arrangement of clusters, which group into four larger kinds with the same names, and so on. Zooming out shows that hierarchy. Lines are inked more heavily the larger the clusters they separate. The colours show which kind of cluster each hat belongs to, at a level that rises as you zoom out.</p>
+    <p>The proof turns this round. In any tiling by hats, the hats must group into these clusters in exactly one way, and the clusters into larger ones, at every scale. A tiling that repeated by some shift would have to repeat by it at every level, but eventually the clusters are larger than the shift, which is impossible. No tiling by hats can do without mirror images: in each H cluster, one hat is flipped over. They are highlighted here. In the limit there are φ⁴ ≈ 6.85 ordinary hats for every reflected one.</p>
+    <p><em>Spectre</em> shows the sequel by the same authors. Copies of this tile kept the same way round can only tile the plane non-periodically. Bending its edges into S-curves stops mirror images from fitting at all. Here the odd ones out are the spectres turned 30° from the rest, about one in 8.9.</p>
+    <p class="report" id="report"></p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>S</kbd><span>switch between the hat and the spectre</span>
+      <kbd>H</kbd><span>highlight the reflected hats, or the turned spectres</span>
+      <kbd>Space</kbd><span>pause or play the zoom</span>
+    </div>
+    <p class="credit">After D. Smith, J. S. Myers, C. S. Kaplan and C. Goodman-Strauss, “An aperiodic monotile” and “A chiral aperiodic monotile” (2023); the construction follows Kaplan’s published substitution. The drawing is original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <div class="seg" role="group" aria-label="Tile">
+        <button id="btn-hat" aria-pressed="true">Hat</button>
+        <button id="btn-spectre" aria-pressed="false">Spectre</button>
+      </div>
+      <button id="btn-odd" class="primary" aria-pressed="true">Highlight</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Scroll or drag to zoom by hand · Highlight picks out the odd ones</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

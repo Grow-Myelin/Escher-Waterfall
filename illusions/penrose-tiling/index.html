@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Penrose Tiling</title>
+  <meta name="description" content="An endless zoom through Penrose's rhomb tiling: two tiles, one matching rule, and a pattern that never repeats.">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4 44 32 32 60 20 32z' fill='%23ece5d5' stroke='%23222' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    .stepper { display: none; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 999px; background: rgba(0, 0, 0, 0.18); }
+    body.steps .stepper { display: inline-flex; }
+    .stepper button { border: 0; background: transparent; padding: 7px 11px; font-size: 14px; }
+    .stepper button:hover { background: rgba(233, 227, 214, 0.08); }
+    .stepper span { min-width: 58px; text-align: center; font: 500 12.5px/1 var(--sans); color: var(--muted); letter-spacing: 0.03em; }
+    .stepper b { color: var(--text); font-weight: 600; }
+    #panel .swatch { display: inline-block; width: 22px; height: 0; border-top: 3px solid #1d1b18; vertical-align: middle; margin-right: 4px; }
+    @media (max-width: 640px) {
+      .stepper button { padding: 6px 10px; }
+      #badge { font-size: 10px; max-width: calc(100% - 20px); }
+      body.steps #panel { bottom: 150px; max-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Penrose Tiling</h1>
+    <p>two rhombs that cover the plane but never repeat, after Roger Penrose (1974)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="An endless zoom into a Penrose rhomb tiling decorated with matching arcs; red stars mark centres of local five-fold symmetry"></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">Why it never repeats</h2>
+    <p>There are two tiles: a thick rhomb with angles of 72° and 108°, and a thin one with 36° and 144°. All their edges are the same length. Each tile carries two arcs of different kinds: bold and hollow in the lithograph, red and cream in colour. Penrose’s rule is that tiles may meet only where every arc runs on across the edge into an arc of the same kind. Nothing else constrains the pattern.</p>
+    <p><em>Deflate</em> shows how the tiling is built. Each rhomb is cut along a diagonal into two triangles (dashed in red). Every triangle is replaced by smaller ones, scaled down by the golden ratio φ ≈ 1.618: a thin half becomes one thin and one thick half, and a thick half becomes one thin and two thick halves. The new halves pair up into rhombs that obey the arc rule again.</p>
+    <p>The rule also forces the reverse. In any tiling that obeys the arcs, the tiles can be halved and regrouped in exactly one way into rhombs φ times larger that obey the same rule, and those into larger ones again, without end. If some shift moved the whole pattern onto itself, it would also move every one of these larger rhombs onto another. Once they are bigger than the shift, each would have to land on a spot overlapping its own, which only it occupies. So no shift works. The tile counts show the same thing: thick rhombs outnumber thin ones by φ to 1, an irrational ratio that no repeating pattern can have.</p>
+    <p>The zoom uses that hierarchy. Two deflations, enlarged by φ² and turned 36°, give back exactly the picture you started with, so the zoom never has to stop. Each red star marks a centre of five-fold symmetry: the pattern round it is unchanged by a turn of 72°. The larger the star, the further that holds; for the larger ones a fine red circle shows where it stops. Such centres come in every size, but at most one point in a Penrose tiling can have that symmetry all the way out. Here it is the centre of the zoom.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>Z</kbd><span>zoom, or step through the deflation</span>
+      <kbd>[</kbd><span>one level coarser (inflate)</span>
+      <kbd>]</kbd><span>one level finer (deflate)</span>
+      <kbd>A</kbd><span>show or hide the arcs</span>
+      <kbd>C</kbd><span>show or hide the symmetry centres</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">After Roger Penrose’s rhomb tiling (1974) and his arc decoration for its matching rules. The tiling is computed exactly; the drawing is original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <div class="seg" role="group" aria-label="View">
+        <button id="btn-zoom" aria-pressed="true">Zoom</button>
+        <button id="btn-steps" aria-pressed="false">Deflate</button>
+      </div>
+      <div class="stepper" role="group" aria-label="Deflation level">
+        <button id="btn-coarser" aria-label="One level coarser">‹</button>
+        <span>Level <b id="level">0</b></span>
+        <button id="btn-finer" aria-label="One level finer">›</button>
+      </div>
+      <button id="btn-arcs" class="primary" aria-pressed="true">Arcs</button>
+      <button id="btn-marks" class="primary" aria-pressed="true">Centres</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Scroll or drag to zoom by hand · Deflate to step through the levels</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

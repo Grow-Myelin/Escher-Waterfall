@@ -1,0 +1,8 @@
+{
+  "slug": "penrose-tiling",
+  "title": "Penrose Tiling",
+  "subtitle": "Two rhombs that cover the plane but never repeat",
+  "technique": "Aperiodic tiling forced by matching rules, built by deflation",
+  "refs": ["Roger Penrose, rhomb tiling (P3), 1974"],
+  "blurb": "An endless zoom into Penrose's rhombs: deflate by the golden ratio twice, turn 36°, and the picture comes back exactly, yet it never repeats."
+}
