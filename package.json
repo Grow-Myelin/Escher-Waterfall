@@ -2,12 +2,13 @@
   "name": "escher-waterfall",
   "version": "1.0.0",
   "private": true,
-  "description": "An animated, true-isometric 3D reconstruction of M. C. Escher's lithograph Waterfall (1961).",
+  "description": "Animated, true-isometric 3D reconstruction of M. C. Escher's Waterfall (1961), and a gallery of illustrated optical-illusion techniques.",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --format=iife --minify --target=es2020 --outfile=dist/waterfall.js",
-    "dev": "esbuild src/main.js --bundle --format=iife --target=es2020 --outfile=dist/waterfall.js --sourcemap --watch",
-    "start": "npm run build && npx --yes http-server -c-1 -p 8080 ."
+    "build": "node build.mjs",
+    "build:one": "node build.mjs",
+    "dev": "node build.mjs waterfall --watch",
+    "start": "node build.mjs && npx --yes http-server -c-1 -p 8080 ."
   },
   "dependencies": {
     "three": "0.186.1"
