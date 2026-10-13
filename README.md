@@ -22,7 +22,45 @@ npm start                      # build, then serve on http://localhost:8080
 
 `node tools/screenshot.cjs <page.html> <out.png> [--frame] [--eval "js"]` takes a headless screenshot of any page and reports console errors.
 
-## Controls
+## The gallery
+
+Each illustration is an original scene that uses the device rather than a copy of any picture. Every one has a lithograph and a colour mode where that makes sense, a control that exposes the mechanism, and a "How it works" panel.
+
+**Tricks Escher used**
+
+| Technique | Illustrations |
+|---|---|
+| Impossible figures | [Waterfall](index.html), [The Endless Stair](illusions/penrose-stairs/index.html) |
+| Ambiguous depth | [The Impossible Cube](illusions/impossible-cube/index.html) |
+| Convex/concave reversal | [Convex and Concave](illusions/convex-concave/index.html) |
+| Multiple gravities | [Three Gravities](illusions/relativity/index.html) |
+| Curved perspective | [Zenith and Nadir](illusions/curved-perspective/index.html) |
+| Tessellation | [Regular Division of the Plane](illusions/tessellation/index.html) |
+| Figure–ground reversal | [Figure and Ground](illusions/figure-ground/index.html) |
+| Metamorphosis | [Metamorphosis](illusions/metamorphosis/index.html) |
+| Flat-to-3D crossover | [Flat to Solid](illusions/flat-to-3d/index.html) |
+| Self-reference loops | [Drawing Hands](illusions/drawing-hands/index.html), [Print Gallery](illusions/print-gallery/index.html) |
+| Infinity in a finite space | [Circle Limit](illusions/circle-limit/index.html), [Smaller and Smaller](illusions/smaller-and-smaller/index.html) |
+| Reflections and layered worlds | [Reflecting Sphere](illusions/reflecting-sphere/index.html), [Three Worlds](illusions/three-worlds/index.html) |
+| One-sided surfaces | [Möbius Lattice](illusions/moebius-strip/index.html) |
+| Ordinary details as misdirection | [Waterfall](index.html) |
+
+**Tricks he didn't use, or that came later**
+
+| Technique | Illustrations |
+|---|---|
+| Reutersvärd's cube-built impossible figures | [Triangle of Cubes](illusions/reutersvard/index.html) |
+| The devil's fork | [The Devil's Fork](illusions/devils-fork/index.html) |
+| Real impossible objects | [The Sweet Spot](illusions/perth-triangle/index.html), [Square or Round](illusions/sugihara/index.html) |
+| Reverse perspective | [The Rooms That Follow You](illusions/reverse-perspective/index.html) |
+| Anamorphic street art | [The Cistern Stair](illusions/street-art/index.html) |
+| Mirror anamorphosis and double images | [The Island and the Mirror](illusions/mirror-anamorphosis/index.html) |
+| Aperiodic tilings | [Penrose Tiling](illusions/penrose-tiling/index.html), [The Hat](illusions/hat-tiling/index.html) |
+| Completing *Print Gallery* | [Print Gallery](illusions/print-gallery/index.html) |
+| Rotating-camera puzzles | [The Turning Bridge](illusions/rotating-puzzle/index.html) |
+| Computer-generated hyperbolic patterns | [Circle Limit](illusions/circle-limit/index.html) |
+
+## The Waterfall's controls
 
 | | |
 |---|---|
@@ -32,7 +70,7 @@ npm start                      # build, then serve on http://localhost:8080
 | Drag / scroll | Pan and zoom; when revealed, drag orbits the structure |
 | Double-click / `0` | Reset the view |
 
-## How the impossible part works
+## How the Waterfall's impossible loop works
 
 The camera is orthographic and sits on the cube diagonal (1, 1, 1), the true isometric angle. From there a horizontal step of (−d, 0, −d) looks exactly like a vertical step of (0, +d, 0), because the two differ by d·(1, 1, 1), which projects to a single point.
 
@@ -54,7 +92,7 @@ Each one is cut once at mid-height. Its upper half is slid back along the line o
 
 The numbers are in `src/layout.js`.
 
-## What's in the picture
+## What's in the Waterfall
 
 - The compound of three cubes on the left tower, and Escher's solid (the first stellation of the rhombic dodecahedron) on the right tower. Each is turned slightly so the isometric view does not look straight down a three-fold axis.
 - The towers' arcaded top storeys, with columns, capitals and entablatures.
@@ -96,4 +134,4 @@ assets/                      the Waterfall's gallery thumbnail
 
 ## Credit
 
-An homage to *Waterfall* (1961) by M. C. Escher. Every model, texture and shader here is original; no part of the print is reproduced. Built with [three.js](https://threejs.org).
+An homage to *Waterfall* (1961) by M. C. Escher, and to the artists and mathematicians credited on each gallery page. Every model, texture and shader here is original; no part of any artwork is reproduced. Built with [three.js](https://threejs.org).

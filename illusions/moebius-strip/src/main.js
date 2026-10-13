@@ -48,7 +48,7 @@ for (let i = 0; i < N_ANTS; i++) {
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.PerspectiveCamera(28, ASPECT, 0.5, 200);
-const view = { az: 1.05, el: 0.26, dist: 24, auto: true, resume: 0 };
+const view = { az: 2.2, el: 0.4, dist: 24, auto: true, resume: 0 };
 const TARGET = new THREE.Vector3(0, -1.0, 0);
 // The light turns with the camera (from the upper left, in front), so the
 // orbit never swings round into an all-shadow view.

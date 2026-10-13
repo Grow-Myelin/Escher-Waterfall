@@ -50,8 +50,10 @@ vec3 finish(vec3 col, float haze, float ink, vec2 huv, float hfw, float face) {
   float d1 = abs(fract(a1) - 0.5) * 2.0;
   float d2 = abs(fract(a2) - 0.5) * 2.0;
   float aa1 = fwidth(a1) * 2.0 + 0.02, aa2 = fwidth(a2) * 2.0 + 0.02;
-  float h1 = 1.0 - smoothstep(1.0 - c1 - aa1, 1.0 - c1 + aa1, d1);
-  float h2 = 1.0 - smoothstep(1.0 - c2 - aa2, 1.0 - c2 + aa2, d2);
+  // d is 0 on a hatch line and 1 midway between lines; a line covers the
+  // fraction c of each period, so darker tones get wider lines
+  float h1 = 1.0 - smoothstep(c1 - aa1, c1 + aa1, d1);
+  float h2 = 1.0 - smoothstep(c2 - aa2, c2 + aa2, d2);
   h1 = mix(c1, h1, hl);
   h2 = mix(c2, h2, hl);
   float v = 0.2 + 0.82 * t;
