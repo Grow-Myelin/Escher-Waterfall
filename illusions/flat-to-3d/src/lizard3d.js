@@ -150,6 +150,20 @@ function project(sp, x, y) {
   return [s, l];
 }
 
+// position of the spine and its frame at arc length s
+function spineAt(sp, s) {
+  const f = Math.min(sp.pts.length - 1.001, Math.max(0, s / sp.step));
+  const i = Math.floor(f), u = f - i;
+  const lerp = (A) => [A[i][0] + (A[i + 1][0] - A[i][0]) * u, A[i][1] + (A[i + 1][1] - A[i][1]) * u];
+  return { p: lerp(sp.pts), t: lerp(sp.T), n: lerp(sp.N) };
+}
+// v = S(s) + a·T(s) + l·N(s): exact for any choice of s
+function decompose(sp, s, x, y) {
+  const f = spineAt(sp, s);
+  const dx = x - f.p[0], dy = y - f.p[1];
+  return [dx * f.t[0] + dy * f.t[1], dx * f.n[0] + dy * f.n[1]];
+}
+
 export function buildLizard(spineStep) {
   const ring = resample(outline(14), 0.018, true).pts;
   const pts = ring.map((p) => p.slice());
@@ -175,10 +189,21 @@ export function buildLizard(spineStep) {
   const dist = new Float32Array(n);
   for (let i = 0; i < n; i++) dist[i] = i < nb ? 0 : distToPoly(ring, pts[i][0], pts[i][1]);
 
-  // spine coordinates
+  // spine coordinates (the nearest point on the whole spine)
   const sp = spineSamples(spineStep);
   const S = new Float32Array(n), Lat = new Float32Array(n);
   for (let i = 0; i < n; i++) { const [s, l] = project(sp, pts[i][0], pts[i][1]); S[i] = s; Lat[i] = l; }
+  // Attachments for the animation. Only the tail itself rides on the curled
+  // part of the spine; everything else hangs from the trunk (s ≥ TAIL_BASE),
+  // offset along it by a and across it by l.
+  const TAIL_BASE = project(sp, -0.62, 0.46)[0];
+  const sAtt = new Float32Array(n), along = new Float32Array(n), across = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const tail = S[i] < TAIL_BASE && Math.abs(Lat[i]) < 0.2;
+    sAtt[i] = tail ? S[i] : Math.max(TAIL_BASE, S[i]);
+    const [a, l] = decompose(sp, sAtt[i], pts[i][0], pts[i][1]);
+    along[i] = a; across[i] = l;
+  }
 
   // heights: inflation, a ridge down the back, bulging eyes; then smoothed
   let h = new Float32Array(n);
@@ -205,7 +230,12 @@ export function buildLizard(spineStep) {
 
   // legs: vertices nearer a leg's axis than the spine swing about its joint
   const legIdx = new Int8Array(n).fill(-1), legW = new Float32Array(n);
-  const joints = LEGS.map((L) => project(sp, L.joint[0], L.joint[1]));
+  const joints = LEGS.map((L) => {
+    const s = Math.max(TAIL_BASE, project(sp, L.joint[0], L.joint[1])[0]);
+    const [a, l] = decompose(sp, s, L.joint[0], L.joint[1]);
+    return { s, a, l };
+  });
+  const legA = new Float32Array(n), legL = new Float32Array(n); // offsets in the joint's frame
   for (let i = 0; i < n; i++) {
     const [x, y] = pts[i];
     let best = -1, bd = Infinity, bt = 0;
@@ -220,6 +250,8 @@ export function buildLizard(spineStep) {
     if (best >= 0 && bt > -0.12 && bd < Math.abs(Lat[i]) * 0.95 + 0.02 && bd < 0.32) {
       legIdx[i] = best;
       legW[i] = Math.min(1, Math.max(0, (bt + 0.1) / 0.5)) ** 1.5;
+      const [a, l] = decompose(sp, joints[best].s, x, y);
+      legA[i] = a; legL[i] = l;
     }
   }
 
@@ -240,5 +272,5 @@ export function buildLizard(spineStep) {
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   geo.setAttribute('aDist', new THREE.Float32BufferAttribute(dist, 1));
   geo.setIndex(index);
-  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, joints, spine: sp, tris };
+  return { geo, n, nb, pts, ring, S, Lat, h, dist, legIdx, legW, legA, legL, joints, sAtt, along, across, spine: sp, tris };
 }

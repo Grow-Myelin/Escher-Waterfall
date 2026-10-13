@@ -216,7 +216,8 @@ function stateAt(t) {
 const fr = { pos: [0, 0, 0], T: [0, 0, 0], B: [0, 0, 0], N: [0, 0, 0] };
 const posAttr = L.geo.getAttribute('position');
 const SNECK = LS * 0.79;
-const legSide = LEGS.map((_, k) => (L.joints[k][1] > 0 ? -1 : 1));
+const legSide = L.joints.map((j) => (j.l > 0 ? -1 : 1));
+const fr2 = { pos: [0, 0, 0], T: [0, 0, 0], B: [0, 0, 0], N: [0, 0, 0] };
 function deform(s) {
   const u = s.u >= U1 - 1e-6 ? U1 : s.u;
   const walked = Math.max(0, u - U0);
@@ -226,36 +227,47 @@ function deform(s) {
   const legA = 0.38 * gait;
   const headA = s.pauseT >= 0 ? 0.55 * Math.sin((s.pauseT / PAUSE) * Math.PI * 2) * smoothstep(0, 0.5, s.pauseT) * smoothstep(PAUSE, PAUSE - 0.5, s.pauseT) : 0;
   const headLift = s.pauseT >= 0 ? 0.12 * Math.sin((s.pauseT / PAUSE) * Math.PI) : 0;
+  const kap = s.relief;
   const P = posAttr.array;
   for (let i = 0; i < L.n; i++) {
-    let sv = L.S[i], lv = L.Lat[i], hv = L.h[i];
-    const k = L.legIdx[i];
-    if (k >= 0 && legA > 0) {
-      const leg = LEGS[k], j = L.joints[k];
-      const w = L.legW[i];
-      const ph = phi + leg.phase;
-      const a = legSide[k] * legA * Math.sin(ph) * w;
-      const ds = sv - j[0], dl = lv - j[1];
-      const ca = Math.cos(a), sa = Math.sin(a);
-      sv = j[0] + ds * ca - dl * sa;
-      lv = j[1] + ds * sa + dl * ca;
-      hv += 0.09 * w * Math.max(0, Math.cos(ph)) * gait;
-    }
+    let sv = L.sAtt[i], av = L.along[i], lv = L.across[i], hv = L.h[i];
     // the trunk bends from side to side with the stride
-    lv += 0.05 * gait * Math.sin(phi) * Math.cos((2 * Math.PI * (sv / LS - 0.45)));
+    lv += 0.05 * gait * Math.sin(phi) * Math.cos(2 * Math.PI * (sv / LS - 0.45));
     if (sv > SNECK && (headA || headLift)) {
       const w = smoothstep(SNECK, SNECK + 0.3, sv);
-      const ds = sv - SNECK, a = headA * w;
+      const ds = sv + av - SNECK, a = headA * w;
       const ca = Math.cos(a), sa = Math.sin(a);
-      sv = SNECK + ds * ca - lv * sa;
+      const ns = SNECK + ds * ca - lv * sa;
       lv = ds * sa + lv * ca;
+      av = ns - sv;
       hv += headLift * w * (ds / 0.5);
     }
     frameAt(path, u - (LS - sv) * K, fr);
-    const l = lv * K, h = hv * K * s.relief + 0.0015;
-    P[i * 3] = fr.pos[0] + fr.B[0] * l + fr.N[0] * h;
-    P[i * 3 + 1] = fr.pos[1] + fr.B[1] * l + fr.N[1] * h;
-    P[i * 3 + 2] = fr.pos[2] + fr.B[2] * l + fr.N[2] * h;
+    let x = fr.pos[0] + (fr.T[0] * av + fr.B[0] * lv) * K;
+    let y = fr.pos[1] + (fr.T[1] * av + fr.B[1] * lv) * K;
+    let z = fr.pos[2] + (fr.T[2] * av + fr.B[2] * lv) * K;
+    let nx = fr.N[0], ny = fr.N[1], nz = fr.N[2];
+    const k = L.legIdx[i];
+    if (k >= 0) {
+      // legs hang rigidly from the frame at their joint and swing about it
+      const leg = LEGS[k], j = L.joints[k], w = L.legW[i];
+      const ph = phi + leg.phase;
+      const ang = legSide[k] * legA * Math.sin(ph);
+      const da = L.legA[i] - j.a, dl = L.legL[i] - j.l;
+      const ca = Math.cos(ang), sa = Math.sin(ang);
+      const ra = j.a + da * ca - dl * sa, rl = j.l + da * sa + dl * ca;
+      frameAt(path, u - (LS - j.s) * K, fr2);
+      const jx = fr2.pos[0] + (fr2.T[0] * ra + fr2.B[0] * rl) * K;
+      const jy = fr2.pos[1] + (fr2.T[1] * ra + fr2.B[1] * rl) * K;
+      const jz = fr2.pos[2] + (fr2.T[2] * ra + fr2.B[2] * rl) * K;
+      x += (jx - x) * w; y += (jy - y) * w; z += (jz - z) * w;
+      nx += (fr2.N[0] - nx) * w; ny += (fr2.N[1] - ny) * w; nz += (fr2.N[2] - nz) * w;
+      hv += 0.09 * w * Math.max(0, Math.cos(ph)) * gait;
+    }
+    const h = hv * K * kap + 0.0015;
+    P[i * 3] = x + nx * h;
+    P[i * 3 + 1] = y + ny * h;
+    P[i * 3 + 2] = z + nz * h;
   }
   posAttr.needsUpdate = true;
   L.geo.computeVertexNormals();

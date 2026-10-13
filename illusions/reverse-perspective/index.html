@@ -3,33 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!-- TEMPLATE: replace every TODO. Keep the element ids; shell.js and page.css rely on them. -->
-  <title>TODO Short Title</title>
-  <meta name="description" content="TODO one sentence">
+  <title>Reverse Perspective</title>
+  <meta name="description" content="A painted relief whose nearest parts show the farthest parts of the scene: as you step from side to side, the painted rooms seem to turn and follow you.">
   <meta name="color-scheme" content="dark">
   <link rel="stylesheet" href="../shared/page.css">
 </head>
 <body>
   <a class="back" href="../index.html">← Gallery</a>
   <header id="masthead">
-    <h1>TODO Title</h1>
-    <p>TODO subtitle: the technique, and the work it refers to</p>
+    <h1>The Rooms That Follow You</h1>
+    <p>A reverspective: a relief that sticks out, painted with rooms that go in, after Patrick Hughes</p>
   </header>
 
   <div id="frame">
-    <canvas id="scene" aria-label="TODO describe the illustration"></canvas>
+    <canvas id="scene" aria-label="A painted relief on a gallery wall: a stone facade with a long tiled hall, two libraries and two niches. The visitor steps from side to side and the painted rooms seem to swing round to face them."></canvas>
     <div id="badge"></div>
   </div>
 
   <aside id="panel" hidden aria-labelledby="panel-title">
     <button id="panel-close" aria-label="Close">✕</button>
-    <h2 id="panel-title">TODO How it works</h2>
-    <p>TODO two to four short paragraphs: what you see, why it fools the eye, the exact geometry or maths.</p>
+    <h2 id="panel-title">How it works</h2>
+    <p>The board carries five shapes that stick out towards you: a tall truncated pyramid in the middle, two lower ones at the sides and two small ones above. They are painted with a facade whose doorways lead into a long hall, two libraries and two niches. The parts that stick out furthest, the flat tops, carry the furthest things in the picture: the end of the hall and the back walls of the rooms.</p>
+    <p>As you step sideways, the real tops slide across the board faster than the board itself, as near things do. But the painting says they are far away, and far things should lag behind. Your eye believes the painting, so it can only explain the motion one way: the rooms are turning to follow you.</p>
+    <p>The relief is computed, not guessed. A perspective transformation centred on the eye, with the board as its fixed plane, slides every point of the painted scene along its own line of sight. Depth behind the board becomes height in front of it, and infinitely far lands <span id="n-h">45</span>&nbsp;cm out. It maps planes to planes, so each wall, floor and ceiling becomes one face of a pyramid, and the painted corners fall on the creases. The <span id="n-hallF">5</span>&nbsp;m hall becomes a pyramid <span id="n-hall">32</span>&nbsp;cm high; the rooms become <span id="n-room">15</span>&nbsp;cm.</p>
+    <p>The paint is projected, not drawn. The scene is rendered from the design eye, <span id="n-d">2.4</span>&nbsp;m from the board, and cast back onto the relief from the same point. From there every patch of paint is exactly where the picture needs it. <b>Remove the paint</b> shows the plain relief. <b>View from above</b> shows its real shape, with the rooms as they are meant to be seen drawn in red behind the board.</p>
     <h3>Keys</h3>
     <div class="keys">
-      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>Space</kbd><span>sway or stop</span>
+      <kbd>←</kbd><span>step left (or drag)</span>
+      <kbd>→</kbd><span>step right</span>
+      <kbd>0</kbd><span>stand at the design point (or double-click)</span>
+      <kbd>P</kbd><span>remove or restore the paint</span>
+      <kbd>T</kbd><span>view from above</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
     </div>
-    <p class="credit">TODO credit the artist or mathematician this refers to.</p>
+    <p class="credit">After Patrick Hughes's reverspectives (from 1964). The facade, rooms and relief here are original.</p>
   </aside>
 
   <footer id="controls">
@@ -38,10 +46,12 @@
         <button id="btn-litho" aria-pressed="true">Lithograph</button>
         <button id="btn-colour" aria-pressed="false">Colour</button>
       </div>
+      <button id="btn-paint" class="primary" aria-pressed="false">Remove the paint</button>
+      <button id="btn-top" class="primary" aria-pressed="false">View from above</button>
       <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
       <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
     </div>
-    <div id="hint">TODO interaction hint</div>
+    <div id="hint">Drag sideways to step left or right · the rooms seem to turn to follow you</div>
   </footer>
 
   <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
@@ -53,7 +63,6 @@
       } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
     })();
   </script>
-  <!-- shared three.js (window.THREE); omit if the page does not use three -->
   <script src="../../vendor/three.min.js"></script>
   <script src="bundle.js"></script>
 </body>

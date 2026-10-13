@@ -198,6 +198,7 @@ const state = {
   litho: 1, lithoTarget: 1, paint: 1, paintTarget: 1, top: 0, topTarget: 0,
   paintDirty: true,
 };
+const OMEGA = (Math.PI * 2) / 9; // one sway every nine seconds
 setupPanel();
 segmented([[document.getElementById('btn-litho'), 1], [document.getElementById('btn-colour'), 0]], (v) => { state.lithoTarget = v; }, 1);
 const setPlaying = playButton((on) => {
@@ -208,7 +209,6 @@ const setPlaying = playButton((on) => {
   }
   state.playing = on;
 });
-const OMEGA = (Math.PI * 2) / 9;
 const btnPaint = document.getElementById('btn-paint');
 const btnTop = document.getElementById('btn-top');
 function setPaint(on) {
