@@ -183,6 +183,8 @@ const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 
 let last = performance.now();
 let badgeShown = '';
+let badgeSince = -1e9;
+let badgeOn = false;
 function frame(now) {
   const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
   last = now;
@@ -217,8 +219,13 @@ function frame(now) {
   uniforms.uGrid.value = state.grid;
   uniforms.uLog.value = ease(state.log);
 
+  // the badge explains the current twist: shown while it changes, and kept
+  // while the picture is open at the seam
   const text = badgeText(t);
-  if (text !== badgeShown) { setBadge(true, text); badgeShown = text; }
+  if (text !== badgeShown) { badgeShown = text; badgeSince = now; }
+  const showBadge = (t > 0.001 && t < 0.999) || now - badgeSince < 3500;
+  if (showBadge !== badgeOn) { badgeOn = showBadge; setBadge(showBadge, text); }
+  else if (showBadge) setBadge(true, text);
 
   renderer.render(display, cam);
   requestAnimationFrame(frame);

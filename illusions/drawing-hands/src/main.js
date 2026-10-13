@@ -46,14 +46,14 @@ function handGeometry() {
 
 // A hexagonal pencil, sharpened: lacquered body, bare wood cone, graphite.
 function pencilGeometry(tip, axis) {
-  const L = 10.5, segA = 36;
+  const L = 9.2, segA = 36;
   const apo = PEN.r * Math.cos(Math.PI / 6);
   const rHex = (a) => apo / Math.cos(((a % (Math.PI / 3)) + Math.PI / 3) % (Math.PI / 3) - Math.PI / 6);
   const rCone = (s) => (s < PEN.tipLen ? 0.012 + (0.09 - 0.012) * (s / PEN.tipLen) : 0.09 + (PEN.r - 0.09) * Math.min(1, (s - PEN.tipLen) / PEN.coneLen));
   const ax = new THREE.Vector3(...axis).normalize();
   const u = new THREE.Vector3(0, 0, 1).cross(ax).normalize();
   const w = new THREE.Vector3().crossVectors(ax, u).normalize();
-  const rings = [0, 0.05, 0.12, 0.2, 0.28, PEN.tipLen, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 1.95, 2.1, 2.25, 2.4, 2.6, 3.2, 5, 7, 9, L];
+  const rings = [0, 0.05, 0.12, 0.2, 0.28, PEN.tipLen, 0.45, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 1.95, 2.1, 2.25, 2.4, 2.6, 3.2, 5, 7, L];
   const pos = [], nor = [], mat = [], idx = [];
   for (const s of rings) {
     for (let k = 0; k <= segA; k++) {
@@ -111,7 +111,7 @@ const drawing = buildDrawing(fp);
 const FLAT_CENTRE = (() => {
   let x = 0, y = 0, n = 0;
   for (const s of drawing.strokes) for (const p of s.pts) { x += p[0]; y += p[1]; n++; }
-  return [x / n - 0.9, y / n + 1.3];
+  return [x / n - 0.9, y / n + 1.9];
 })();
 const PHI = -Math.PI / 2 - 0.66;
 const placeA = new THREE.Matrix4();
@@ -263,7 +263,7 @@ const arrowMat = new THREE.MeshBasicMaterial({ color: 0xa23b2a, transparent: tru
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
-const VIEW_H = 14.6; // half height of the sheet in view
+const VIEW_H = 15.3; // half height of the sheet in view
 const TOP = { az: -Math.PI / 2, el: Math.PI / 2, zoom: 1 };
 const SIDE = { az: -Math.PI / 2 + 0.7, el: 0.56, zoom: 0.95 };
 const view = { ...TOP, px: 0, py: 0 };
@@ -329,6 +329,7 @@ function pencilTarget(T) {
 // sliding the pencil where it rests in the hand; the hand itself follows,
 // smoothly, only as far as it must.
 const REACH = 2.3;
+const TURN_MAX = 0.11;
 const handState = { turn: 0, slide: 0, vTurn: 0, vSlide: 0, init: false };
 const qTmp = new THREE.Quaternion(), d0 = new THREE.Vector3(), d1 = new THREE.Vector3(), m4 = new THREE.Matrix4();
 function handFor(px, py) {
@@ -346,17 +347,23 @@ function solveMotion(T, dt) {
   let dx = vA.x - tipL[0], dy = vA.y - tipL[1];
   const d = Math.hypot(dx, dy);
   const k = d > REACH ? (d - REACH) / d : 0;
-  const [turn, slide] = handFor(tipL[0] + dx * k, tipL[1] + dy * k);
+  let [turn, slide] = handFor(tipL[0] + dx * k, tipL[1] + dy * k);
+  // never lean further towards the other hand than this; the fingers do the rest
+  turn = Math.min(turn, TURN_MAX);
   // critically damped follow
   if (!handState.init || dt <= 0) { handState.turn = turn; handState.slide = slide; handState.init = true; }
   else {
     const w = 9.0;
-    for (const key of ['turn', 'slide']) {
-      const target = key === 'turn' ? turn : slide;
-      const vk = key === 'turn' ? 'vTurn' : 'vSlide';
-      const a = w * w * (target - handState[key]) - 2 * w * handState[vk];
-      handState[vk] += a * dt;
-      handState[key] += handState[vk] * dt;
+    const n = Math.ceil(dt / 0.01);
+    const h = dt / n;
+    for (let i = 0; i < n; i++) {
+      for (const key of ['turn', 'slide']) {
+        const target = key === 'turn' ? turn : slide;
+        const vk = key === 'turn' ? 'vTurn' : 'vSlide';
+        const a = w * w * (target - handState[key]) - 2 * w * handState[vk];
+        handState[vk] += a * h;
+        handState[key] += handState[vk] * h;
+      }
     }
   }
   shared.uMotion.value.set(handState.turn, handState.slide, lift, 0);

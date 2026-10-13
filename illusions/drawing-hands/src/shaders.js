@@ -155,7 +155,7 @@ void main() {
   float light = (0.1 + 0.9 * mix(wrap * wrap, diff, 0.72)) * ao + 0.05 * rim;
   float spec = pow(max(dot(n, h), 0.0), 26.0) * gloss;
   vec3 colour = alb * (0.22 + 0.86 * light) + spec * vec3(1.0, 0.97, 0.9);
-  colour *= 1.0 - 0.45 * nailEdge;
+  colour *= 1.0 - 0.3 * nailEdge;
 
   // ---- lithograph: crayon tone that keeps the paper as its highlight,
   // with hatching that goes round the form in the shadows
@@ -176,7 +176,7 @@ void main() {
   float hh = 1.0 - (1.0 - h1 * ok1 - (1.0 - ok1) * 2.0 * w1) * (1.0 - h2 * ok2 - (1.0 - ok2) * 2.0 * w2) * (1.0 - h3);
   float g = grain();
   float v = mix(1.0, tv, 0.86) * (1.0 - 0.42 * hh) + g * 1.3;
-  v *= 1.0 - 0.6 * nailEdge;
+  v *= 1.0 - 0.35 * nailEdge;
   vec3 litho = mix(uInk, uPaper, clamp(v, 0.0, 1.0));
   vec3 col = mix(colour + g * 0.6, litho, uLitho);
   gl_FragColor = vec4(col, 1.0);
@@ -202,6 +202,7 @@ void main() {
   dir = l > 1e-6 ? dir / l : vec2(0.0);
   float wpx = uWidth * (0.45 + 0.55 * smoothstep(0.3, 0.85, f)) * smoothstep(0.08, 0.3, f);
   c.xy += dir * wpx * 2.0 / uRes * c.w;
+  c.z += 0.0009 * c.w; // just behind the surface, so it shows only at silhouettes
   vF = f;
   gl_Position = c;
 }

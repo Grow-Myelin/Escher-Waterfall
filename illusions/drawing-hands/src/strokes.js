@@ -59,15 +59,15 @@ export function buildDrawing(fp) {
   const sideY = (x, sgn) => sgn * (rimY + 0.18 * Math.sin(Math.PI * (XC - x) / (XC - XB)) + 0.1 * (XC - x) / (XC - XB));
   const sleeveY = (x, sgn) => sgn * (rimY + 0.1 + 0.75 * Math.sin(0.5 * Math.PI * Math.min(1, (XB - x) / (XB - XS))));
 
-  // 1. the wrist: two contours from the hand back into the cuff
-  add(curve(line([XW, W(XW)[1]], [XC + 0.2, W(XC)[1] - 0.02]), 0.12, 0.02, rand));
-  add(curve(line([XW, W(XW)[0]], [XC + 0.2, W(XC)[0] + 0.02]), 0.12, 0.02, rand));
   // 2. the cuff's rim: the near side, then the far side beside the wrist
   add(curve(arc([XC, 0], RX, rimY, 1, -Math.PI / 2, Math.PI / 2), 0.12, 0.018, rand));
   const wl = W(XC);
   const aLo = Math.asin(Math.max(-1, wl[0] / rimY)), aHi = Math.asin(Math.min(1, wl[1] / rimY));
   add(curve((t) => { const a = lerp(Math.PI * 0.5, Math.PI - aHi, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.06, dark: 0.85 });
   add(curve((t) => { const a = lerp(-Math.PI * 0.5, -Math.PI - aLo, t); return [XC + RX * Math.cos(a), rimY * Math.sin(a)]; }, 0.1, 0.01, rand), { w: 0.06, dark: 0.85 });
+  // 1. the wrist: two contours from the cuff up to where the hand rises
+  add(curve(line([XC + 0.2, W(XC)[0] + 0.02], [XW, W(XW)[0]]), 0.12, 0.02, rand));
+  add(curve(line([XC + 0.2, W(XC)[1] - 0.02], [XW, W(XW)[1]]), 0.12, 0.02, rand));
   // 3. the cuff's sides and its seam with the sleeve
   add(curve((t) => { const x = lerp(XC, XB, t); return [x, sideY(x, 1)]; }, 0.14, 0.02, rand));
   add(curve((t) => { const x = lerp(XC, XB, t); return [x, sideY(x, -1)]; }, 0.14, 0.02, rand));
