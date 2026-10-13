@@ -322,7 +322,12 @@ function flatLine(pts2, closed, w, dash, gap) {
 {
   const hole = outline(10).map((p) => heroWorld(p));
   guides.add(flatLine(hole, true, 0.009, 0.05, 0.03));
-  guides.add(flatLine(H.map((p) => heroWorld(p)), true, 0.005, 0.03, 0.03));
+  const hexPts = [];
+  for (let i = 0; i < 6; i++) for (let k = 0; k < 40; k++) {
+    const a = H[i], b = H[(i + 1) % 6];
+    hexPts.push(heroWorld([a[0] + (b[0] - a[0]) * (k / 40), a[1] + (b[1] - a[1]) * (k / 40)]));
+  }
+  guides.add(flatLine(hexPts, true, 0.0045, 0.03, 0.025));
   for (const i of [0, 2, 4]) {
     const c = heroWorld(H[i]);
     const dot = new THREE.Mesh(new THREE.CircleGeometry(0.04, 20), guideMat);
@@ -427,5 +432,12 @@ window.__page = {
   at: (name, f = 0) => { const p = PHASES.find((q) => q[0] === name); state.t = p.start + p[1] * f; },
   path, hero, L, TIMES,
   get frames() { return frames; },
+  // jump to the moment the head reaches distance u along the walk
+  atU(u) {
+    const p = PHASES.find((q) => q[0] === 'walk');
+    const i = walk.U.findIndex((v) => v >= u);
+    state.t = p.start + walk.T[Math.max(0, i)];
+  },
+  UP, U0, U1,
   get label() { return lastLabel; },
 };
