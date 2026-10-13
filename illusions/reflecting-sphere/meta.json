@@ -1,0 +1,8 @@
+{
+  "slug": "reflecting-sphere",
+  "title": "Reflecting Sphere",
+  "subtitle": "A mirror ball holds the whole room, and the viewer at its centre",
+  "technique": "Reflection in a convex sphere, ray-traced per pixel: each eye ray is reflected about the true sphere normal and traced through a distance cube map of the room captured at the ball's centre",
+  "refs": ["M. C. Escher, Hand with Reflecting Sphere, 1935", "L. Szirmay-Kalos, B. Aszódi, I. Lazányi and M. Premecz, Approximate Ray-Tracing on the GPU with Distance Impostors, 2005"],
+  "blurb": "Walk an artist round a mirror ball in a study: the whole room is in the ball, and however you move, your own eye stays at its centre."
+}

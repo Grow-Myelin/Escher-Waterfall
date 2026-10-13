@@ -109,7 +109,7 @@ fitFrame(ASPECT, (w, h) => {
 });
 
 // ------------------------------------------------------------------ state + ui
-const state = { playing: true, litho: 1, lithoTarget: 1, t: 0, fishT: 40, phase: 0, nextDrop: 1.5, drop: 0, gaugeHold: 5 };
+const state = { playing: true, litho: 1, lithoTarget: 1, t: 0, fishT: 3.6, phase: 0, nextDrop: 1.5, drop: 0, gaugeHold: 5 };
 
 setupPanel();
 segmented([[document.getElementById('btn-litho'), 1], [document.getElementById('btn-colour'), 0]], (v) => { state.lithoTarget = v; }, 1);

@@ -3,33 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!-- TEMPLATE: replace every TODO. Keep the element ids; shell.js and page.css rely on them. -->
-  <title>TODO Short Title</title>
-  <meta name="description" content="TODO one sentence">
+  <title>Ambiguous Cylinders</title>
+  <meta name="description" content="Two tubes in front of a mirror: square in front, round in the reflection. Each rim is a space curve computed so that it projects to a square from one side and a circle from the other.">
   <meta name="color-scheme" content="dark">
   <link rel="stylesheet" href="../shared/page.css">
 </head>
 <body>
   <a class="back" href="../index.html">← Gallery</a>
   <header id="masthead">
-    <h1>TODO Title</h1>
-    <p>TODO subtitle: the technique, and the work it refers to</p>
+    <h1>Square or Round</h1>
+    <p>Ambiguous cylinders in a mirror, after Kokichi Sugihara</p>
   </header>
 
   <div id="frame">
-    <canvas id="scene" aria-label="TODO describe the illustration"></canvas>
+    <canvas id="scene" aria-label="Two tubes on a wooden table in front of a standing mirror. In front they look square; in the mirror the same tubes look round. Every few seconds they turn half round and swap."></canvas>
     <div id="badge"></div>
   </div>
 
   <aside id="panel" hidden aria-labelledby="panel-title">
     <button id="panel-close" aria-label="Close">✕</button>
-    <h2 id="panel-title">TODO How it works</h2>
-    <p>TODO two to four short paragraphs: what you see, why it fools the eye, the exact geometry or maths.</p>
+    <h2 id="panel-title">How it works</h2>
+    <p>Each tube has straight, vertical walls, but its top edge is not flat: it rises at two corners and dips at the other two. Seen from the front, 42° above the table, the edge lines up exactly with the outline of a flat square. Seen from behind at the same angle, which is the view the mirror gives, it lines up with the outline of a flat circle. The eye takes the simplest reading, a flat rim, so it sees two different tubes.</p>
+    <p>Both views keep each point's left–right position <i>x</i>. They differ only in how depth turns into height in the picture: <i>s</i> = <i>y</i> cos θ − <i>z</i> sin θ from the front, and <i>s</i> = <i>y</i> cos θ + <i>z</i> sin θ from the back. For every <i>x</i>, setting the first to the square's edge and the second to the circle's edge gives two linear equations. Together they fix one height <i>y</i> and one depth <i>z</i>, and that is the rim.</p>
+    <p>The result is a rounded square in plan, halfway between the two shapes. Its straight sides run exactly along the mirror's line of sight, so the circle sees each of them as a single point. Turning a tube by 180° swaps front and back, and so swaps the square and the circle. <b>Show the real shape</b> swings the view off the design angle and draws, in red, the flat square and circle and the sight lines that join them to the rim.</p>
+    <p>The views here are parallel projections, as if seen from far away, so the construction is exact for any tube anywhere on the table. Sugihara builds his objects for a camera at a fixed distance in the same way.</p>
     <h3>Keys</h3>
     <div class="keys">
-      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>T</kbd><span>turn the tubes 180°</span>
+      <kbd>R</kbd><span>show the real shape</span>
+      <kbd>Space</kbd><span>turn them automatically, or stop</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Drag</kbd><span>look from elsewhere; double-click or <kbd>0</kbd> to come back</span>
     </div>
-    <p class="credit">TODO credit the artist or mathematician this refers to.</p>
+    <p class="credit">After Kokichi Sugihara's ambiguous cylinders (2016). The tubes, the table and the mirror here are original.</p>
   </aside>
 
   <footer id="controls">
@@ -38,10 +44,12 @@
         <button id="btn-litho" aria-pressed="true">Lithograph</button>
         <button id="btn-colour" aria-pressed="false">Colour</button>
       </div>
+      <button id="btn-turn">Turn 180°</button>
+      <button id="btn-reveal" class="primary" aria-pressed="false"><span>Show the real shape</span></button>
       <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
       <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
     </div>
-    <div id="hint">TODO interaction hint</div>
+    <div id="hint">Drag to look from elsewhere · the mirror shows the back of each tube</div>
   </footer>
 
   <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
@@ -53,7 +61,6 @@
       } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
     })();
   </script>
-  <!-- shared three.js (window.THREE); omit if the page does not use three -->
   <script src="../../vendor/three.min.js"></script>
   <script src="bundle.js"></script>
 </body>

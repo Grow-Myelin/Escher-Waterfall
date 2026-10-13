@@ -1,0 +1,8 @@
+{
+  "slug": "three-worlds",
+  "title": "Three Worlds",
+  "subtitle": "One surface holds what floats on it, what it mirrors and what lies beneath",
+  "technique": "Reflection and refraction at a water surface, weighted per pixel by the exact Fresnel equations: the reflected ray samples a mirror-camera image of the world above, and the refracted ray is traced by Snell's law through absorbing water to a ray-marched carp and the pond bottom",
+  "refs": ["M. C. Escher, Three Worlds, 1955"],
+  "blurb": "Fallen leaves, mirrored trees and a carp share one winter pond; tilt your view and watch the Fresnel equations trade the reflections for the world beneath."
+}

@@ -89,15 +89,15 @@ function markings(g, T, cls, mode, px, a) {
   for (let k = 0; k < SP.length; k += 1) {
     const p = SP[k];
     const f = p[2];
-    if (f < 0.1 || f > 0.82 || k % 5) continue;
+    if (f < 0.12 || f > 0.8 || k % 7) continue;
     const q0 = SP[Math.max(0, k - 1)], q1 = SP[Math.min(SP.length - 1, k + 1)];
     const dir = Math.atan2(q1[1] - q0[1], q1[0] - q0[0]);
-    const size = 0.05 * (f < 0.35 ? 0.7 + f : 1.05 - (f - 0.35) * 0.9);
+    const size = 0.07 * (f < 0.35 ? 0.7 + f : 1.05 - (f - 0.35) * 0.9);
     const c = T([p[0], p[1]]);
     const c2 = T([p[0] + Math.cos(dir), p[1] + Math.sin(dir)]);
     const ang = Math.atan2(c2[1] - c[1], c2[0] - c[0]);
-    g.moveTo(c[0] + Math.cos(ang) * size * px * 1.5, c[1] + Math.sin(ang) * size * px * 1.5);
-    g.ellipse(c[0], c[1], size * px * 1.5, size * px * 0.75, ang, 0, Math.PI * 2);
+    g.moveTo(c[0] + Math.cos(ang) * size * px * 0.8, c[1] + Math.sin(ang) * size * px * 0.8);
+    g.ellipse(c[0], c[1], size * px * 0.8, size * px * 0.62, ang, 0, Math.PI * 2);
   }
   g.fill();
   // stipple: a sparse lattice of dots, scales on the flanks

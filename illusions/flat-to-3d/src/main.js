@@ -13,6 +13,9 @@ import { buildLizard } from './lizard3d.js';
 import { buildPath, frameAt, STEP } from './path.js';
 import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady } from '../../shared/shell.js';
 
+const T0 = performance.now();
+const TIMES = {};
+const mark = (k) => { TIMES[k] = Math.round(performance.now() - T0); };
 const ASPECT = 39 / 31;
 const K = 0.42; // world units per tile unit
 const SNOUT = [-0.95, 1.7]; // where the hero's snout lies on the page (x, z)
@@ -39,19 +42,21 @@ add(buildBook());
 add(buildDodecahedron().b);
 add(buildDish());
 add(buildPencil());
+mark('desk');
 
 // ------------------------------------------------------------------ the drawing
 // Choose the hero: a lizard near the edge of the patch whose head, once the
 // patch is turned by ψ, points along +x towards the book.
-const tiles = tessellate(7).map((pl) => ({ pl, c: apply(pl, [0, 0]) }));
+const tiles = tessellate(9).map((pl) => ({ pl, c: apply(pl, [0, 0]) }));
 const HEAD_DIR = -32 * (Math.PI / 180); // the head's direction in the base tile
 let hero = null, best = Infinity;
 for (const t of tiles) {
+  if (t.pl.r !== 1) continue; // a grey lizard: its fill and its shading both show
   const want = t.pl.r * (2 * Math.PI / 3) + HEAD_DIR; // centre should lie this way from the patch's middle
   const d = Math.hypot(t.c[0], t.c[1]);
   let da = Math.atan2(t.c[1], t.c[0]) - want;
   da = Math.atan2(Math.sin(da), Math.cos(da));
-  const score = Math.abs(d - 3.6) + Math.abs(da) * 2.5;
+  const score = Math.abs(d - 4.3) + Math.abs(da) * 2.5;
   if (score < best) { best = score; hero = t; }
 }
 const PSI = -HEAD_DIR - hero.pl.r * (2 * Math.PI / 3);
@@ -75,7 +80,7 @@ const onPage = tiles.filter((t) => ring.every((p) => {
 }));
 const layout = {
   W: page.W, D: page.D, res: 2048 / page.W, k: K, tiles: onPage, ring, hero,
-  rIn: 1.9, rOut: 4.1,
+  rIn: 2.6, rOut: 5.0,
   centreDist: (t) => Math.hypot(t.c[0], t.c[1]),
   toPage: (t) => { const w = toWorld(t); return [w[0] - page.x0, w[1] - page.z0]; },
 };
@@ -88,7 +93,12 @@ function texture(c) {
   t.minFilter = THREE.LinearMipmapLinearFilter;
   return t;
 }
-const pageMat = makeDrawingMaterial(uniforms, texture(drawPage('L', layout)), texture(drawPage('C', layout)));
+mark('layout');
+const pageL = drawPage('L', layout);
+mark('pageL');
+const pageC = drawPage('C', layout);
+mark('pageC');
+const pageMat = makeDrawingMaterial(uniforms, texture(pageL), texture(pageC));
 {
   const g = new THREE.BufferGeometry();
   const y = PAGE_Y + 0.0004;
@@ -104,9 +114,11 @@ const pageMat = makeDrawingMaterial(uniforms, texture(drawPage('L', layout)), te
 
 // ------------------------------------------------------------------ the lizard
 const L = buildLizard(STEP / K);
+mark('lizard');
 const LS = L.spine.length; // spine length, tile units
 const spineWorld = L.spine.pts.map((p) => heroWorld(p));
 const path = buildPath(spineWorld);
+mark('path');
 const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.pl.r)), texture(drawHero('C', ring, hero.pl.r)), { contourStep: 0.05 });
 {
   // the outline-only state must match the pencil outline drawn on the page
@@ -118,6 +130,7 @@ const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.p
   heroMat.uniforms.uSketchPaper.value.set(...PAPER);
   heroMat.uniforms.uLineW.value = (0.011 + 0.006 * heroQ) / 2;
 }
+mark('hero');
 const lizard = new THREE.Mesh(L.geo, heroMat);
 lizard.frustumCulled = false;
 lizard.renderOrder = 2;
@@ -308,7 +321,7 @@ function flatLine(pts2, closed, w, dash, gap) {
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 400);
-const VIEW = { H: 6.4, target: new THREE.Vector3(0.0, 0.3, 1.9) };
+const VIEW = { H: 5.6, target: new THREE.Vector3(0.2, 0.3, 2.0) };
 let fw = 1, fh = 1;
 function updateCamera() {
   const t = VIEW.target;
@@ -378,6 +391,7 @@ function frame(now) {
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
+mark('ready');
 markReady();
 requestAnimationFrame(frame);
 
@@ -386,5 +400,5 @@ window.__page = {
   setLitho: (v) => { setLitho(v ? 1 : 0); state.litho = v ? 1 : 0; },
   setReveal: (v) => { setReveal(v); state.reveal = v ? 1 : 0; },
   at: (name, f = 0) => { const p = PHASES.find((q) => q[0] === name); state.t = p.start + p[1] * f; },
-  path, hero, L,
+  path, hero, L, TIMES,
 };

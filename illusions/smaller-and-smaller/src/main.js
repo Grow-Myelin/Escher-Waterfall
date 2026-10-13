@@ -6,7 +6,7 @@ import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady 
 import { VERT, FRAG } from './shader.js';
 
 const PERIOD = 7.5; // seconds per doubling of the zoom
-const FIT = 0.5; // ring 0's outer square spans the print at zoom phase 0
+const FIT = 0.32; // ring 0's outer square spans 64% of the print at zoom phase 0
 
 // ------------------------------------------------------------------ WebGL
 const canvas = document.getElementById('scene');

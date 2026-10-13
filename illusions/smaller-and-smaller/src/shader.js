@@ -64,10 +64,10 @@ float gauss(float x, float c, float w) { float t = (x - c) / w; return exp(-t * 
 float edgeT(float x) {               // back: positive is outward
   float s = (x - 1.15) / 0.82;      // dorsal fin: 0 at its trailing base, 1 at its leading base
   float fin = 0.0;
-  if (s > 0.0 && s < 1.0) fin = s < 0.22 ? pow(s / 0.22, 1.9) : 1.0 - pow((s - 0.22) / 0.78, 1.3);
+  if (s > 0.0 && s < 1.0) fin = s < 0.26 ? pow(sin(1.5707963 * s / 0.26), 2.2) : 1.0 - pow((s - 0.26) / 0.74, 1.35);
   float stock = smoothstep(0.0, 0.45, x) * smoothstep(1.05, 0.62, x);
   float win = smoothstep(0.0, 0.04, x) * smoothstep(3.0, 2.88, x);
-  return uAmp * win * (0.46 * fin - 0.28 * stock + 0.08 * gauss(x, 2.42, 0.28));
+  return uAmp * win * (0.42 * fin - 0.33 * stock + 0.08 * gauss(x, 2.42, 0.28));
 }
 float edgeE(float y) {               // head: positive is forward (beak and melon)
   float win = smoothstep(0.0, 0.05, y) * smoothstep(1.0, 0.88, y);
@@ -160,7 +160,7 @@ void main() {
   float rootT = line(x - fb, 0.008, px) * step(0.10, y) * step(y, 0.88);
   float roots = max(rootF, max(rootP, rootT)) * detail;
   float dEye = length(vec2(x - 2.60, y - 0.55));
-  float rE = 0.050;
+  float rE = 0.058;
   float eyeW = fill(dEye - rE, px) * detail;
   float eyeP = fill(dEye - rE * 0.55, px) * detail;
   float eyeL = line(dEye - rE, 0.007, px) * detail;
@@ -169,32 +169,36 @@ void main() {
   float dBh = length(vec2(x - 2.30, (y - 0.97) * 2.0));
   float lineH = line(dBh - 0.045, 0.007, px) * step(y, 0.97) * detail;
   float lineC = line(dC, 0.006, px) * detail * 0.7;
-  // engraving: lines that follow the body, heavier on the back
-  float hs = 0.05;
-  float hh = abs(fract((y - yc) / hs) - 0.5) * hs;
-  float hl = smoothstep(2.2, 4.5, hs / px) * detail;
-  float engr = line(hh, mix(0.006, 0.013, cape), px) * hl;
+  // engraving: a few lines that follow the back, for volume
+  float dTop = 1.0 + edgeT(x) - y;                  // depth below the back
+  float hs = 0.06;
+  float hh = abs(fract(dTop / hs) - 0.5) * hs;
+  float hl = smoothstep(2.5, 5.0, hs / px) * detail;
+  float band = smoothstep(0.30, 0.10, dTop) * step(0.03, dTop) * step(0.0, dC);
+  float engr = line(hh, 0.008, px) * hl * band;
+  float dBot = y - bx;                               // height above the belly
+  float hb = abs(fract(dBot / hs) - 0.5) * hs;
+  float bandB = smoothstep(0.24, 0.08, dBot) * step(0.03, dBot);
+  float engrB = line(hb, 0.007, px) * hl * bandB;
 
-  // ---- tone and colour
-  float lit, ink2, pale;
+  // ---- tone and colour: flat light and dark dolphins, like a woodcut
+  float lit;
   vec3 col;
+  float marks = max(max(roots, lineM), max(lineH, lineC));
   if (fam < 0.5) {
-    // pale dolphin: white belly, grey engraved back
-    lit = mix(0.97, mix(0.90, 0.48, engr), cape);
-    lit = mix(lit, 0.62, engr * (1.0 - cape) * 0.5);
-    col = mix(vec3(0.94, 0.91, 0.84), vec3(0.80, 0.74, 0.64), cape);
-    col = mix(col, col * 0.82, engr);
-    lit = mix(lit, 0.10, max(max(roots, lineM), max(lineH, lineC)));
-    col = mix(col, INK, max(max(roots, lineM), max(lineH, lineC)) * 0.85);
+    lit = 0.95;
+    col = mix(vec3(0.95, 0.92, 0.85), vec3(0.88, 0.82, 0.71), cape);
+    lit = mix(lit, 0.25, max(engr, engrB * 0.5));
+    col = mix(col, vec3(0.55, 0.48, 0.40), max(engr, engrB * 0.5) * 0.8);
+    lit = mix(lit, 0.10, marks);
+    col = mix(col, INK, marks * 0.85);
   } else {
-    // dark dolphin: black back cut with pale lines, grey belly
-    lit = mix(0.30, mix(0.11, 0.42, engr), cape);
-    lit = mix(lit, 0.46, engr * (1.0 - cape) * 0.6);
-    col = mix(vec3(0.38, 0.47, 0.54), vec3(0.20, 0.28, 0.35), cape);
-    col = mix(col, col * 1.25, engr);
-    float pl = max(max(roots, lineM), max(lineH, lineC));
-    lit = mix(lit, 0.78, pl);
-    col = mix(col, vec3(0.86, 0.88, 0.84), pl * 0.8);
+    lit = 0.14;
+    col = mix(vec3(0.31, 0.42, 0.50), vec3(0.20, 0.29, 0.37), cape);
+    lit = mix(lit, 0.70, max(engr * 0.6, engrB));
+    col = mix(col, vec3(0.62, 0.70, 0.73), max(engr * 0.6, engrB) * 0.8);
+    lit = mix(lit, 0.80, marks);
+    col = mix(col, vec3(0.86, 0.88, 0.84), marks * 0.8);
   }
   lit = mix(lit, 0.97, eyeW); col = mix(col, vec3(0.97, 0.95, 0.89), eyeW);
   lit = mix(lit, 0.05, max(eyeP, eyeL)); col = mix(col, INK, max(eyeP, eyeL));

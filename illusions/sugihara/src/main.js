@@ -19,8 +19,8 @@ const GLASS = { x0: -2.4, x1: 2.6, y0: 0.14, y1: 4.85 };
 const WALL_Z = -2.75;
 const TABLE = { x0: -8, x1: 8, z0: WALL_Z, z1: 2.75, top: 0, th: 0.3 };
 const TUBES = [
-  { x: -0.6, z: 0.2, r: 1.0, hMin: 0.95, wall: 0.07, col: 0xd99063, inner: 0xe8c3a2, turn: 0 },
-  { x: 1.78, z: 0.55, r: 0.52, hMin: 0.5, wall: 0.05, col: 0x93a9bd, inner: 0xc9d6e0, turn: Math.PI },
+  { x: -0.6, z: 0.2, r: 1.0, hMin: 0.95, wall: 0.07, col: 0xefb88f, inner: 0xf6dcc4, turn: 0 },
+  { x: 1.78, z: 0.55, r: 0.52, hMin: 0.5, wall: 0.05, col: 0xb8cddd, inner: 0xdfe8ef, turn: Math.PI },
 ];
 for (const t of TUBES) t.y0 = t.hMin + (TAN * t.r) / 2;
 
@@ -33,7 +33,7 @@ const PAPER = new THREE.Color(0xece5d5), CREAM = new THREE.Color(0xe9e4da);
 renderer.setClearColor(PAPER, 1);
 
 const uniforms = createSharedUniforms();
-uniforms.uHatch = { value: 2.6 };
+uniforms.uHatch = { value: 5 };
 uniforms.uLight.value.set(-0.42, 0.78, 0.47).normalize();
 // the mirror world is lit by the mirror image of the same lamp
 const mirrorUniforms = { ...uniforms, uLight: { value: uniforms.uLight.value.clone().multiply(new THREE.Vector3(1, 1, -1)) } };
@@ -62,14 +62,14 @@ function mesh(build, mat = ink) {
   m.frustumCulled = false;
   return m;
 }
-const wood = st(0xb08a62, PAT.WOOD);
-const woodDark = st(0x6e5038, PAT.WOOD);
-const plaster = st(0xe3dccb, PAT.PLASTER);
+const wood = st(0xdcc6a3, PAT.WOOD);
+const woodDark = st(0xa98a68, PAT.WOOD);
+const plaster = st(0xf0e9da, PAT.PLASTER, { f: 0.15 });
 
 scene.add(mesh((b) => {
   // back wall with a dado rail and skirting
   b.box(-12, -3, WALL_Z - 0.3, 12, 12, WALL_Z, plaster, { skip: ['nz'] });
-  b.box(-12, 1.6, WALL_Z, 12, 1.72, WALL_Z + 0.06, st(0xd2c8b4, PAT.PLAIN), {});
+  b.box(-12, 1.6, WALL_Z, 12, 1.72, WALL_Z + 0.06, st(0xe2d9c6, PAT.PLAIN), {});
   // the mirror: frame, a bevelled edge and two feet resting on the table
   const { x0, x1, y0, y1 } = GLASS;
   const f = 0.2, d0 = ZM - 0.14, d1 = ZM + 0.07;
@@ -198,10 +198,10 @@ scene.add(glassSheen);
 
 // ------------------------------------------------------------------ camera
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
-const TARGET = new THREE.Vector3(0.1, 1.55, -0.75);
-const VIEW_H = 7.2;
+const TARGET = new THREE.Vector3(0.1, 1.62, -0.75);
+const VIEW_H = 7.7;
 const DESIGN = { az: 0, el: TH, zoom: 1 };
-const REVEAL = { az: 0.78, el: 0.36, zoom: 0.92 };
+const REVEAL = { az: 0.62, el: 0.5, zoom: 1.08 };
 const view = { ...DESIGN };
 let aspect = 30 / 38;
 function placeCamera() {
@@ -323,10 +323,8 @@ function frame(now) {
     const flip = Math.round((o.real.rotation.y / Math.PI) % 2) === 1;
     o.guides.direct.visible = !flip; o.guides.directAlt.visible = flip;
     o.guides.mirror.visible = !flip; o.guides.mirrorAlt.visible = flip;
-    for (const m of o.guides.mats) m.opacity = g;
-    o.guides.mats.forEach(() => {});
+    for (const grp of [o.guides.direct, o.guides.directAlt, o.guides.mirror, o.guides.mirrorAlt]) grp.children.forEach((l) => { l.material.opacity = g; });
   }
-  for (const o of tubeObjs) for (const grp of [o.guides.direct, o.guides.directAlt, o.guides.mirror, o.guides.mirrorAlt]) grp.children.forEach((l) => { l.material.opacity = g; });
 
   if (state.litho !== state.lithoTarget) {
     const d = state.lithoTarget - state.litho;

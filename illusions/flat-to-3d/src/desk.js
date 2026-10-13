@@ -72,9 +72,9 @@ export function dodecahedron(a) {
 // ------------------------------------------------------------------ build
 export function buildDesk() {
   const b = new Builder();
-  const wood = st(0xc9a57c, P.DESK);
+  const wood = st(0xd9c3a2, P.DESK);
   // desk top and its front edges
-  b.box(DESK.x0, -0.45, DESK.z0, DESK.x1, 0, DESK.z1, wood, { top: st(0xd8bd98, P.DESK) });
+  b.box(DESK.x0, -0.45, DESK.z0, DESK.x1, 0, DESK.z1, wood, { top: st(0xeadcc4, P.DESK) });
   return b;
 }
 
@@ -82,7 +82,7 @@ export function buildSketchbook() {
   const b = new Builder();
   const { x0, x1, z0, z1 } = SKETCH;
   // back board, then the block of pages slightly inset
-  b.box(x0, 0, z0, x1, 0.04, z1, st(0x6b665c, P.CLOTH), { ao: 0.8 });
+  b.box(x0, 0, z0, x1, 0.04, z1, st(0x8c857a, P.CLOTH), { ao: 0.85 });
   b.box(x0 + 0.06, 0.04, z0 + 0.05, x1 - 0.04, PAGE_Y, z1 - 0.05, st(0xefe9da, P.PAGES), { skip: ['py'] });
   // spiral binding along the left edge
   const rings = 22;
@@ -114,7 +114,7 @@ function tubeSeg(b, p0, p1, r, s) {
 export function buildBook() {
   const b = new Builder();
   const { x0, x1, z0, z1, h } = BOOK;
-  const cloth = st(0x9a6a52, P.CLOTH);
+  const cloth = st(0xbf9474, P.CLOTH);
   const t = 0.05; // board thickness
   b.box(x0, 0, z0, x1, t, z1, cloth, { ao: 0.85 });
   b.box(x0 + 0.04, t, z0 + 0.05, x1 - 0.06, h - t, z1 - 0.05, st(0xece4d0, P.PAGES), { skip: ['py', 'nx'] });
@@ -134,7 +134,7 @@ export function buildBook() {
   }
   b.pop();
   // two bands across the spine and a title panel on the cover
-  b.box(x0 + 0.5, h, z0 + 0.6, x0 + 1.6, h + 0.004, z1 - 0.6, st(0x86584a, P.CLOTH));
+  b.box(x0 + 0.5, h, z0 + 0.6, x0 + 1.6, h + 0.004, z1 - 0.6, st(0xa8795e, P.CLOTH));
   return b;
 }
 
@@ -143,7 +143,7 @@ export function buildDodecahedron() {
   const D = dodecahedron(DODECA.a);
   const [cx, , cz] = DODECA.c;
   const y0 = BOOK.h;
-  const s = st(0xc9c3b4, P.STONE);
+  const s = st(0xe6e1d6, P.STONE);
   for (const f of D.faces) {
     const pts = f.idx.map((i) => [D.V[i][0] + cx, D.V[i][1] + y0, D.V[i][2] + cz]);
     b.poly(pts, s);
