@@ -193,16 +193,30 @@ export function buildLizard(spineStep) {
   const sp = spineSamples(spineStep);
   const S = new Float32Array(n), Lat = new Float32Array(n), Dsp = new Float32Array(n);
   for (let i = 0; i < n; i++) { const [s, l, d] = project(sp, pts[i][0], pts[i][1]); S[i] = s; Lat[i] = l; Dsp[i] = d; }
-  // heights: inflation, a ridge down the back, bulging eyes; then smoothed
+  // heights: inflation, a ridge down the back, bulging eyes; then smoothed.
+  // A narrow neck (a wrist, the root of a leg) borrows height from the bulk
+  // around it, so limbs stay joined to the body: d is raised towards the
+  // mean distance within 0.16, but still falls to zero at the outline.
+  const dMean = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let s = 0, c = 0;
+    for (let j = nb; j < n; j++) {
+      const dx = pts[j][0] - pts[i][0], dy = pts[j][1] - pts[i][1];
+      if (dx * dx + dy * dy < 0.0256) { s += dist[j]; c++; }
+    }
+    dMean[i] = c ? s / c : dist[i];
+  }
   let h = new Float32Array(n);
   for (let i = 0; i < n; i++) {
     if (i < nb) continue;
-    const d = dist[i];
+    const d0 = dist[i];
+    const edge = Math.min(1, d0 / 0.045);
+    const d = d0 + 0.7 * Math.max(0, dMean[i] - d0) * edge * edge * (3 - 2 * edge);
     const f = S[i] / sp.length;
     const ridge = 0.035 * Math.exp(-((Lat[i] / 0.07) ** 2)) * Math.min(1, d / 0.12) * (f > 0.15 && f < 0.9 ? 1 : 0.4);
     let eye = 0;
     for (const e of EYES) eye += 0.075 * Math.exp(-(((pts[i][0] - e[0]) ** 2 + (pts[i][1] - e[1]) ** 2) / 0.05 ** 2));
-    h[i] = A * Math.sqrt(d) * (d < 0.03 ? 0.75 + (d / 0.03) * 0.25 : 1) + ridge + eye * Math.min(1, d / 0.05);
+    h[i] = A * Math.sqrt(d) * (d0 < 0.03 ? 0.75 + (d0 / 0.03) * 0.25 : 1) + ridge + eye * Math.min(1, d0 / 0.05);
   }
   const nbrs = Array.from({ length: n }, () => new Set());
   for (const [a, b, c] of tris) { nbrs[a].add(b).add(c); nbrs[b].add(a).add(c); nbrs[c].add(a).add(b); }
