@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Triangle of Cubes</title>
+  <meta name="description" content="Oscar Reutersvärd's impossible triangle of nine cubes (1934), assembled cube by cube in true isometric, with the real arrangement revealed.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Triangle of Cubes</h1>
+    <p>Oscar Reutersvärd’s impossible triangle of nine cubes (1934), assembled in true isometric</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Cubes drop one by one onto isometric paper and close into a triangle whose three sides each recede, so it cannot exist as drawn."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>Each cube in the triangle sits in front of the one before it, all the way round. The last cube is also tucked behind the first. No arrangement of real cubes can do both.</p>
+    <p>The cubes are real. They are laid along x, then y, then z, three steps per side: from (0,0,0) to (3,0,0) to (3,3,0) to (3,3,2). Each one is a unit nearer the viewer than the one before. In space they form an open spiral, not a triangle.</p>
+    <p>The camera looks along the cube diagonal (1,1,1). The next cube would sit at (3,3,3) = 3·(1,1,1), which is drawn exactly on top of the cube at the origin, so the picture closes into a triangle. To get the overlaps right at the join, the ninth cube is cut along its diagonal plane y = z. That plane contains the line of sight, so the cut is seen edge-on. The half that touches its real neighbour stays put. The other half is slid back 3·(1,1,1), to just behind the first cube.</p>
+    <p>In <b>Colour</b>, each cube is tinted by its true depth, from warm (far) to cool (near). <b>Reveal the trick</b> turns the camera and marks the jump of the cut half in red, with a dashed outline where a tenth cube would have to be to close the loop in space.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>R</kbd><span>reveal the trick, or go back</span>
+      <kbd>← →</kbd><span>remove or place one cube</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>0</kbd><span>reset the view</span>
+    </div>
+    <p class="credit">After Oscar Reutersvärd’s triangle of nine cubes (<i>Opus 1</i>, 1934), drawn more than twenty years before Lionel and Roger Penrose published the tribar (1958).</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <div class="seg" role="group" aria-label="Figure">
+        <button id="btn-9" aria-pressed="true">9 cubes</button>
+        <button id="btn-15" aria-pressed="false">15 cubes</button>
+      </div>
+      <button id="btn-reveal" class="primary" aria-pressed="false"><span>Reveal the trick</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">← → place or remove one cube · drag to pan · scroll to zoom</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

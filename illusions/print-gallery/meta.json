@@ -1,0 +1,11 @@
+{
+  "slug": "print-gallery",
+  "title": "Print Gallery",
+  "subtitle": "A picture that contains itself, twisted round its centre",
+  "technique": "Droste self-similarity and the conformal map z ↦ exp(α log z)",
+  "refs": [
+    "M. C. Escher, Print Gallery, 1956",
+    "B. de Smit and H. W. Lenstra Jr., The Mathematical Structure of Escher's Print Gallery, 2003"
+  ],
+  "blurb": "A gallery print that contains the gallery, twisted so one turn round the centre takes you down a whole level, with the centre filled in and an endless zoom."
+}

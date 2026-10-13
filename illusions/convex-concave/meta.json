@@ -1,0 +1,8 @@
+{
+  "slug": "convex-concave",
+  "title": "Convex and Concave",
+  "subtitle": "The light decides which way round you see it",
+  "technique": "Depth reversal under parallel projection: the same lines read as a relief or its mould, and shading with light assumed from above picks one",
+  "refs": ["M. C. Escher, Convex and Concave, 1955", "H. Schröder, reversible staircase, 1858"],
+  "blurb": "A symmetric isometric cloister seen from above on the left and from below on the right; swing the light round and the two halves change places."
+}

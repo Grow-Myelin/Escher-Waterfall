@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Reflecting Sphere</title>
+  <meta name="description" content="A mirror ball in a study, ray-traced from the eye of an artist who walks round it: the whole room is in the ball, and the artist's own eye always sits at its centre.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #inset {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      border: 1px solid rgba(29, 27, 24, 0.85);
+      box-shadow: 0 0 0 4px rgba(241, 235, 223, 0.9), 0 0 0 5px rgba(29, 27, 24, 0.35);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    #inset.on { opacity: 1; }
+    #inset span {
+      position: absolute;
+      left: 50%;
+      bottom: -26px;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      padding: 3px 7px 4px;
+      border-radius: 3px;
+      background: rgba(29, 27, 24, 0.78);
+      color: var(--text);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Reflecting Sphere</h1>
+    <p>a mirror ball shows the whole room, and the viewer at its centre · after Hand with Reflecting Sphere (1935)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A mirror sphere on a pedestal in a study with bookshelves, a window, a desk lamp and pictures. The sphere reflects the whole room, and at its centre the artist who is looking at it."></canvas>
+    <div id="inset" aria-hidden="true"><span>What the artist sees</span></div>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">Why you are always at the centre</h2>
+    <p>Every ray from your eye that meets the ball bounces off it at the same angle it arrived, measured from the surface normal. On a sphere every normal points straight out from the centre. So the one ray that comes straight back to your eye is the one aimed at the centre, and it meets the ball at the point nearest you, which you see in the middle of the disc. That is where your own eye appears, whichever way you walk round the ball.</p>
+    <p>The other rays fan out. The further a ray lands from the middle, the more it is turned aside. A ray that just grazes the edge goes on almost straight, so the thin rim of the disc shows what is directly behind the ball. Between the middle and the rim lies the rest of the room, squeezed together. The ball shows almost everything around it, in one picture.</p>
+    <p>Here every pixel of the ball is computed that way. The eye ray is intersected with the true sphere and reflected about the normal. The reflected ray is then traced through a depth map of the room, captured from the ball's centre. That puts near things, such as the pedestal, the artist and the desk, where they really are.</p>
+    <p>Press <em>Show the rays</em> to step outside. The red line is the ray that comes back, and the inset shows what the artist sees.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>←</kbd><span>walk left round the sphere (<kbd>→</kbd> right)</span>
+      <kbd>R</kbd><span>show the rays, or go back to the artist’s eye</span>
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">An homage to M. C. Escher’s lithograph <em>Hand with Reflecting Sphere</em> (1935). The room, the figure and every shader here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-rays" class="primary" aria-pressed="false"><span>Show the rays</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to walk round the sphere</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

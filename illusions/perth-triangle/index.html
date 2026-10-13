@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Impossible Triangle, Real Object</title>
+  <meta name="description" content="A real, open sculpture of three square bars in a small park. From one marked spot on the path it closes into a perfect Penrose triangle.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Sweet Spot</h1>
+    <p>A real object that is a Penrose triangle from one point only, after the Impossible Triangle in East Perth</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A sculpture of three ochre bars on a stone plinth in a park. Seen from a bronze marker on the path, the bars close into an impossible triangle; walking on round the path shows that the bars do not meet."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The sculpture is three square bars, <span id="n-len">4.6</span>&nbsp;m long, along three perpendicular directions, joined at two right-angled corners. It does not close: the free end of the third bar stops <span id="n-gap">8.0</span>&nbsp;m in front of the start of the first. From the bronze marker, both ends lie on one line of sight, and the bars draw a closed triangle in which every corner looks like a right angle.</p>
+    <p>A single eye can't measure depth along a line of sight. Two surfaces that cover the same directions look the same, however far apart they are. The dashed red line marks that sight line: from the marker it shrinks to a point.</p>
+    <p>The near end is <span id="n-near">17.0</span>&nbsp;m from the eye and the far end <span id="n-dist">25.0</span>&nbsp;m, so a near end of the same size would look too big. Here the near end is an exact copy of the far corner, scaled by <span id="n-k">0.68</span> about the eye. Scaling about the eye moves every point along its own sight line, so from the marker the picture does not change. To meet that smaller end, each bar tapers by <span id="n-taper">12</span>% (from <span id="n-wfar">64</span>&nbsp;cm wide at the far end to <span id="n-wnear">44</span>&nbsp;cm at the near end).</p>
+    <p>The corner is split along sight lines. The wedge of the first bar that, from the eye, lies in front of the arriving bar is carried forward with the near end. Every line of sight through the corner then meets the same faces, in the same order, as it would at a real joint. So the join is seamless, but only from that one point.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>Space</kbd><span>walk or stop</span>
+      <kbd>S</kbd><span>stand at the sweet spot (again: walk on)</span>
+      <kbd>←</kbd><span>step round the path (or drag)</span>
+      <kbd>→</kbd><span>step the other way</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Wheel</kbd><span>zoom</span>
+    </div>
+    <p class="credit">After the <i>Impossible Triangle</i> (1999) by Brian McKay and Ahmad Abas, East Perth. The tribar is Oscar Reutersvärd's (1934); Lionel and Roger Penrose published it in 1958. The park and the sculpture's proportions here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-spot" class="primary" aria-pressed="false">Stand at the sweet spot</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to walk round the path · the bronze disc marks the sweet spot</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

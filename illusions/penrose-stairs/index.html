@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Endless Stair</title>
+  <meta name="description" content="A closed loop of stairs on a roof that climbs for ever, built as a real spiral and drawn in true isometric: the Penrose stairs, after Ascending and Descending.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Endless Stair</h1>
+    <p>the Penrose stairs (1958) and Escher’s Ascending and Descending (1960), as a real spiral in true isometric</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="An isometric drawing of a square stone building whose roof carries a closed loop of stairs. One file of hooded figures climbs it and another descends it, without end."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The stair on the roof has four flights and forty risers. Walk it anticlockwise and every step goes up; walk it clockwise and every step goes down. Yet you come back to where you started.</p>
+    <p>The camera looks along the diagonal (1, 1, 1) of a cube, the true isometric angle. A move of d along that line lands on the same point of the drawing. So a step back of d along both x and z looks exactly like a step up of d.</p>
+    <p>The stair really is a spiral. Each riser is 0.15 high and each tread 0.75 deep. The two flights that come towards you have 14 risers; the two that go away have 6. Going round once, you climb 40 × 0.15 = 6, and you also drift 8 × 0.75 = 6 towards the viewer along both x and z. The top landing is therefore exactly 6·(1, 1, 1) from the bottom one, and the drawing shows them as one landing.</p>
+    <p>That landing is cut along its diagonal, in a vertical plane that contains the line of sight, so the cut is seen edge-on. The half where the stair begins stays at the foot. The half where it ends sits at the top, inside the courtyard. A figure crossing the cut jumps 6·(1, 1, 1), which you cannot see from this angle. <b>Reveal the trick</b> turns the camera off the axis and marks the jump with red dashed lines.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>R</kbd><span>reveal the trick, or go back</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>0</kbd><span>reset the view</span>
+    </div>
+    <p class="credit">After the impossible staircase of L. S. and R. Penrose (1958) and M. C. Escher’s lithograph <i>Ascending and Descending</i> (1960). The building and figures are an original design.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-reveal" class="primary" aria-pressed="false"><span>Reveal the trick</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to pan · scroll to zoom · double-click to reset</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

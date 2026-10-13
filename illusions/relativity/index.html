@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Three Gravities</title>
+  <meta name="description" content="An original hall with three mutually perpendicular gravities, after M. C. Escher's Relativity (1953). Turn the print so each world in turn is upright.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(233, 227, 214, 0.5); background: transparent; }
+    body.colour .swatch.g0 { background: #b35a3e; border-color: #b35a3e; }
+    body.colour .swatch.g1 { background: #4c8a57; border-color: #4c8a57; }
+    body.colour .swatch.g2 { background: #3f68a6; border-color: #3f68a6; }
+    .seg .lbl { color: var(--muted); font-size: 12px; padding: 0 4px 0 9px; align-self: center; }
+    .seg button[aria-pressed="true"] .swatch { border-color: var(--ink); }
+    #panel .gkey { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Three Gravities</h1>
+    <p>multiple gravities in one building, after M. C. Escher’s Relativity (1953)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A hall seen into one corner. Its floor and its two walls are each the floor of a different world; small figures walk its stairs and doorways, each upright in its own gravity."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">Three floors at right angles</h2>
+    <p>You look into one corner of a cubic hall, along the cube’s diagonal, with the three near walls cut away. Each of the three back planes is a floor. One world stands on the bottom one and the other two stand on the walls. Every face you can see points up in exactly one of the three worlds, so it is a floor there and a wall in the other two.</p>
+    <p>The stairs are shared. On each flight one world walks on the treads and the other walks on the risers, so the same steps work from two sides. Two people on a flight can walk in the same direction while one climbs and the other descends. Each lane ends in a doorway that stands upright for its own walker. In the other world the same doorway lies flat, as a hatch in the floor.</p>
+    <p>The building is one design, built three times. Each copy is rotated 120° about your line of sight, which takes each world’s down to the next one’s. <em>Turn</em> rolls the picture by exactly that angle. When it stops, the hall looks just as it did before, but a different set of people stand upright. Every part is an ordinary place for somebody.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>T</kbd><span>turn to the next gravity</span>
+      <kbd>1</kbd><span>gravity I down (<span class="gkey" style="background:#b35a3e"></span>terracotta)</span>
+      <kbd>2</kbd><span>gravity II down (<span class="gkey" style="background:#4c8a57"></span>green)</span>
+      <kbd>3</kbd><span>gravity III down (<span class="gkey" style="background:#3f68a6"></span>blue)</span>
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">An homage to <em>Relativity</em> (1953) by M. C. Escher. The building, its figures and the drawing are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <div class="seg" role="group" aria-label="Which gravity points down">
+        <span class="lbl" aria-hidden="true">Down</span>
+        <button id="btn-g0" aria-pressed="true" aria-label="Gravity I down"><span class="swatch g0"></span>I</button>
+        <button id="btn-g1" aria-pressed="false" aria-label="Gravity II down"><span class="swatch g1"></span>II</button>
+        <button id="btn-g2" aria-pressed="false" aria-label="Gravity III down"><span class="swatch g2"></span>III</button>
+      </div>
+      <button id="btn-turn" class="primary">↻ <span>Turn</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Turn the print to stand each world upright · drag to turn it by hand</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

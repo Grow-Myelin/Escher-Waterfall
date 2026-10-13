@@ -1,0 +1,8 @@
+{
+  "slug": "rotating-puzzle",
+  "title": "The Turning Bridge",
+  "subtitle": "A rotating-world puzzle in true isometric projection",
+  "technique": "Rotating-camera puzzles: walkways that join only in the picture, along the isometric line of sight",
+  "refs": ["Echochrome, 2008", "Monument Valley, 2014"],
+  "blurb": "Turn the crank until the bridge lines up with a tower in the picture, and a traveller walks across a gap that only your line of sight hides."
+}

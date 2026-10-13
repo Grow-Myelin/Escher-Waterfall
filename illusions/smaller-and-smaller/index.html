@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Smaller and Smaller</title>
+  <meta name="description" content="Interlocking dolphins halve in size ring by ring toward a vanishing point, in an endless zoom that loops because the tiling is self-similar. After Escher's Smaller and Smaller and Square Limit.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Smaller and Smaller</h1>
+    <p>Infinity toward a point: a self-similar tiling, after Escher’s Smaller and Smaller (1956) and Square Limit (1964)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Dolphins chase each other round a square in a pinwheel. Each ring of four is half the size of the ring outside it, so they shrink without end toward the centre. The picture zooms in for ever."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The square is cut into nested square rings. Each ring is half the size of the one outside it. Each ring is a pinwheel of four rectangles, and each rectangle is three squares long. Every dolphin is one of those rectangles with its edges bent. Every ring is an exact half-scale copy of the next, so the dolphins shrink toward the centre and never reach it.</p>
+    <p>For the bent tiles to fit with no gaps, the edges must agree. A dolphin’s back runs along the outer edge of its ring. The next ring out is twice as big, so the belly of each dolphin there must match the backs and heads of the smaller dolphins below it, at half scale. The shape is built that way: its belly is a half-size copy of the head and back of the ring inside, plus the tail of the dolphin ahead, turned over. Only the back, head and tail can be drawn freely. The fit is then exact for any shape, even while the tails beat.</p>
+    <p>Because the picture is the same at every scale, zooming in by a factor of two lands exactly where it started. The endless zoom is one loop. <b>Reveal construction</b> straightens the dolphins back into the rectangles and draws the square grid underneath.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>R</kbd><span>reveal or hide the construction</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play the zoom</span>
+      <kbd>Drag</kbd><span>up or down (or scroll) to zoom by hand</span>
+    </div>
+    <p class="credit">An homage to M. C. Escher’s <i>Smaller and Smaller</i> (wood engraving, 1956) and <i>Square Limit</i> (woodcut, 1964). The dolphins and the pinwheel division are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-reveal" class="primary" aria-pressed="false">Reveal construction</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag up or down, or scroll, to zoom by hand</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="bundle.js"></script>
+</body>
+</html>

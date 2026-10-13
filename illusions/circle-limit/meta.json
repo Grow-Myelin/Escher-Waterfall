@@ -1,0 +1,8 @@
+{
+  "slug": "circle-limit",
+  "title": "Circle Limit",
+  "subtitle": "Infinity inside a circle: a hyperbolic tiling",
+  "technique": "An exact {p,q} tiling of the Poincaré disk, drawn per pixel by folding each point into one triangle with reflections in hyperbolic lines, then decorated with fish that keep its rotations",
+  "refs": ["M. C. Escher, Circle Limit I, 1958", "M. C. Escher, Circle Limit II, 1959", "M. C. Escher, Circle Limit III, 1959", "M. C. Escher, Circle Limit IV, 1960", "H. S. M. Coxeter, Crystal Symmetry and Its Generalizations, 1957"],
+  "blurb": "Fish circle starfish in a disk that never ends: drag to glide through the hyperbolic plane, switch between five tilings, and reveal Coxeter's triangles underneath."
+}

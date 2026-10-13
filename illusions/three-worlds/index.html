@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Three Worlds</title>
+  <meta name="description" content="A winter pond in which one surface holds three worlds: leaves floating on it, bare trees mirrored in it and a carp beneath it. The viewing angle sets the balance, through the Fresnel equations.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #gauge {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      width: 178px;
+      padding: 4px 4px 2px;
+      background: rgba(241, 235, 223, 0.92);
+      border: 1px solid rgba(29, 27, 24, 0.7);
+      box-shadow: 0 0 0 3px rgba(241, 235, 223, 0.6);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    #gauge.on { opacity: 1; }
+    #gauge svg { display: block; width: 100%; height: auto; overflow: visible; }
+    #gauge .g-title { font: 600 8.5px/1 var(--serif); fill: #1d1b18; letter-spacing: 0.02em; }
+    #gauge .g-tick { font: 6.5px/1 var(--sans); fill: #5d564b; }
+    #gauge .g-axis { stroke: #1d1b18; stroke-width: 0.8; }
+    #gauge .g-grid { stroke: #1d1b18; stroke-width: 0.4; stroke-dasharray: 1.5 2; opacity: 0.5; }
+    #gauge .g-band { fill: #1d1b18; opacity: 0.1; }
+    #gauge .g-curve { fill: none; stroke: #1d1b18; stroke-width: 1.4; }
+    #gauge .g-dot { fill: #a23b2a; stroke: #f1ebdf; stroke-width: 1.2; }
+    #gauge .g-label { font: 600 7.5px/1 var(--sans); fill: #1d1b18; paint-order: stroke; stroke: #f1ebdf; stroke-width: 2.5px; }
+    label.slider output { min-width: 2.6em; color: var(--text); font-variant-numeric: tabular-nums; }
+    @media (max-width: 640px) { #gauge { width: 118px; left: 6px; bottom: 6px; } }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Three Worlds</h1>
+    <p>one surface holds three spaces: what floats on it, what it mirrors, what lies beneath · after Three Worlds (1955)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A winter pond seen from its bank. Fallen leaves float on the surface, bare trees and the sky are mirrored in it, and a large carp swims beneath it. Looking more steeply down shows the fish; looking across the water shows the reflections."></canvas>
+    <div id="gauge" aria-hidden="true"></div>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">One surface, three worlds</h2>
+    <p>Light meeting the water splits in two. Part bounces off and shows the world above, here the trees and the sky. The rest passes in, bent towards the vertical by Snell’s law, and shows the world beneath. The leaves lie on the surface itself.</p>
+    <p>How the light divides depends only on the angle at which your line of sight meets the water. The Fresnel equations give it exactly. Looking straight down, water reflects 2% and you see through it to the fish. At 60° from vertical it still reflects only 6%. Near grazing the share climbs steeply towards 100%, and the pond becomes a mirror. The inset plots this curve, shades the range of angles in the picture, and marks the angle at its centre.</p>
+    <p>So a single picture shows a gradient. In the foreground you look down steeply into the water, and further off the reflections take over. A dark reflection, such as a trunk, lets the dim world beneath show through. Bright sky drowns it.</p>
+    <p>Each pixel of the water is computed this way. The rippled surface normal sets the angle. The reflected ray is looked up in an image of the world rendered from the camera mirrored in the water plane. The refracted ray is traced through the water to the carp, the posts or the bottom, losing light along the way.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>↑</kbd><span>look more steeply down (<kbd>↓</kbd> look across)</span>
+      <kbd>L</kbd><span>switch between lithograph and colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">An homage to M. C. Escher’s lithograph <em>Three Worlds</em> (1955). The pond, the trees, the fish and every shader here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <label class="slider">Looking down <input id="elev" type="range" min="4" max="88" step="1" value="24" aria-label="Viewing elevation in degrees"><output id="elev-out">24°</output></label>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag up or down to change how steeply you look at the water</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

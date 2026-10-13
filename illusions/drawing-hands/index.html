@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Drawing Hands</title>
+  <meta name="description" content="Two hands on a sheet of paper, each drawing the other's cuff and wrist: a picture that draws itself, after Escher's Drawing Hands (1948).">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Drawing Hands</h1>
+    <p>A picture that draws itself · after M. C. Escher, Drawing Hands (1948)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Two hands lie on a sheet of paper, each holding a pencil. Each hand is solid at the fingers and a flat pencil sketch at the wrist, and each pencil is drawing the other hand's cuff and wrist. Then the sketches fade and the drawing starts again."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>Each hand is half drawing and half thing. Its fingers and pencil are modelled and lit as solid forms that cast shadows. Behind the wrist the same arm is pressed down into the sheet until it has no height at all, and there it is only pencil lines.</p>
+    <p>Those lines are being drawn by the other hand. Each pencil tip follows a list of strokes, the outline of the wrist, the cuff's rim, its buttons and then the shading, and each stroke appears exactly where the tip passes. Both pencils move at the same moment, so neither hand is drawn first.</p>
+    <p>The two hands are one model placed twice, half a turn apart round the centre of the sheet. Turn the sheet upside down and the picture is the same. That symmetry is the loop: A draws B, which draws A. Escher called this kind of loop a picture that draws itself. Douglas Hofstadter later called it a strange loop: following the arrows of cause brings you back to where you started.</p>
+    <p><b>Tilt the sheet</b> turns the view to the side. The solid hands stand up out of the paper, while the cuffs they grow from lie flat.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>R</kbd><span>tilt the sheet</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+    </div>
+    <p class="credit">After M. C. Escher, <i>Drawing Hands</i> (1948, lithograph). The hands, pose and drawing here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-reveal" class="primary" aria-pressed="false"><span>Tilt the sheet</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Each pencil draws the other hand's cuff · R tilts the sheet</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

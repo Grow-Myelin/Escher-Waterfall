@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Metamorphosis</title>
+  <meta name="description" content="An endless strip whose tiles change, column by column, from a checkerboard into fish, hexagons, honeycomb, tortoises and cubes, while staying an exact tiling everywhere.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Metamorphosis</h1>
+    <p>A tiling that changes along its length, after Escher’s Metamorphosis I–III (1937–1968)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A long printed strip of interlocking tiles scrolling sideways. A checkerboard grows into fish, which flatten into hexagons; the hexagons become honeycomb cells, the cells grow heads and legs and become tortoises, the tortoises fold into a stack of cubes, and the cubes flatten back into the checkerboard."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>Wherever you stop the strip, the tiles fit together with no gaps and no overlaps. Yet no two columns are quite the same: the shape of the tiles is a slowly changing function of the position along the strip.</p>
+    <p>Every tile is built from six shared corners and six shared edges. Each corner and each edge curve is computed once, from the morph values at its own place on the strip, and is then used by the tiles on both sides of it. A bump that grows out of one tile is the same curve as the dent in its neighbour, so the pieces always fit, however quickly the shapes change.</p>
+    <p>All the tiles have the topology of hexagons, with three meeting at every corner. A square is a hexagon with two opposite edges shrunk to zero length; the point where four squares meet is one of those edges. Sliding each column up by half a row while drawing the columns closer together turns the squares into regular hexagons. Over one loop the columns climb exactly 14 rows, so the strip closes on itself and scrolls forever.</p>
+    <p><b>Show construction</b> draws each tile’s six corners in red and plots the morph parameters along the bottom.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>R</kbd><span>show or hide the construction</span>
+      <kbd>← →</kbd><span>step along the strip</span>
+      <span>Drag</span><span>scrub the strip; fling to coast</span>
+    </div>
+    <p class="credit">An homage to M. C. Escher’s woodcuts Metamorphosis I (1937), II (1939–40) and III (1967–68). The tiles and creatures here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-reveal" class="primary" aria-pressed="false">Show construction</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to scrub along the strip · fling to coast</div>
+  </footer>
+
+  <script src="bundle.js"></script>
+</body>
+</html>

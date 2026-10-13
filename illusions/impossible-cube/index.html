@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Impossible Cube</title>
+  <meta name="description" content="Three animated plates on ambiguous depth under parallel projection: the Necker cube, the impossible cube, and an isometric belvedere whose crossing pillars join the front of one floor to the back of the next.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #overlay {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
+    #caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 2.2em 8% 0;
+      background: linear-gradient(to top, var(--paper-bg, #ece5d5) 0%, var(--paper-bg, #ece5d5) 55%, rgba(236, 229, 213, 0));
+      bottom: 0;
+      padding-bottom: 2.6%;
+      margin: 0;
+      text-align: center;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(11px, 1.55vh, 14.5px);
+      line-height: 1.4;
+      color: rgba(36, 32, 28, 0.86);
+      pointer-events: none;
+      transition: opacity 0.26s ease;
+      text-wrap: balance;
+    }
+    #caption.swap { color: transparent; }
+    #caption { transition: opacity 0.26s ease, color 0.26s ease; }
+    body.colour #caption { --paper-bg: #e9e6dc; background: linear-gradient(to top, #e9e6dc 0%, #e9e6dc 55%, rgba(233, 230, 220, 0)); }
+    #btn-reveal[aria-pressed="true"] { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+    @media (max-width: 640px) {
+      #caption { padding: 1.8em 4% 1.8%; font-size: 10.5px; line-height: 1.3; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Impossible Cube</h1>
+    <p>front and back under parallel projection, after Necker (1832) and Escher’s <em>Belvedere</em> (1958)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Animated plates: a Necker cube that flips between two readings, an impossible cube frame, and an isometric belvedere with crossing pillars"></canvas>
+    <canvas id="overlay" aria-hidden="true"></canvas>
+    <p id="caption" aria-live="off"></p>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">Which edge is in front?</h2>
+    <p>A parallel projection keeps where a point is in the picture and throws away how far away it is. Slide any point along your line of sight and the drawing does not change. Mirror a wire cube in the picture plane and you get a second cube, seen from below instead of from above, with exactly the same twelve lines. That is the Necker cube. Only cues such as shading (we assume light comes from above) and which line hides which decide between the two.</p>
+    <p>The impossible cube keeps every line and swaps one of those overlaps. Of the two places where a back beam crosses a front beam, one is drawn front over back and the other back over front. Each crossing is believable on its own, but no solid frame has both. To build it, a short piece of the back post is cut out and slid towards you along the line of sight until it passes in front of the top beam.</p>
+    <p>The belvedere uses the same freedom in true isometric. Seen down the cube diagonal (1, 1, 1), a corner (x, z) of a floor and the mirrored corner (−z, −x) lie on one vertical line of the picture. So the turned upper floor has a corner directly above each corner of the podium, but at the opposite depth. The pillars that join them lean along the line of sight. From this one angle they look plumb, and the front pillar seems to hold up the back of the floor above.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>1</kbd><span>Necker cube</span>
+      <kbd>2</kbd><span>impossible cube</span>
+      <kbd>3</kbd><span>belvedere</span>
+      <kbd>R</kbd><span>reveal the real 3D, or go back</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <kbd>0</kbd><span>reset the view</span>
+    </div>
+    <p class="credit">After L. A. Necker’s rhomboid (1832) and the impossible cube and crossing pillars of M. C. Escher’s <em>Belvedere</em> (1958). The pavilion and every model here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Plate">
+        <button id="btn-plate-1" aria-pressed="true">Necker</button>
+        <button id="btn-plate-2" aria-pressed="false">Impossible</button>
+        <button id="btn-plate-3" aria-pressed="false">Belvedere</button>
+      </div>
+      <button id="btn-reveal" aria-pressed="false"><span>Reveal the 3D</span></button>
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to pan · scroll to zoom · 1 2 3 choose a plate</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

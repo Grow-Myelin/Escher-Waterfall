@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Turning Bridge</title>
+  <meta name="description" content="A rotating-world puzzle in true isometric projection: turn a crank until a bridge lines up with a walkway in the picture, and a traveller walks across a join that exists only along your line of sight.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #btn-reveal[aria-pressed="true"] { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+    #btn-auto[aria-pressed="true"] { background: rgba(216, 201, 163, 0.16); border-color: rgba(216, 201, 163, 0.55); }
+    #btn-auto .dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid currentColor; }
+    #btn-auto[aria-pressed="true"] .dot { background: var(--accent); border-color: var(--accent); }
+    #badge { max-width: calc(100% - 20px); white-space: normal; line-height: 1.35; }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Turning Bridge</h1>
+    <p>a rotating-world puzzle, after Monument Valley and Echochrome</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="An isometric diorama of stone towers in the mist. A bridge on a central tower turns with a crank; a small cloaked traveller climbs a stair, rides the bridge and walks across to a bell tower and a garden that the bridge meets only in the picture."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How the bridge reaches the bell tower</h2>
+    <p>The camera is orthographic and looks straight down the cube diagonal (1, 1, 1). From there, any two points that differ by a multiple of (1, 1, 1) fall on the same spot of the picture. So a tile 2 units higher, 2 nearer on x and 2 nearer on z looks exactly like a tile at the same height.</p>
+    <p>The crank turns the bridge in quarter turns. At 0° its tip meets the landing at the top of the stairs: a real join. At 270° the tip lines up with the top of the bell tower, which is really 2 units higher and nearer on every axis, about 3.5 tiles closer to you along your line of sight. At 90° it lines up with the garden, 3.5 tiles farther away. The tower bases vanish into mist, so nothing in the picture gives the depths away.</p>
+    <p>The traveller follows the picture, not the world. Walking off the tip, it reaches the seam and is moved by 2·(1, 1, 1) along your line of sight, which you cannot see. A join only counts when the tiles line up exactly, and when the lower tile in the picture is also the nearer one, so its edge hides the seam. The path finder searches over tiles and bridge positions together, which is how <em>Auto-solve</em> plans its turns.</p>
+    <p><em>Reveal the trick</em> swings the camera off the diagonal. The dashed red lines run along the old line of sight and span each gap.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>←</kbd><span>turn the bridge a quarter turn (also <kbd>Q</kbd>)</span>
+      <kbd>→</kbd><span>turn it back (also <kbd>E</kbd>)</span>
+      <kbd>A</kbd><span>auto-solve on or off</span>
+      <kbd>R</kbd><span>reveal the trick, or return</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">An homage to the rotating-world puzzles of <em>Echochrome</em> (Sony, 2008) and <em>Monument Valley</em> (ustwo games, 2014), both descended from Escher. The diorama, figure and puzzle here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-reveal" aria-pressed="false"><span>Reveal the trick</span></button>
+      <button id="btn-auto" aria-pressed="true"><b class="dot" aria-hidden="true"></b><span>Auto-solve</span></button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag the crank to turn the bridge · click a walkway to walk there</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

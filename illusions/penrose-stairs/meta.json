@@ -1,0 +1,8 @@
+{
+  "slug": "penrose-stairs",
+  "title": "The Endless Stair",
+  "subtitle": "the Penrose stairs, as a real spiral in true isometric",
+  "technique": "Impossible staircase: a real spiral whose top lands exactly on its foot along the isometric line of sight",
+  "refs": ["L. S. Penrose and R. Penrose, Impossible Objects: A Special Type of Visual Illusion, 1958", "M. C. Escher, Ascending and Descending, 1960"],
+  "blurb": "Two files of hooded figures climb and descend a closed loop of stairs on a roof for ever; turn the camera and the loop opens into a spiral."
+}

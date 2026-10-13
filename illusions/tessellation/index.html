@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Regular Division of the Plane</title>
+  <meta name="description" content="A regular hexagon bent, edge pair by edge pair, into a lizard that still fills the plane: Escher's method of regular division, with the plane group p3.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #legend {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      max-width: calc(100% - 20px);
+      padding: 6px 10px 7px;
+      border-radius: 3px;
+      background: rgba(241, 235, 223, 0.92);
+      color: #1d1b18;
+      box-shadow: 0 0 0 1px rgba(29, 27, 24, 0.25);
+      font: 12px/1.35 var(--serif);
+      pointer-events: none;
+    }
+    #legend b { font: 600 14px/1 var(--serif); letter-spacing: 0.02em; }
+    #legend .tri { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid; margin: 0 1px; vertical-align: -1px; }
+    #legend .more { display: none; color: #4a443b; }
+    #legend.on .more { display: inline; }
+    label.slider .end { color: var(--text); font-size: 12px; }
+    #btn-reset { padding: 7px 12px; }
+    @media (max-width: 640px) {
+      #legend { font-size: 11px; padding: 5px 8px; left: 6px; bottom: 6px; }
+      #legend b { font-size: 12.5px; }
+      label.slider { padding: 3px 10px; }
+      label.slider input[type="range"] { width: 110px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Regular Division of the Plane</h1>
+    <p>Bending a hexagon into a lizard, after Escher’s Reptiles (1943) and his notebook on regular division</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A plane filled with copies of one tile. A regular hexagon bends, one pair of edges at a time, into a lizard; copies in three orientations are coloured in three tones and fill the plane with no gaps."></canvas>
+    <div id="badge"></div>
+    <div id="legend"><b>p3</b> &nbsp;120° turns about <span class="tri" style="color:#b23a26"></span><span class="tri" style="color:#2d5a96"></span><span class="tri" style="color:#3b7a4c"></span><span class="more"> · three kinds of centre · orbifold 333 · Heesch type C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub> · dashed: one lattice cell, three tiles</span></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>Escher filled the plane with creatures by starting from a polygon that already tiles it and changing its edges in pairs. Whatever bump is pushed out of one edge is cut into its partner, so neighbouring tiles still fit. Which edges are partners, and how one is carried onto the other, decides how the copies are arranged. Heinrich Heesch listed the 28 ways this can work for a tile with no symmetry of its own.</p>
+    <p>Here the tile is a regular hexagon. At three alternate corners (the coloured triangles) the two edges that meet are partners: one is the other turned 120° about that corner. Bend the solid edge and its dashed partner bends with it, turned. The other three corners are free but move together. In Heesch’s notation this is type C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>C<sub>3</sub>.</p>
+    <p>Each turning corner becomes a point where three copies meet, each turned 120° from the next. The symmetries of the finished pattern are these turns and the translations they generate: the plane group p3 (orbifold 333), with three kinds of rotation centre and no mirrors. Each copy appears in one of three orientations, and colouring by orientation needs exactly three colours, with no two neighbours alike. Here three heads meet at the red centres and three hind feet at the blue and green ones.</p>
+    <p>Every copy on screen is the same outline under a different turn and shift, so shared edges coincide point for point. Drag a handle and every copy changes with it. If an outline crosses itself, copies overlap and it is shaded red.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>Space</kbd><span>play or pause the construction</span>
+      <kbd>S</kbd><span>show the symmetry: centres and a lattice cell</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>R</kbd><span>back to the lizard</span>
+      <span>Drag</span><span>a dot or square on the outlined tile</span>
+    </div>
+    <p class="credit">After M. C. Escher, Reptiles (1943), and his 1941–42 notebook on the regular division of the plane; tile types after Heinrich Heesch. The lizard is an original design.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-sym" class="primary" aria-pressed="false">Symmetry</button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div class="bar">
+      <label class="slider"><span class="end">Hexagon</span><input id="morph" type="range" min="0" max="1000" value="0" aria-label="Morph from hexagon to lizard"><span class="end">Lizard</span></label>
+      <button id="btn-reset">Reset</button>
+    </div>
+    <div id="hint">Drag the dots on the outlined tile: its partner edge, and every copy, follows</div>
+  </footer>
+
+  <script src="bundle.js"></script>
+</body>
+</html>

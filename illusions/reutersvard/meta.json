@@ -1,0 +1,8 @@
+{
+  "slug": "reutersvard",
+  "title": "Triangle of Cubes",
+  "subtitle": "Oscar Reutersvärd’s impossible triangle of nine cubes, assembled in true isometric",
+  "technique": "Impossible figure from cubes: an open spiral of cubes whose ends meet along the isometric line of sight, with the last cube cut and half of it slid behind the first",
+  "refs": ["Oscar Reutersvärd, Opus 1 (triangle of nine cubes), 1934", "L. S. Penrose and R. Penrose, Impossible Objects: A Special Type of Visual Illusion, 1958"],
+  "blurb": "Nine cubes drop into place one by one, each in front of the last, until the ninth slips behind the first and closes a triangle that cannot exist."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "metamorphosis",
+  "title": "Metamorphosis",
+  "subtitle": "A tiling that changes along its length",
+  "technique": "Gradual transformation of a tessellation: every corner and edge curve is a shared function of position, so the strip is an exact tiling at every x",
+  "refs": ["Metamorphosis I, 1937", "Metamorphosis II, 1939–40", "Metamorphosis III, 1967–68"],
+  "blurb": "An endless printed strip in which a checkerboard grows into fish, hexagons, honeycomb, tortoises and cubes, and back again, without ever leaving a gap."
+}

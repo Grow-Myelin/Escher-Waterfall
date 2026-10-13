@@ -1,0 +1,8 @@
+{
+  "slug": "moebius-strip",
+  "title": "Möbius Lattice",
+  "subtitle": "Ants on a one-sided surface",
+  "technique": "One-sided surfaces: a parametric Möbius band, cut as a lattice, whose single side takes two laps (720°) to walk",
+  "refs": ["M. C. Escher, Möbius Strip II (Red Ants), 1963"],
+  "blurb": "Nine ants walk a latticed Möbius band in single file; the red one needs two full laps, 720°, to come home the right way up."
+}

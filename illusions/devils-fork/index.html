@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Devil’s Fork</title>
+  <meta name="description" content="The devil's fork (blivet), engraved stroke by stroke: three round prongs at one end, two square bars at the other. Cover either half and each is a consistent object.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #readings { position: absolute; pointer-events: none; opacity: 0; }
+    #scene { cursor: ew-resize; }
+    label.slider span { white-space: nowrap; }
+    @media (max-width: 640px) {
+      label.slider { padding: 4px 9px; gap: 6px; }
+      label.slider input[type="range"] { width: 110px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Devil’s Fork</h1>
+    <p>the impossible fork, or blivet, widely known from D. H. Schuster (1964), engraved stroke by stroke</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="An engraved drawing of the devil's fork: three round prongs at the left turn into two square bars at the right. Below it, the two solid objects the drawing could be."></canvas>
+    <canvas id="readings" aria-hidden="true"></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The whole figure hangs on six long, evenly spaced lines. At the left they pair up as the outlines of three round prongs, each ending in an ellipse. At the right the same six lines are the edges of a U-shaped bar of square section seen from above: the top and front of a back bar, the slot, then the top and front of a front bar.</p>
+    <p>So the same line changes its job along its length. Line 2 starts as the underside of a round prong, where the surface turns away from you, and ends as a fold between a top face and a front face. Lines 3 and 4 outline the middle prong at the left and the slot at the right. The gaps between the prongs become solid faces, and the middle prong becomes empty space.</p>
+    <p>A line drawing gives no depth, only edges, and the eye reads each edge from what is near it. Near the left end the ellipses say “cylinder”; near the right end the corners say “box”. In the middle, nothing settles it. Slide the card over either half and the rest is a consistent object. The hatching shows the same switch: lines that round the prongs taper out where the flat shading of the bar begins.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>← →</kbd><span>slide the card over the right or left half</span>
+      <kbd>0</kbd><span>remove the card</span>
+      <kbd>N</kbd><span>number the lines</span>
+      <kbd>D</kbd><span>engrave the drawing again</span>
+      <kbd>L</kbd><span>engraving or hand-coloured</span>
+      <kbd>Space</kbd><span>pause or play</span>
+    </div>
+    <p class="credit">The impossible fork is anonymous; it became widely known in 1964 through D. H. Schuster’s note in the <i>American Journal of Psychology</i>. This plate is an original drawing.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Engraving</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <label class="slider"><span>Left half</span><input id="cover" type="range" min="-100" max="100" step="1" value="0" aria-label="Slide a card over the right half (left) or the left half (right)"><span>Right half</span></label>
+      <button id="btn-labels" class="primary" aria-pressed="false">Number the lines</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Slide the card, or drag across the drawing, to see each half alone</div>
+  </footer>
+
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

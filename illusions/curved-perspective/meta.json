@@ -1,0 +1,8 @@
+{
+  "slug": "curved-perspective",
+  "title": "Zenith and Nadir",
+  "subtitle": "curvilinear perspective, after M. C. Escher’s High and Low (1947) and House of Stairs (1951)",
+  "technique": "Curvilinear perspective: every vertex placed by its angles from the eye (a transverse equirectangular map), so straight up and straight down are two points of one picture",
+  "refs": ["M. C. Escher, High and Low, 1947", "M. C. Escher, House of Stairs, 1951"],
+  "blurb": "Drift up and down an open stairwell whose walls bow from the zenith at the top of the picture to the nadir at the bottom; slide to straighten it back into ordinary perspective."
+}

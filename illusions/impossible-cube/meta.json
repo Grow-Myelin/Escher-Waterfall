@@ -1,0 +1,8 @@
+{
+  "slug": "impossible-cube",
+  "title": "The Impossible Cube",
+  "subtitle": "Front and back under parallel projection",
+  "technique": "Ambiguous depth in parallel projection: Necker reversal by reflection in the picture plane, a swapped overlap, and pillars sheared along the isometric line of sight",
+  "refs": ["L. A. Necker, rhomboid figure, 1832", "M. C. Escher, Belvedere, 1958"],
+  "blurb": "A wire cube flips between two readings, an impossible cube swaps one overlap, and an isometric belvedere stands on pillars that join the front of one floor to the back of the next."
+}

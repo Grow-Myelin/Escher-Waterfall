@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Circle Limit</title>
+  <meta name="description" content="An endless school of fish in the Poincaré disk: an exact hyperbolic {p,q} tiling drawn by reflection in a fragment shader, after Escher's Circle Limit woodcuts.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #controls .bar + .bar { margin-top: -1px; }
+    .seg.tilings button { font-variant-numeric: lining-nums; letter-spacing: 0.04em; min-width: 44px; justify-content: center; }
+    @media (max-width: 640px) {
+      .seg.tilings button { min-width: 0; padding: 6px 9px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Circle Limit</h1>
+    <p>Infinity inside a circle: a hyperbolic tiling, after Escher’s Circle Limit woodcuts (1958–60)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="Interlocking fish fill a disk, shrinking without end toward its rim. They swim in rings around the centres of a hyperbolic tiling, in lanes on either side of white curved lines that meet the rim at right angles."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The disk is Poincaré’s map of the hyperbolic plane. Every fish here is the same size in that geometry. The map shrinks lengths by a factor of (1 − r²)/2 at distance r from the centre, so the fish look smaller toward the rim. The rim itself is infinitely far away. Straight lines are arcs of circles that meet the rim at right angles.</p>
+    <p>For each pixel, the shader reflects the point in the sides of one small triangle until it lands inside it. The triangle has angles π/2, π/p and π/q. Two of its sides run through the centre. Reflecting in the third side is an inversion in a circle that meets the rim at right angles. How many reflections it took (odd or even) and where the point lands decide the colour. That is exact at any depth. <b>Show the tiling</b> draws those triangles in black and white, as in Coxeter’s 1957 figure, with the {p,q} polygons in heavy lines.</p>
+    <p>The fish swim in rings around two kinds of centre: the middle of each p-sided polygon and each corner where q polygons meet. Around each centre is a starfish with as many arms as the turn has steps. The white backbones are the lines through the midpoints of neighbouring edges. They divide the plane into those two kinds of ring and are complete hyperbolic straight lines. Every ring turns the same way, so the fish on either side of a backbone pass in opposite directions, like meshed gears. Turning a ring keeps the pattern’s symmetry: it has every rotation of the tiling but none of its mirrors.</p>
+    <p>Dragging applies a Möbius transformation that is a hyperbolic translation. It moves the plane without stretching it. When the view drifts too far, it is reset by one of the tiling’s own rotations, which leaves the picture unchanged.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>Drag</kbd><span>translate the hyperbolic plane (it keeps gliding)</span>
+      <kbd>1</kbd><span>–<kbd>5</kbd> choose the tiling {p,q}</span>
+      <kbd>T</kbd><span>show or hide the tiling</span>
+      <kbd>B</kbd><span>white backbones on or off</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>0</kbd><span>recentre (or double-click)</span>
+      <kbd>Space</kbd><span>pause or play the drift</span>
+    </div>
+    <p class="credit">An homage to M. C. Escher’s woodcuts <i>Circle Limit I–IV</i> (1958–60), which he made after seeing H. S. M. Coxeter’s figure of a hyperbolic triangle tiling. The fish and their lanes are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-tiling" class="primary" aria-pressed="false">Show the tiling</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div class="bar">
+      <div class="seg tilings" role="group" aria-label="Tiling {p,q}">
+        <button data-pq="6,4" aria-pressed="true">{6,4}</button>
+        <button data-pq="8,3" aria-pressed="false">{8,3}</button>
+        <button data-pq="7,3" aria-pressed="false">{7,3}</button>
+        <button data-pq="5,4" aria-pressed="false">{5,4}</button>
+        <button data-pq="4,5" aria-pressed="false">{4,5}</button>
+      </div>
+      <button id="btn-backbone" class="primary" aria-pressed="true">Backbones</button>
+    </div>
+    <div id="hint">Drag to glide through the hyperbolic plane · double-click to recentre</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="bundle.js"></script>
+</body>
+</html>

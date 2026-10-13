@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Convex and Concave</title>
+  <meta name="description" content="A symmetric isometric arcade whose left half is seen from above and right half from below, and Schröder's stairs: move the light and the readings swap.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    #overlay { position: absolute; left: 0; top: 0; pointer-events: none; }
+    #scene { cursor: crosshair; }
+    #caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 2.2em 8% 0;
+      background: linear-gradient(to top, var(--paper-bg, #ece5d5) 0%, var(--paper-bg, #ece5d5) 55%, rgba(236, 229, 213, 0));
+      bottom: 0;
+      padding-bottom: 2.4%;
+      margin: 0;
+      text-align: center;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(11px, 1.55vh, 14.5px);
+      line-height: 1.4;
+      color: rgba(36, 32, 28, 0.86);
+      pointer-events: none;
+      transition: opacity 0.26s ease;
+      text-wrap: balance;
+    }
+    #caption.swap { color: transparent; }
+    #caption { transition: opacity 0.26s ease, color 0.26s ease; }
+    body.colour #caption { --paper-bg: #e9e6dc; background: linear-gradient(to top, #e9e6dc 0%, #e9e6dc 55%, rgba(233, 230, 220, 0)); }
+    @media (max-width: 640px) {
+      #caption { padding: 1.8em 4% 1.8%; font-size: 10.5px; line-height: 1.3; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>Convex and Concave</h1>
+    <p>the light decides which way round you see it, after Escher (1955) and Schröder (1858)</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="An isometric arcade shaded as seen from above on the left and from below on the right; drag to move the light"></canvas>
+    <canvas id="overlay" aria-hidden="true"></canvas>
+    <p id="caption" aria-live="off"></p>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">Floor or ceiling?</h2>
+    <p>In a parallel projection every point slides freely along your line of sight without changing the drawing. Push the whole relief through the picture plane, reversing all its depths, and you get its mould: floors turn into ceilings, a column into a niche, a stair that climbs into one that hangs. The lines are identical. Only the shading differs, because each surface now faces the other way up.</p>
+    <p>We read shading assuming the light comes from above. A face that is lit reads as turned up, and a face in shadow reads as turned down. Here the arcade is mirror-symmetric about its centre line. The left half is shaded with its real surfaces, the right half with the surfaces of its mould. So the left reads as seen from above and the right as seen from below. Across the middle the relief is flattened and turned over gradually. At the centre line every face points straight at you and the shading says nothing, so the two halves join without a seam.</p>
+    <p>Swing the light round to come from below and the evidence reverses: the right half becomes solid and the left becomes hollow. With no shading at all, as in Schröder’s line drawing of 1858, the reading flips back and forth by itself.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>A</kbd><span>light from above</span>
+      <kbd>B</kbd><span>light from below</span>
+      <kbd>N</kbd><span>no shading</span>
+      <kbd>S</kbd><span>swap the light</span>
+      <kbd>1</kbd><span>the arcade</span>
+      <kbd>2</kbd><span>Schröder’s stairs</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>swing the light by itself, or stop</span>
+    </div>
+    <p class="credit">After M. C. Escher’s <em>Convex and Concave</em> (1955) and H. Schröder’s reversible staircase (1858). The arcade and every model here are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Figure">
+        <button id="btn-arcade" aria-pressed="true">Arcade</button>
+        <button id="btn-stairs" aria-pressed="false">Schröder stairs</button>
+      </div>
+      <div class="seg" role="group" aria-label="Light">
+        <button id="btn-above" aria-pressed="true">Light above</button>
+        <button id="btn-flat" aria-pressed="false">None</button>
+        <button id="btn-below" aria-pressed="false">Below</button>
+      </div>
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag on the print to move the light · A above · B below · N none</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>
