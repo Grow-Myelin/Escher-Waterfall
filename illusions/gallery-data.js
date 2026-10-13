@@ -116,11 +116,15 @@ window.GALLERY = [
           {
             "slug": "tessellation",
             "href": "tessellation/index.html",
-            "thumb": null,
-            "title": "tessellation",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "tessellation/thumb.jpg",
+            "title": "Regular Division of the Plane",
+            "subtitle": "Bending a hexagon into a lizard that still fills the plane",
+            "refs": [
+              "M. C. Escher, Reptiles, 1943",
+              "M. C. Escher, notebook on the regular division of the plane, 1941–42",
+              "H. Heesch, Aufbau der Ebene aus kongruenten Bereichen, 1935"
+            ],
+            "blurb": "Watch a field of hexagons bend, one pair of edges at a time, into walking lizards in three colours, then drag the outline yourself and the whole plane follows.",
             "ready": true
           }
         ]
@@ -132,12 +136,15 @@ window.GALLERY = [
           {
             "slug": "figure-ground",
             "href": "figure-ground/index.html",
-            "thumb": null,
-            "title": "figure-ground",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "figure-ground/thumb.jpg",
+            "title": "Figure and Ground",
+            "subtitle": "One tiling of birds and fish, read two ways",
+            "refs": [
+              "M. C. Escher, Sky and Water I, 1938",
+              "M. C. Escher, Day and Night, 1938"
+            ],
+            "blurb": "Light birds and dark fish share one tiling; above the band the birds are figures and fly off, below it the fish are, and they swim away.",
+            "ready": true
           }
         ]
       },
@@ -168,11 +175,13 @@ window.GALLERY = [
           {
             "slug": "flat-to-3d",
             "href": "flat-to-3d/index.html",
-            "thumb": null,
-            "title": "flat-to-3d",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "flat-to-3d/thumb.jpg",
+            "title": "Flat to Solid",
+            "subtitle": "A drawn creature that becomes three-dimensional",
+            "refs": [
+              "Reptiles, 1943"
+            ],
+            "blurb": "A lizard in a drawn tessellation swells into a solid animal, climbs a book and a dodecahedron, crosses a dish and slides back into its place in the drawing.",
             "ready": true
           }
         ]
@@ -184,17 +193,20 @@ window.GALLERY = [
           {
             "slug": "drawing-hands",
             "href": "drawing-hands/index.html",
-            "thumb": null,
-            "title": "drawing-hands",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "drawing-hands/thumb.jpg",
+            "title": "Drawing Hands",
+            "subtitle": "A picture that draws itself",
+            "refs": [
+              "M. C. Escher, Drawing Hands, 1948",
+              "Douglas Hofstadter, Gödel, Escher, Bach, 1979"
+            ],
+            "blurb": "Two hands rise out of a sheet of paper, each pencil drawing the other's cuff, so neither hand is ever drawn first.",
             "ready": true
           },
           {
             "slug": "print-gallery",
             "href": "print-gallery/index.html",
-            "thumb": null,
+            "thumb": "print-gallery/thumb.jpg",
             "title": "Print Gallery",
             "subtitle": "A picture that contains itself, twisted round its centre",
             "refs": [
@@ -229,11 +241,14 @@ window.GALLERY = [
           {
             "slug": "smaller-and-smaller",
             "href": "smaller-and-smaller/index.html",
-            "thumb": null,
-            "title": "smaller-and-smaller",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "smaller-and-smaller/thumb.jpg",
+            "title": "Smaller and Smaller",
+            "subtitle": "Infinity toward a point: a self-similar tiling",
+            "refs": [
+              "M. C. Escher, Smaller and Smaller, 1956",
+              "M. C. Escher, Square Limit, 1964"
+            ],
+            "blurb": "Interlocking dolphins halve in size ring by ring toward a vanishing point, in an endless spiral zoom that loops because the tiling is the same at every scale.",
             "ready": true
           }
         ]
@@ -245,21 +260,26 @@ window.GALLERY = [
           {
             "slug": "reflecting-sphere",
             "href": "reflecting-sphere/index.html",
-            "thumb": null,
-            "title": "reflecting-sphere",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "reflecting-sphere/thumb.jpg",
+            "title": "Reflecting Sphere",
+            "subtitle": "A mirror ball holds the whole room, and the viewer at its centre",
+            "refs": [
+              "M. C. Escher, Hand with Reflecting Sphere, 1935",
+              "L. Szirmay-Kalos, B. Aszódi, I. Lazányi and M. Premecz, Approximate Ray-Tracing on the GPU with Distance Impostors, 2005"
+            ],
+            "blurb": "Walk an artist round a mirror ball in a study: the whole room is in the ball, and however you move, your own eye stays at its centre.",
             "ready": true
           },
           {
             "slug": "three-worlds",
             "href": "three-worlds/index.html",
-            "thumb": null,
-            "title": "three-worlds",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "three-worlds/thumb.jpg",
+            "title": "Three Worlds",
+            "subtitle": "One surface holds what floats on it, what it mirrors and what lies beneath",
+            "refs": [
+              "M. C. Escher, Three Worlds, 1955"
+            ],
+            "blurb": "Fallen leaves, mirrored trees and a carp share one winter pond; tilt your view and watch the Fresnel equations trade the reflections for the world beneath.",
             "ready": true
           }
         ]
@@ -363,12 +383,15 @@ window.GALLERY = [
           {
             "slug": "sugihara",
             "href": "sugihara/index.html",
-            "thumb": null,
-            "title": "sugihara",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "sugihara/thumb.jpg",
+            "title": "Square or Round",
+            "subtitle": "Ambiguous cylinders in a mirror, after Kokichi Sugihara",
+            "refs": [
+              "Kokichi Sugihara, Ambiguous Cylinder Illusion, 2016",
+              "Kokichi Sugihara, Impossible Motion: Magnet-like Slopes, 2010"
+            ],
+            "blurb": "Two tubes look square on the table and round in the mirror behind them, because their wavy rims line up with a square from one side and a circle from the other.",
+            "ready": true
           }
         ]
       },
@@ -379,12 +402,15 @@ window.GALLERY = [
           {
             "slug": "reverse-perspective",
             "href": "reverse-perspective/index.html",
-            "thumb": null,
-            "title": "reverse-perspective",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
-            "ready": false
+            "thumb": "reverse-perspective/thumb.jpg",
+            "title": "The Rooms That Follow You",
+            "subtitle": "A reverspective: a relief that sticks out, painted with rooms that go in, after Patrick Hughes",
+            "refs": [
+              "Patrick Hughes, Sticking-out Room, 1964",
+              "Patrick Hughes, reverspective reliefs, 1990s–"
+            ],
+            "blurb": "A painted relief of a tiled hall and two libraries: its nearest parts show the farthest rooms, so as you step aside the whole scene turns to follow you.",
+            "ready": true
           }
         ]
       },
@@ -465,7 +491,7 @@ window.GALLERY = [
           {
             "slug": "print-gallery",
             "href": "print-gallery/index.html",
-            "thumb": null,
+            "thumb": "print-gallery/thumb.jpg",
             "title": "Print Gallery",
             "subtitle": "A picture that contains itself, twisted round its centre",
             "refs": [
