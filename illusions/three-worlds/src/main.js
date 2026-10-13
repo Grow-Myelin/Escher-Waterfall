@@ -21,7 +21,7 @@ const EL_MIN = 4, EL_MAX = 88, EL_START = 24;
 // ------------------------------------------------------------------ renderer
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 const PAPER = new THREE.Color(0xece5d5);
 renderer.setClearColor(PAPER, 1);
 

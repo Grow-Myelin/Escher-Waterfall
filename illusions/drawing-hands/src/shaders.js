@@ -36,11 +36,20 @@ float grain() {
 `;
 
 export const MOTION = /* glsl */ `
-uniform vec4 uMotion;   // turn (rad), slide (cm), lift (cm), unused
+attribute float aFing;  // how much a vertex follows the pencil (1 for the pencil)
+uniform vec3 uPenW;     // the pencil turns about where it rests in the hand
+uniform mat3 uPenR;     // ... by this rotation
+uniform vec3 uPenS;     // ... and slides along itself by this
+uniform vec4 uMotion;   // hand: turn (rad), slide (cm), lift (cm), unused
 uniform vec2 uPivot;    // pivot of the turn, hand frame
 uniform vec2 uFlat;     // the arm rises out of the paper between these x
 uniform mat4 uPlace;    // hand frame -> world
 vec3 handMotion(vec3 p, inout vec3 n, out float f) {
+  // fingers move the pencil
+  vec3 pf = uPenW + uPenR * (p - uPenW) + uPenS;
+  p = mix(p, pf, aFing);
+  n = normalize(mix(n, uPenR * n, aFing));
+  // the hand slides and turns
   vec3 q = p + vec3(uMotion.y, 0.0, 0.0);
   vec2 r = q.xy - uPivot;
   float cs = cos(uMotion.x), sn = sin(uMotion.x);

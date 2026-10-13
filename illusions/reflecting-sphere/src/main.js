@@ -31,7 +31,7 @@ const RED = 0xa23b2a;
 // ------------------------------------------------------------------ renderer
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 const PAPER = new THREE.Color(0xece5d5);
 renderer.setClearColor(PAPER, 1);
 
@@ -67,8 +67,11 @@ const artistMat = makeRoomMaterial(shared);
 const artist = buildArtist(artistMat);
 scene.add(artist.group);
 
+// half-float keeps the distances exact; without it, store distance / 8 m in 8 bits
+const halfOK = !/[?&]cube8/.test(location.search) && (renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float'));
+if (!halfOK) shared.uDistScale.value = 1 / 8;
 const cubeRT = new THREE.WebGLCubeRenderTarget(512, {
-  type: THREE.HalfFloatType, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter,
+  type: halfOK ? THREE.HalfFloatType : THREE.UnsignedByteType, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter,
 });
 const cubeCam = new THREE.CubeCamera(0.05, 30, cubeRT);
 cubeCam.position.copy(SPHERE.c);

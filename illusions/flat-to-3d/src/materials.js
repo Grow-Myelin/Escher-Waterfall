@@ -19,6 +19,7 @@ export function createSharedUniforms() {
     uInk: { value: new THREE.Vector3(0.11, 0.1, 0.09) },
     uHaze: { value: new THREE.Vector3(0.83, 0.86, 0.84) },
     uFade: { value: 1 },
+    uHatch: { value: 0.055 }, // hatching period, world units (the Waterfall uses 0.22 at its scale)
   };
 }
 
@@ -67,7 +68,7 @@ vec3 finish(vec3 col, float haze, float ink, vec2 huv, float hfw, float face) {
   float t = clamp((L - 0.07) / 0.85, 0.0, 1.0);
   t = t * t * (3.0 - 2.0 * t) * 0.6 + t * 0.4;
   // hatching that follows the surface: one set below mid tone, a cross set in deep shade
-  float hp = 0.22 + haze * 0.25;
+  float hp = uHatch + haze * 0.25;
   float hl = lod(hp, hfw);
   float a1 = (huv.x + huv.y) / hp;
   float a2 = (huv.x - huv.y) / hp + face * 0.37;
@@ -77,8 +78,9 @@ vec3 finish(vec3 col, float haze, float ink, vec2 huv, float hfw, float face) {
   float d1 = abs(fract(a1) - 0.5) * 2.0;
   float d2 = abs(fract(a2) - 0.5) * 2.0;
   float aa1 = fwidth(a1) * 2.0 + 0.02, aa2 = fwidth(a2) * 2.0 + 0.02;
-  float h1 = 1.0 - smoothstep(1.0 - c1 - aa1, 1.0 - c1 + aa1, d1);
-  float h2 = 1.0 - smoothstep(1.0 - c2 - aa2, 1.0 - c2 + aa2, d2);
+  // a line covers the fraction c of each period (darker tone, wider line)
+  float h1 = smoothstep(1.0 - c1 - aa1, 1.0 - c1 + aa1, d1) * smoothstep(0.0, 0.06, c1);
+  float h2 = smoothstep(1.0 - c2 - aa2, 1.0 - c2 + aa2, d2) * smoothstep(0.0, 0.06, c2);
   h1 = mix(c1, h1, hl);
   h2 = mix(c2, h2, hl);
   float v = 0.2 + 0.82 * t;
@@ -133,6 +135,7 @@ uniform vec3 uPaper;
 uniform vec3 uInk;
 uniform vec3 uHaze;
 uniform float uFade;
+uniform float uHatch;
 varying vec3 vN;
 varying vec3 vC;
 varying vec2 vUV;
@@ -321,6 +324,7 @@ uniform float uFill;       // 1 the finished drawing, 0 just its outline
 uniform float uLineW;      // half width of that outline (distance units)
 uniform vec3 uSketchPaper;
 uniform vec3 uSketchLine;
+uniform float uUvScale;
 varying vec2 vUv;
 varying vec3 vN;
 varying vec3 vW;
@@ -348,13 +352,14 @@ void main() {
   // lithograph: hatching that follows the surface where it turns from the light
   float L = dot(col, vec3(0.30, 0.59, 0.11));
   float dark = clamp((1.0 - shade) * 2.2, 0.0, 1.0) * uSolid;
-  vec2 hu = vW.xz * 1.0 + vW.y * 0.7;
+  // hatching follows the drawing's own coordinates, so it bends with the body
+  vec2 hu = vUv * uUvScale;
   float hp = 0.045;
   float a1 = (hu.x + hu.y) / hp;
   float d1 = abs(fract(a1) - 0.5) * 2.0;
   float aa = fwidth(a1) * 1.5 + 0.02;
   float c1 = clamp(dark * 0.9, 0.0, 0.85);
-  float h1 = (1.0 - smoothstep(1.0 - c1 - aa, 1.0 - c1 + aa, d1)) * lod(hp, fwidth(hu.x));
+  float h1 = mix(c1, smoothstep(1.0 - c1 - aa, 1.0 - c1 + aa, d1) * smoothstep(0.0, 0.06, c1), lod(hp, fwidth(hu.x)));
   float g = vnoise(gl_FragCoord.xy * 0.6) - 0.5;
   float gw = hash12(gl_FragCoord.xy) - 0.5;
   vec3 colour = col * (1.0 - rim * 0.55 * uSolid) + g * 0.03 + gw * 0.025;
@@ -383,6 +388,7 @@ export function makeDrawingMaterial(uniforms, mapL, mapC, opts = {}) {
       uContours: { value: 0 },
       uContourStep: { value: opts.contourStep ?? 0.02 },
       uFill: { value: 1 },
+      uUvScale: { value: opts.uvScale ?? 1 },
       uLineW: { value: 0.006 },
       uSketchPaper: { value: new THREE.Vector3(0.955, 0.935, 0.885) },
       uSketchLine: { value: new THREE.Vector3(0.4, 0.4, 0.4) },

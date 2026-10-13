@@ -11,7 +11,8 @@ export const PAGE_Y = 0.12; // top of the sketchbook's page
 export const SKETCH = { x0: -4.5, x1: 0.35, z0: 0.3, z1: 3.9 };
 export const BOOK = { x0: 1.0, x1: 3.9, z0: 0.45, z1: 2.75, h: 0.55 };
 export const DODECA = { c: [2.45, 0, 1.6], a: 0.5 }; // centre (x, -, z), edge length
-export const DISH = { c: [-0.8, 0, -1.75], r: 1.02, h: 0.26 };
+export const DISH = { c: [2.45, 0, 4.55], r: 0.95, h: 0.26 };
+export const BOTTLE = { c: [3.5, 0, -0.9] };
 export const DESK = { x0: -7.5, x1: 7.2, z0: -5.2, z1: 6.4 };
 
 // ------------------------------------------------------------------ dodecahedron
@@ -166,13 +167,13 @@ export function buildDish() {
   const inner = prof.slice(DISH_RIM);
   // (a lathe's normals point to the right of the profile's direction)
   b.lathe(cx, 0, cz, outer, 48, st(0xb8b5ad, P.PEWTER), { edges: outer.map((_, i) => i === 4 || i === DISH_RIM) });
-  b.lathe(cx, 0, cz, inner, 48, st(0xc4c1b9, P.PEWTER), { edges: inner.map(() => false) });
+  b.lathe(cx, 0, cz, inner.slice().reverse(), 48, st(0xc4c1b9, P.PEWTER), { edges: inner.map(() => false) });
   return b;
 }
 
 export function buildPencil() {
   const b = new Builder();
-  const a = new THREE.Vector3(-0.6, 0.06, 4.35), c = new THREE.Vector3(1.9, 0.06, 3.55);
+  const a = new THREE.Vector3(-3.9, 0.06, -0.75), c = new THREE.Vector3(-1.3, 0.06, -0.15);
   const d = c.clone().sub(a);
   const len = d.length();
   const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
@@ -184,6 +185,25 @@ export function buildPencil() {
   b.cyl(0, -0.12, 0, 0.062, 0, 12, st(0xb0a998, P.PLAIN));
   b.cyl(0, -0.22, 0, 0.055, -0.12, 12, st(0xc98f86, P.PLAIN));
   b.pop();
+  b.pop();
+  return b;
+}
+
+// an ink bottle: a squat glass bottle with a cork
+export function buildBottle() {
+  const b = new Builder();
+  const [cx, , cz] = BOTTLE.c;
+  const prof = [[0, 0.0], [0.34, 0.0], [0.36, 0.03], [0.36, 0.36], [0.33, 0.42], [0.2, 0.47], [0.12, 0.5], [0.12, 0.6], [0.14, 0.62], [0.14, 0.66], [0.11, 0.67]];
+  b.lathe(cx, 0, cz, prof, 28, st(0x4d5a63, P.PLAIN), { edges: prof.map((_, i) => i === 1 || i === 4 || i === 7 || i === 9) });
+  b.cyl(cx, 0.66, cz, 0.1, 0.78, 14, st(0xb08a62, P.WOOD));
+  // a paper label
+  b.push(M.T(cx, 0, cz));
+  const seg = 10;
+  for (let k = 0; k < seg; k++) {
+    const a0 = 0.15 + (k / seg) * 1.4, a1 = 0.15 + ((k + 1) / seg) * 1.4;
+    const r = 0.365;
+    b.quad([Math.cos(a0) * r, 0.1, Math.sin(a0) * r], [Math.cos(a1) * r, 0.1, Math.sin(a1) * r], [Math.cos(a1) * r, 0.28, Math.sin(a1) * r], [Math.cos(a0) * r, 0.28, Math.sin(a0) * r], st(0xe8e0cc, P.PLAIN), [1, k === seg - 1 ? 1 : 0, 1, k === 0 ? 1 : 0], { n: [[Math.cos(a0), 0, Math.sin(a0)], [Math.cos(a1), 0, Math.sin(a1)], [Math.cos(a1), 0, Math.sin(a1)], [Math.cos(a0), 0, Math.sin(a0)]] });
+  }
   b.pop();
   return b;
 }

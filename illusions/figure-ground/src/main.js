@@ -77,7 +77,7 @@ function marksPaths(list) {
     for (const c of m.circles || []) { p.moveTo(c[0] + c[2], c[1]); p.arc(c[0], c[1], c[2], 0, Math.PI * 2); }
     const fill = new Path2D();
     for (const c of m.dots || []) { fill.moveTo(c[0] + c[2], c[1]); fill.arc(c[0], c[1], c[2], 0, Math.PI * 2); }
-    return { level: m.level, width: m.width || 1, stroke: p, fill, light: !!m.light };
+    return { level: m.level, width: m.width || 1, stroke: p, fill, light: !!m.light, dark: !!m.dark };
   });
 }
 const birdMarks = marksPaths(BIRD_MARKS);
@@ -230,7 +230,7 @@ function draw() {
     // birds carry the ink line between bird and fish; it fades as they become ground
     const lw = 1 / (S * Math.max(0.6, Math.min(1, c.sy)));
     if (!c.isFish) {
-      const a = 1 - downs(c.d);
+      const a = 1 - smooth((-c.d + 0.1) / 1.0);
       if (a > 0.01) {
         ctx.globalAlpha = a * (0.55 + 0.45 * L);
         ctx.strokeStyle = L > 0.5 ? 'rgb(28,26,23)' : 'rgb(40,36,30)';
@@ -240,7 +240,7 @@ function draw() {
       }
     }
     // detail grows with distance from the band
-    const amount = c.isFish ? smooth((-(c.d) - 0.35) / 2.4) : smooth((c.d - 0.35) / 2.4);
+    const amount = c.isFish ? smooth((-c.d - 0.7) / 2.3) : smooth((c.d - 0.7) / 2.3);
     const marks = c.isFish ? fishMarks : birdMarks;
     if (amount > 0.01) {
       for (const mk of marks) {
@@ -249,7 +249,7 @@ function draw() {
         const pale = c.isFish ? (L > 0.5 ? 'rgb(240,234,220)' : 'rgb(196,214,214)') : 'rgb(28,26,23)';
         ctx.globalAlpha = a;
         ctx.strokeStyle = pale;
-        ctx.fillStyle = mk.light ? 'rgb(244,239,226)' : pale;
+        ctx.fillStyle = mk.light ? 'rgb(244,239,226)' : mk.dark ? 'rgb(28,26,23)' : pale;
         ctx.lineWidth = mk.width * lw;
         ctx.stroke(mk.stroke);
         ctx.fill(mk.fill);

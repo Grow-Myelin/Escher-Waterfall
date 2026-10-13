@@ -193,7 +193,7 @@ export function buildLizard(spineStep) {
   }
   const nbrs = Array.from({ length: n }, () => new Set());
   for (const [a, b, c] of tris) { nbrs[a].add(b).add(c); nbrs[b].add(a).add(c); nbrs[c].add(a).add(b); }
-  for (let it = 0; it < 3; it++) {
+  for (let it = 0; it < 10; it++) {
     const h2 = h.slice();
     for (let i = nb; i < n; i++) {
       let s = 0, k = 0;

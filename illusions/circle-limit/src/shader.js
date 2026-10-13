@@ -326,10 +326,13 @@ void pattern(vec2 w, float pxh, vec4 P0, vec4 P1, vec4 P2, vec4 P3) {
     float mir = line(min(m1, m2), 0.006 * ell, pxh) * 0.7;
     float poly = line(m3, 0.024 * ell, pxh);
     rl = mix(rl, 0.08, max(mir, poly)); rc = mix(rc, INK, max(mir, poly));
-    float dph = fract(fs.x / (0.22 * ell));
-    float dpx = pxh / (0.22 * ell);
-    float dash = smoothstep(-dpx, dpx, dph) * (1.0 - smoothstep(0.58 - dpx, 0.58 + dpx, dph));
-    float lane = line(hL, 0.016 * ell, pxh) * mix(1.0, dash, smoothstep(1.5, 4.0, 0.22 * ell / pxh));
+    // dashes symmetric about the lane's midpoint X, with a gap centred on each
+    // edge midpoint C (|t| = ell), so neighbouring segments of a lane agree
+    float dP = ell / 4.5;
+    float dph = abs(fract(abs(fs.x) / dP + 0.5) - 0.5);
+    float dpx = pxh / dP;
+    float dash = 1.0 - smoothstep(0.29 - dpx, 0.29 + dpx, dph);
+    float lane = line(hL, 0.016 * ell, pxh) * mix(1.0, dash, smoothstep(1.5, 4.0, dP / pxh));
     gRed = lane * uReveal * lod;
     lit = mix(lit, rl, uReveal);
     col = mix(col, rc, uReveal);

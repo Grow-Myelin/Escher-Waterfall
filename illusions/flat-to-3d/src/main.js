@@ -5,10 +5,10 @@
 import * as THREE from 'three';
 import { createSharedUniforms, makeInkMaterial, makeDrawingMaterial } from './materials.js';
 import {
-  buildDesk, buildSketchbook, buildBook, buildDodecahedron, buildDish, buildPencil, SKETCH, PAGE_Y,
+  buildDesk, buildSketchbook, buildBook, buildDodecahedron, buildDish, buildPencil, buildBottle, SKETCH, PAGE_Y,
 } from './desk.js';
 import { outline, tessellate, apply, H, LEGS } from './lizard.js';
-import { drawPage, drawHero, PAPER } from './drawing.js';
+import { drawPage, drawHero, PAPER, HERO_SPAN } from './drawing.js';
 import { buildLizard } from './lizard3d.js';
 import { buildPath, frameAt, STEP } from './path.js';
 import { fitFrame, setupPanel, segmented, keys, playButton, setBadge, markReady } from '../../shared/shell.js';
@@ -42,6 +42,7 @@ add(buildBook());
 add(buildDodecahedron().b);
 add(buildDish());
 add(buildPencil());
+add(buildBottle());
 mark('desk');
 
 // ------------------------------------------------------------------ the drawing
@@ -119,7 +120,7 @@ const LS = L.spine.length; // spine length, tile units
 const spineWorld = L.spine.pts.map((p) => heroWorld(p));
 const path = buildPath(spineWorld);
 mark('path');
-const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.pl.r)), texture(drawHero('C', ring, hero.pl.r)), { contourStep: 0.05 });
+const heroMat = makeDrawingMaterial(uniforms, texture(drawHero('L', ring, hero.pl.r)), texture(drawHero('C', ring, hero.pl.r)), { contourStep: 0.05, uvScale: 2 * HERO_SPAN * K });
 {
   // the outline-only state must match the pencil outline drawn on the page
   const sm = (a, b, x) => smoothstep(a, b, x);

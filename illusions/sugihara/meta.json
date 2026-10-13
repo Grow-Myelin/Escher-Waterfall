@@ -1,0 +1,8 @@
+{
+  "slug": "sugihara",
+  "title": "Square or Round",
+  "subtitle": "Ambiguous cylinders in a mirror, after Kokichi Sugihara",
+  "technique": "Ambiguous object: a tube whose rim is a space curve computed to project to a square from the front and a circle from behind",
+  "refs": ["Kokichi Sugihara, Ambiguous Cylinder Illusion, 2016", "Kokichi Sugihara, Impossible Motion: Magnet-like Slopes, 2010"],
+  "blurb": "Two tubes look square on the table and round in the mirror behind them, because their wavy rims line up with a square from one side and a circle from the other."
+}

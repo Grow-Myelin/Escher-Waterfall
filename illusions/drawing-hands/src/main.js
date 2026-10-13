@@ -38,6 +38,7 @@ function handGeometry() {
   g.setAttribute('aAO', new THREE.BufferAttribute(ex.ao, 1));
   g.setAttribute('aNail', new THREE.BufferAttribute(ex.nail, 1));
   g.setAttribute('aMat', new THREE.BufferAttribute(new Float32Array(n), 1));
+  g.setAttribute('aFing', new THREE.BufferAttribute(ex.fing, 1));
   g.setIndex(new THREE.BufferAttribute(mesh.index, 1));
   return g;
 }
@@ -90,6 +91,7 @@ function pencilGeometry(tip, axis) {
   g.setAttribute('aMat', new THREE.Float32BufferAttribute(mat, 1));
   g.setAttribute('aAO', new THREE.Float32BufferAttribute(new Array(pos.length / 3).fill(1), 1));
   g.setAttribute('aNail', new THREE.Float32BufferAttribute(new Array(pos.length / 3).fill(9), 1));
+  g.setAttribute('aFing', new THREE.Float32BufferAttribute(new Array(pos.length / 3).fill(1), 1));
   g.setIndex(idx);
   return g;
 }
@@ -103,8 +105,13 @@ const fp = footprint(handGeo.attributes.position.array, -11, 0, 0.2);
 // Each hand sits in its own paper frame (x along the arm). Hand B is hand A
 // turned half a turn round the centre of the sheet. A's pencil rests, before
 // it moves, on the middle of B's drawn cuff, which fixes where A must be.
-const FLAT_CENTRE = [-6.6, 0.0];
-const PHI = -Math.PI / 2 + 0.16;
+const drawing = buildDrawing(fp);
+const FLAT_CENTRE = (() => {
+  let x = 0, y = 0, n = 0;
+  for (const s of drawing.strokes) for (const p of s.pts) { x += p[0]; y += p[1]; n++; }
+  return [x / n, y / n + 1.3];
+})();
+const PHI = -Math.PI / 2 + 0.42;
 const placeA = new THREE.Matrix4();
 {
   const c = Math.cos(PHI), s = Math.sin(PHI);
@@ -118,7 +125,6 @@ const PIVOT = new THREE.Vector2(-2.6, 0);
 const FLAT = new THREE.Vector2(-5.0, -0.3);
 
 // ------------------------------------------------------------------ drawing
-const drawing = buildDrawing(fp);
 const tl = makeTimeline(drawing.strokes);
 const HOLD = 1.6, FADE = 1.4, BACK = 0.9;
 const PERIOD = tl.end + HOLD + FADE + BACK;
@@ -133,7 +139,12 @@ renderer.autoClear = false;
 const PAPER = new THREE.Vector3(0.93, 0.905, 0.845);
 const INK = new THREE.Vector3(0.11, 0.1, 0.09);
 const LIGHT = new THREE.Vector3(-0.45, 0.55, 0.72).normalize();
+const PEN_W = new THREE.Vector3(...X.apply(model.pen.W));
+const PEN_T = new THREE.Vector3(...tipL);
 const shared = {
+  uPenW: { value: PEN_W },
+  uPenR: { value: new THREE.Matrix3() },
+  uPenS: { value: new THREE.Vector3() },
   uMotion: { value: new THREE.Vector4(0, 0, 0, 0) },
   uPivot: { value: PIVOT },
   uFlat: { value: FLAT },
@@ -282,17 +293,56 @@ function pencilTarget(T) {
   const p = [tl.last[0] + (tl.first[0] - tl.last[0]) * e, tl.last[1] + (tl.first[1] - tl.last[1]) * e];
   return { p, lift: 0.6 * Math.min(1, (T - tl.end) / 0.5) };
 }
-function solveMotion(T) {
-  const { p, lift } = pencilTarget(T);
-  // the target lies in B's flat drawing; express it in A's frame
-  vA.set(p[0], p[1], 0).applyMatrix4(placeB).applyMatrix4(invA);
-  const rx = vA.x - PIVOT.x, ry = vA.y - PIVOT.y;
+// The fingers can move the pencil tip a little way (REACH) by tilting and
+// sliding the pencil where it rests in the hand; the hand itself follows,
+// smoothly, only as far as it must.
+const REACH = 1.7;
+const handState = { turn: 0, slide: 0, vTurn: 0, vSlide: 0, init: false };
+const qTmp = new THREE.Quaternion(), d0 = new THREE.Vector3(), d1 = new THREE.Vector3(), m4 = new THREE.Matrix4();
+function handFor(px, py) {
+  const rx = px - PIVOT.x, ry = py - PIVOT.y;
   const R = Math.hypot(rx, ry);
   const tx = tipL[0] - PIVOT.x, ty = tipL[1] - PIVOT.y;
   const X0 = Math.sqrt(Math.max(1, R * R - ty * ty));
-  const slide = X0 - tx;
-  const turn = Math.atan2(ry, rx) - Math.atan2(ty, X0);
-  shared.uMotion.value.set(turn, slide, lift, 0);
+  return [Math.atan2(ry, rx) - Math.atan2(ty, X0), X0 - tx];
+}
+function solveMotion(T, dt) {
+  const { p, lift } = pencilTarget(T);
+  // the target lies in B's flat drawing; express it in A's frame
+  vA.set(p[0], p[1], 0).applyMatrix4(placeB).applyMatrix4(invA);
+  // where the hand should take its resting pencil tip
+  let dx = vA.x - tipL[0], dy = vA.y - tipL[1];
+  const d = Math.hypot(dx, dy);
+  const k = d > REACH ? (d - REACH) / d : 0;
+  const [turn, slide] = handFor(tipL[0] + dx * k, tipL[1] + dy * k);
+  // critically damped follow
+  if (!handState.init || dt <= 0) { handState.turn = turn; handState.slide = slide; handState.init = true; }
+  else {
+    const w = 9.0;
+    for (const key of ['turn', 'slide']) {
+      const target = key === 'turn' ? turn : slide;
+      const vk = key === 'turn' ? 'vTurn' : 'vSlide';
+      const a = w * w * (target - handState[key]) - 2 * w * handState[vk];
+      handState[vk] += a * dt;
+      handState[key] += handState[vk] * dt;
+    }
+  }
+  shared.uMotion.value.set(handState.turn, handState.slide, lift, 0);
+  // the rest is done by the fingers: bring the target back into the hand's
+  // resting frame and turn the pencil about where it rests
+  const c = Math.cos(-handState.turn), s = Math.sin(-handState.turn);
+  const rx = vA.x - PIVOT.x, ry = vA.y - PIVOT.y;
+  const qx = PIVOT.x + c * rx - s * ry - handState.slide, qy = PIVOT.y + s * rx + c * ry;
+  d0.copy(PEN_T).sub(PEN_W);
+  const L0 = d0.length();
+  d0.normalize();
+  d1.set(qx, qy, 0).sub(PEN_W);
+  const L1 = d1.length();
+  d1.normalize();
+  qTmp.setFromUnitVectors(d0, d1);
+  m4.makeRotationFromQuaternion(qTmp);
+  shared.uPenR.value.setFromMatrix4(m4);
+  shared.uPenS.value.copy(d1).multiplyScalar(L1 - L0);
 }
 
 const approach = (v, t, r) => v + Math.sign(t - v) * Math.min(Math.abs(t - v), r);
@@ -304,7 +354,7 @@ function frame(now) {
   last = now;
   if (state.playing) state.t = (state.t + dt) % PERIOD;
   const T = state.t;
-  solveMotion(T);
+  solveMotion(T, state.playing ? dt : 0);
   strokeU.uNow.value = T;
   strokeU.uFade.value = 1 - Math.min(1, Math.max(0, (T - tl.end - HOLD) / FADE));
 
@@ -333,4 +383,4 @@ function frame(now) {
 markReady();
 requestAnimationFrame(frame);
 
-window.__page = { state, view, updateCamera, setRevealed, setPlaying, shared, tl, PERIOD, solveMotion, fp, drawing };
+window.__page = { state, view, updateCamera, setRevealed, setPlaying, shared, tl, PERIOD, solveMotion, fp, drawing, strokeU, scene, placeA, placeB };

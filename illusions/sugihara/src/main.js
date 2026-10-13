@@ -34,7 +34,7 @@ renderer.setClearColor(PAPER, 1);
 
 const uniforms = createSharedUniforms();
 uniforms.uHatch = { value: 5 };
-uniforms.uLight.value.set(-0.42, 0.78, 0.47).normalize();
+uniforms.uLight.value.set(-0.62, 0.7, 0.32).normalize();
 // the mirror world is lit by the mirror image of the same lamp
 const mirrorUniforms = { ...uniforms, uLight: { value: uniforms.uLight.value.clone().multiply(new THREE.Vector3(1, 1, -1)) } };
 const ink = inkMaterial(uniforms);

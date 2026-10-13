@@ -29,7 +29,7 @@ const perp = (a, d) => norm(sub(a, mul(d, dot(a, d)))); // component of a orthog
 export const POSE = {
   roll: 0.36, // hand rolled onto its little-finger side (rad)
   pitch: 0.17, // fingers tilted down (rad); solved for in makeHtoL
-  dev: 0.45, // the hand turned towards the thumb at the wrist (rad)
+  dev: 0.5, // the hand turned towards the thumb at the wrist (rad)
   ext: -0.42, // the forearm dipping back towards the paper (rad)
 };
 
@@ -386,6 +386,14 @@ export function vertexExtras(model, pos, normals, sdf) {
   const n = pos.length / 3;
   const nail = new Float32Array(n).fill(9);
   const ao = new Float32Array(n).fill(1);
+  const fing = new Float32Array(n);
+  const pinchers = model.prims.fingers.filter((f) => ['index', 'middle', 'thumb'].includes(f.name));
+  const others = model.prims.fingers.filter((f) => !['index', 'middle', 'thumb'].includes(f.name));
+  const segDist = (p, f) => {
+    let best = 1e9;
+    for (const s of f.segs) best = Math.min(best, sdRoundCone(p[0], p[1], p[2], s));
+    return best;
+  };
   // nails sit on the back of each distal phalanx
   const nails = [];
   for (const f of model.prims.fingers) {
@@ -422,6 +430,15 @@ export function vertexExtras(model, pos, normals, sdf) {
       if (d < best) best = d;
     }
     nail[i] = best;
+    // fingers that hold the pencil follow it, more so near the pinch
+    let dp = 1e9;
+    for (const f of pinchers) dp = Math.min(dp, segDist(p, f));
+    let doth = 1e9;
+    for (const f of others) doth = Math.min(doth, segDist(p, f));
+    if (dp < 0.6 && dp < doth) {
+      const dc = len(sub(p, model.pen.C));
+      fing[i] = 1 - smooth(1.2, 4.6, dc);
+    }
     // ambient occlusion: how far the field opens up along the normal
     const nx = normals[3 * i], ny = normals[3 * i + 1], nz = normals[3 * i + 2];
     let occ = 0, w = 1;
@@ -433,7 +450,7 @@ export function vertexExtras(model, pos, normals, sdf) {
     }
     ao[i] = Math.max(0, 1 - occ * 0.9);
   }
-  return { nail, ao };
+  return { nail, ao, fing };
 }
 
 // Plan outline of the arm behind the wrist (L frame): for each x, the

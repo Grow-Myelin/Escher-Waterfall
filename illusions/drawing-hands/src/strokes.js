@@ -48,9 +48,9 @@ export function buildDrawing(fp) {
   const rand = rng(11);
   const S = [];
   const add = (pts, o = {}) => S.push({ pts, w: o.w ?? 0.05, dark: o.dark ?? 0.85, speed: o.speed ?? 12, kind: o.kind ?? 'line' });
-  const XW = -3.9; // where the drawn wrist meets the rising form
-  const XC = -5.65; // the cuff's opening
-  const XB = -8.3; // the cuff's far edge
+  const XW = -4.1; // where the drawn wrist meets the rising form
+  const XC = -5.4; // the cuff's opening
+  const XB = -7.5; // the cuff's far edge
   const W = (x) => fp.at(x); // [lo, hi] of the arm's outline
   const rimY = Math.max(-W(XC)[0], W(XC)[1]) + 0.55;
   const RX = 0.5;

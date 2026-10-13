@@ -123,10 +123,11 @@ function dodecaSection(z0) {
 function profileA(x0, x1) {
   const B = BOOK, h = B.h, py = PAGE_Y;
   const P = [[x0, py], [SKETCH.x1, py], [SKETCH.x1, 0]];
-  // the rounded spine: a half-ellipse bulging out of the book's left side
+  // the rounded spine bulges out of the book's left side: climb straight up
+  // to its widest point, then over its upper half
   const sx = B.x0 + 0.02, rx = 0.1375, ry = h / 2;
-  P.push([sx + 0.0, 0]);
-  for (let k = 1; k < 12; k++) {
+  P.push([sx - rx, 0], [sx - rx, ry]);
+  for (let k = 7; k < 12; k++) {
     const th = (k / 12) * Math.PI;
     P.push([sx - rx * Math.sin(th), ry - ry * Math.cos(th)]);
   }
@@ -135,7 +136,8 @@ function profileA(x0, x1) {
   for (const p of sec.chain) P.push(p);
   // the fore-edge: boards to x1, the pages set back
   P.push([B.x1, h], [B.x1, h - 0.05], [B.x1 - 0.06, h - 0.05], [B.x1 - 0.06, 0.05], [B.x1, 0.05], [B.x1, 0], [x1, 0]);
-  return { P, top: sec.top };
+  // as (distance along the run, height)
+  return { P: P.map(([x, y]) => [x - x0, y]), top: sec.top };
 }
 
 // Run C, along −x through the dish's centre: desk, over the rim, across the

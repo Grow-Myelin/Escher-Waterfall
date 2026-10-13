@@ -81,6 +81,7 @@ export function createSharedUniforms() {
     uLitho: { value: 1 },
     uHatch: { value: 0.012 },
     uCubePass: { value: 0 },
+    uDistScale: { value: 1 },
     uAir: { value: 0 },
     uSun: { value: new THREE.Vector3(1, 0.55, -0.22).normalize() },
     uLamp: { value: new THREE.Vector3() },
@@ -122,6 +123,7 @@ uniform float uClock;
 uniform float uLitho;
 uniform float uHatch;
 uniform float uCubePass;
+uniform float uDistScale;
 uniform float uAir;
 uniform float uFade;
 uniform vec3 uSun;
@@ -418,7 +420,7 @@ void main() {
   // a little aerial perspective in the main view sets the ball off from the room behind it
   float air = uAir * smoothstep(1.4, 4.5, length(vW - cameraPosition));
   vec3 outc = finish(col, max(emit * 0.35, air), ink * (1.0 - air), huv, hfw, face);
-  gl_FragColor = vec4(outc, uCubePass > 0.5 ? length(vW - uC) : 1.0);
+  gl_FragColor = vec4(outc, uCubePass > 0.5 ? length(vW - uC) * uDistScale : 1.0);
 }
 `;
 
@@ -452,6 +454,7 @@ uniform float uR;
 uniform float uLitho;
 uniform float uMark;
 uniform float uSize;
+uniform float uDistScale;
 uniform vec3 uPaper;
 uniform vec3 uInk;
 varying vec3 vW;
@@ -461,7 +464,7 @@ const int STEPS = 30;
 const int REFINE = 6;
 const float TMAX = 7.0;
 
-float surf(vec3 x) { return length(x) - textureLod(uEnv, x, 0.0).a; }
+float surf(vec3 x) { return length(x) - textureLod(uEnv, x, 0.0).a / uDistScale; }
 
 vec3 trace(vec3 P, vec3 R) {
   vec3 x0 = P - uC;
@@ -539,6 +542,7 @@ export function makeSphereMaterial(shared, env, radius, size) {
       uLitho: shared.uLitho,
       uMark: { value: 0 },
       uSize: { value: size },
+      uDistScale: shared.uDistScale,
       uPaper: shared.uPaper,
       uInk: shared.uInk,
     },

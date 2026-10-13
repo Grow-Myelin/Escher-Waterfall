@@ -148,38 +148,36 @@ void main() {
   // ---- the dolphin, drawn in its tile's frame
   float detail = 1.0 - 0.8 * uReveal;
   float fam = mod(aa + kk, 2.0);                    // light and dark alternate in every direction
-  // a soft line between the darker back and the paler belly
-  float yc = 0.40 + 0.15 * smoothstep(0.3, 1.6, x) - 0.07 * smoothstep(2.1, 3.1, x) + 0.02 * sin(x * 2.6);
+  // the line between the darker cape and the pale belly: from the beak, under
+  // the eye, dipping behind the flipper and rising to the tail stock
+  float yc = 0.40 - 0.07 * gauss(x, 2.15, 0.35) + 0.22 * smoothstep(1.9, 0.7, x) - 0.04 * smoothstep(2.6, 3.0, x);
   float dC = y - yc;
   float cape = smoothstep(-0.5 * px, 0.5 * px, dC);
-  // fin and fluke roots, eye, mouth, blowhole
+  float lineC = line(dC, 0.007, px) * step(0.45, x) * step(x, 2.95) * detail;
+  // fin, flipper and fluke roots, eye, mouth, blowhole
   float bx = edgeB(x);
-  float rootF = line(y - 1.0, 0.008, px) * step(1.17, x) * step(x, 1.95) * step(0.02, edgeT(x));
-  float rootP = line(y - 0.035 - 0.03 * (x - 2.4), 0.008, px) * step(2.38, x) * step(x, 2.95) * step(bx, -0.03);
+  float rootF = line(y - 1.0 + 0.05 * sin(PI * clamp((x - 1.2) / 0.7, 0.0, 1.0)), 0.008, px) * step(1.2, x) * step(x, 1.9) * step(0.03, edgeT(x));
+  float rootP = line(y - 0.06 - 0.05 * (x - 2.45), 0.008, px) * step(2.45, x) * step(x, 2.9) * step(bx, -0.03);
   float fb = 0.30 + 0.30 * sq(y - 0.40);
-  float rootT = line(x - fb, 0.008, px) * step(0.10, y) * step(y, 0.88);
+  float rootT = line(x - fb, 0.008, px) * step(0.18, y) * step(y, 0.72);
   float roots = max(rootF, max(rootP, rootT)) * detail;
-  float dEye = length(vec2(x - 2.60, y - 0.55));
+  float dEye = length(vec2(x - 2.62, y - 0.56));
   float rE = 0.058;
   float eyeW = fill(dEye - rE, px) * detail;
   float eyeP = fill(dEye - rE * 0.55, px) * detail;
   float eyeL = line(dEye - rE, 0.007, px) * detail;
-  float ym = 0.255 + 0.06 * smoothstep(2.86, 2.66, x);
-  float lineM = line(y - ym, 0.008, px) * step(2.64, x) * step(x, 3.0 + edgeE(0.255) - 0.06) * detail;
-  float dBh = length(vec2(x - 2.30, (y - 0.97) * 2.0));
-  float lineH = line(dBh - 0.045, 0.007, px) * step(y, 0.97) * detail;
-  float lineC = line(dC, 0.006, px) * detail * 0.7;
-  // engraving: a few lines that follow the back, for volume
-  float dTop = 1.0 + edgeT(x) - y;                  // depth below the back
-  float hs = 0.06;
-  float hh = abs(fract(dTop / hs) - 0.5) * hs;
+  float ym = 0.255 + 0.07 * smoothstep(2.84, 2.66, x);
+  float lineM = line(y - ym, 0.008, px) * step(2.66, x) * step(x, 3.0 + edgeE(0.255) - 0.06) * detail;
+  float dBh = length(vec2(x - 2.32, (y - 0.98) * 2.0));
+  float lineH = line(dBh - 0.045, 0.007, px) * step(y, 0.98) * detail;
+  // engraving: short diagonal strokes over the cape, thinning toward its edge
+  float hs = 0.055;
+  float hd = abs(fract((x * 0.55 + y) / hs) - 0.5) * hs;
   float hl = smoothstep(2.5, 5.0, hs / px) * detail;
-  float band = smoothstep(0.30, 0.10, dTop) * step(0.03, dTop) * step(0.0, dC);
-  float engr = line(hh, 0.008, px) * hl * band;
-  float dBot = y - bx;                               // height above the belly
-  float hb = abs(fract(dBot / hs) - 0.5) * hs;
-  float bandB = smoothstep(0.24, 0.08, dBot) * step(0.03, dBot);
-  float engrB = line(hb, 0.007, px) * hl * bandB;
+  float dTop = 1.0 + edgeT(x) - y;
+  float capeW = smoothstep(0.02, 0.10, dC) * step(0.03, dTop);
+  float engr = line(hd, 0.004 + 0.010 * smoothstep(0.05, 0.35, dC), px) * hl * capeW;
+  float engrB = 0.0;
 
   // ---- tone and colour: flat light and dark dolphins, like a woodcut
   float lit;

@@ -1,0 +1,8 @@
+{
+  "slug": "smaller-and-smaller",
+  "title": "Smaller and Smaller",
+  "subtitle": "Infinity toward a point: a self-similar tiling",
+  "technique": "Square rings that halve toward the centre, each a pinwheel of four 3 × 1 rectangles bent into interlocking dolphins whose edges match exactly across scales; the tiling repeats under a ×2 scaling with a quarter turn, so the zoom loops",
+  "refs": ["M. C. Escher, Smaller and Smaller, 1956", "M. C. Escher, Square Limit, 1964"],
+  "blurb": "Interlocking dolphins halve in size ring by ring toward a vanishing point, in an endless spiral zoom that loops because the tiling is the same at every scale."
+}
