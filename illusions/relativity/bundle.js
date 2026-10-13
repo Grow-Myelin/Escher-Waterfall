@@ -99,7 +99,7 @@ ${yo}
 void main() {
   vec3 n = normalize(vN);
   float diff = max(dot(n, uLight), 0.0);
-  float shade = 0.36 + 0.66 * diff;
+  float shade = 0.46 + 0.58 * diff;
   float pat = floor(vM.x + 0.5);
   vec2 uv = vUV;
   float fw = max(fwidth(uv.x), fwidth(uv.y));

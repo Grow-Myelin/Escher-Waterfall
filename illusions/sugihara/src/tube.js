@@ -23,7 +23,8 @@ export function rimPoint(r, y0, th, x, back) {
     : [x, y0 + (t * (s - r)) / 2, (s + r) / 2];
 }
 
-// The closed rim, counter-clockwise seen from above, as samples
+// The closed rim, as samples (front half from +x to −x, left side, back half,
+// right side),
 // { p:[x,y,z], n:[nx,0,nz] (outward footprint normal), corner } .
 export function rimCurve(r, y0, th, n = 48, nSide = 6) {
   const pts = [];
@@ -87,19 +88,19 @@ export function buildTube(b, r, y0, th, wall, s, sIn) {
     const u0 = arc[i], u1 = arc[i + 1];
     // a vertical ink line where the straight sides meet the curved halves
     const edgeA = A.corner ? 1 : 0, edgeB = B.corner ? 1 : 0;
-    // outer wall: counter-clockwise seen from outside: bottom i, bottom j, top j, top i
+    // outer wall (the curve runs clockwise seen from above, so B comes first)
     b.quad(
-      [A.p[0], 0, A.p[2]], [B.p[0], 0, B.p[2]], B.p, A.p, s, [1, edgeB, 1, edgeA],
-      { n: [A.n, B.n, B.n, A.n], uv: [[u0, 0], [u1, 0], [u1, B.p[1]], [u0, A.p[1]]] },
+      [B.p[0], 0, B.p[2]], [A.p[0], 0, A.p[2]], A.p, B.p, s, [1, edgeA, 1, edgeB],
+      { n: [B.n, A.n, A.n, B.n], uv: [[u1, 0], [u0, 0], [u0, A.p[1]], [u1, B.p[1]]] },
     );
     // inner wall, facing in
     const ni = (q) => [-q.n[0], 0, -q.n[2]];
     b.quad(
-      [Bi.p[0], 0, Bi.p[2]], [Ai.p[0], 0, Ai.p[2]], Ai.p, Bi.p, sIn, [0, edgeA, 1, edgeB],
-      { n: [ni(Bi), ni(Ai), ni(Ai), ni(Bi)], uv: [[u1, 0], [u0, 0], [u0, Ai.p[1]], [u1, Bi.p[1]]] },
+      [Ai.p[0], 0, Ai.p[2]], [Bi.p[0], 0, Bi.p[2]], Bi.p, Ai.p, sIn, [0, edgeB, 1, edgeA],
+      { n: [ni(Ai), ni(Bi), ni(Bi), ni(Ai)], uv: [[u0, 0], [u1, 0], [u1, Bi.p[1]], [u0, Ai.p[1]]] },
     );
     // rim band
-    b.quad(A.p, B.p, Bi.p, Ai.p, s, [1, 0, 1, 0]);
+    b.quad(B.p, A.p, Ai.p, Bi.p, s, [1, 0, 1, 0]);
   }
   return out;
 }
