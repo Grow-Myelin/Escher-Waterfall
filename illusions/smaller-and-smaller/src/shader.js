@@ -79,6 +79,12 @@ float edgeL(float y) {               // tail: positive is into the tile (the not
   float t = y < apex ? y / apex : (1.0 - y) / (1.0 - apex);
   return uAmp * (0.38 + 0.03 * gSw) * pow(clamp(t, 0.0, 1.0), 1.15);
 }
+float edgeB(float x) {               // belly, forced by the neighbours
+  if (x < 0.5) return 0.5 * edgeE(1.0 - 2.0 * x);
+  if (x < 2.0) return 0.5 * edgeT(2.0 * x - 1.0);
+  return -edgeL(x - 2.0);
+}
+
 vec2 armLocal(vec2 P, float k, float a) {
   vec2 Q = P * exp2(-k);
   for (int i = 0; i < 3; i++) if (float(i) < a) Q = vec2(-Q.y, Q.x);
@@ -88,7 +94,11 @@ vec2 armLocal(vec2 P, float k, float a) {
 void main() {
   vec2 fc = gl_FragCoord.xy;
   float pxw = 1.0 / (uS * exp2(uPhase));            // world units per device px
-  vec2 P = (fc - 0.5 * uRes) * pxw;
+  // magnify by 2^phase and turn a quarter clockwise per doubling: the tiling
+  // is the same after scaling by 2 and turning by 90°, colours included
+  float ang = uPhase * 0.5 * PI;
+  vec2 q = (fc - 0.5 * uRes) * pxw;
+  vec2 P = vec2(cos(ang) * q.x - sin(ang) * q.y, sin(ang) * q.x + cos(ang) * q.y);
   float m = max(abs(P.x), abs(P.y));
 
   gSw = sin(uTime * 2.6);
@@ -125,7 +135,6 @@ void main() {
   }
   float px = pxw * 2.0 * exp2(-kk);                 // local units per px for the owner
   float x = l.x, y = l.y;
-  float fam = mod(aa, 2.0);
 
   // ---- the tile outline, from the owner's side
   float h = 0.004;
@@ -137,56 +146,56 @@ void main() {
   float lineO = line(dOut, 0.022, px);
 
   // ---- the dolphin, drawn in its tile's frame
-  float detail = 1.0 - 0.75 * uReveal;
-  // countershading: dark cape above, pale belly below
-  float yc = 0.38 + 0.15 * smoothstep(0.25, 1.6, x) - 0.10 * smoothstep(2.1, 3.15, x) + 0.03 * sin(x * 2.4);
-  float dC = (y - yc) / 1.05;
+  float detail = 1.0 - 0.8 * uReveal;
+  float fam = mod(aa + kk, 2.0);                    // light and dark alternate in every direction
+  // a soft line between the darker back and the paler belly
+  float yc = 0.40 + 0.15 * smoothstep(0.3, 1.6, x) - 0.07 * smoothstep(2.1, 3.1, x) + 0.02 * sin(x * 2.6);
+  float dC = y - yc;
   float cape = smoothstep(-0.5 * px, 0.5 * px, dC);
-  float lineC = line(dC, 0.008, px) * detail;
-  // fins: the dorsal fin above the back line, the flipper below the belly, the flukes
-  float inFin = max(step(1.0, y) * step(1.15, x) * step(x, 2.05),
-                max(step(y, 0.0) * step(2.25, x) * step(x, 2.85), step(x, 0.22 + 0.1 * (y - 0.5) * (y - 0.5))));
-  float finLine = 0.0;
-  finLine = max(finLine, line(y - 1.0, 0.007, px) * step(1.22, x) * step(x, 1.97) * step(0.0, edgeT(x) - 0.01));
-  finLine = max(finLine, line(y + 0.01 * sin((x - 2.3) * 9.0), 0.007, px) * step(2.3, x) * step(x, 2.8) * step(0.0, -edgeB(x) - 0.01));
-  float fb = 0.22 + 0.1 * (y - 0.5) * (y - 0.5);
-  finLine = max(finLine, line(x - fb, 0.007, px) * step(0.08, y) * step(y, 0.92));
-  finLine *= detail;
-  // eye, mouth, blowhole
-  float dEye = length(vec2(x - 2.63, y - 0.56));
-  float rE = 0.052;
+  // fin and fluke roots, eye, mouth, blowhole
+  float bx = edgeB(x);
+  float rootF = line(y - 1.0, 0.008, px) * step(1.17, x) * step(x, 1.95) * step(0.02, edgeT(x));
+  float rootP = line(y - 0.035 - 0.03 * (x - 2.4), 0.008, px) * step(2.38, x) * step(x, 2.95) * step(bx, -0.03);
+  float fb = 0.30 + 0.30 * sq(y - 0.40);
+  float rootT = line(x - fb, 0.008, px) * step(0.10, y) * step(y, 0.88);
+  float roots = max(rootF, max(rootP, rootT)) * detail;
+  float dEye = length(vec2(x - 2.60, y - 0.55));
+  float rE = 0.050;
   float eyeW = fill(dEye - rE, px) * detail;
-  float eyeP = fill(dEye - rE * 0.52, px) * detail;
-  float eyeL = line(dEye - rE, 0.008, px) * detail;
-  float ym = 0.285 - 0.05 * smoothstep(3.05, 2.72, x) + 0.03 * smoothstep(2.82, 2.70, x);
-  float lineM = line(y - ym, 0.008, px) * step(2.70, x) * step(x, 3.0 + edgeE(ym) - 0.04) * detail;
-  float dBh = length(vec2(x - 2.36, y - 0.93) * vec2(1.0, 2.2));
-  float lineH = line(dBh - 0.035, 0.007, px) * step(y, 0.93) * detail;
-  // engraved shading that follows the body
-  float hs = 0.045;
+  float eyeP = fill(dEye - rE * 0.55, px) * detail;
+  float eyeL = line(dEye - rE, 0.007, px) * detail;
+  float ym = 0.255 + 0.06 * smoothstep(2.86, 2.66, x);
+  float lineM = line(y - ym, 0.008, px) * step(2.64, x) * step(x, 3.0 + edgeE(0.255) - 0.06) * detail;
+  float dBh = length(vec2(x - 2.30, (y - 0.97) * 2.0));
+  float lineH = line(dBh - 0.045, 0.007, px) * step(y, 0.97) * detail;
+  float lineC = line(dC, 0.006, px) * detail * 0.7;
+  // engraving: lines that follow the body, heavier on the back
+  float hs = 0.05;
   float hh = abs(fract((y - yc) / hs) - 0.5) * hs;
-  float hl = smoothstep(2.0, 4.0, hs / px);
+  float hl = smoothstep(2.2, 4.5, hs / px) * detail;
+  float engr = line(hh, mix(0.006, 0.013, cape), px) * hl;
 
   // ---- tone and colour
-  float backL = fam < 0.5 ? 0.40 : 0.13;
-  float bellyL = fam < 0.5 ? 0.96 : 0.74;
-  vec3 backC = fam < 0.5 ? vec3(0.33, 0.44, 0.52) : vec3(0.52, 0.30, 0.21);
-  vec3 bellyC = fam < 0.5 ? vec3(0.93, 0.90, 0.82) : vec3(0.90, 0.77, 0.58);
-  float lit = mix(bellyL, backL, cape);
-  vec3 col = mix(bellyC, backC, cape);
-  // lithograph: the cape is engraved with lines, the belly lightly shaded toward the cape
-  float engr = line(hh, 0.012 + 0.008 * fam, px) * hl * cape;
-  float capeL = mix(backL, mix(backL + 0.32, backL - 0.08, engr), hl);
-  float shade = (1.0 - cape) * smoothstep(-0.25, 0.0, dC) * 0.12;
-  lit = mix(bellyL - shade, capeL, cape);
-  col *= 1.0 - 0.10 * inFin;
-  lit -= 0.06 * inFin * (1.0 - cape);
-  float pale = fam < 0.5 ? 0.0 : 1.0;
-  lit = mix(lit, 0.08, max(lineC, finLine * (1.0 - cape)));
-  col = mix(col, INK, max(lineC, finLine) * 0.8);
-  lit = mix(lit, mix(0.08, 0.75, cape), max(finLine * cape, lineH));
-  lit = mix(lit, 0.08, lineM);
-  col = mix(col, INK, lineM);
+  float lit, ink2, pale;
+  vec3 col;
+  if (fam < 0.5) {
+    // pale dolphin: white belly, grey engraved back
+    lit = mix(0.97, mix(0.90, 0.48, engr), cape);
+    lit = mix(lit, 0.62, engr * (1.0 - cape) * 0.5);
+    col = mix(vec3(0.94, 0.91, 0.84), vec3(0.80, 0.74, 0.64), cape);
+    col = mix(col, col * 0.82, engr);
+    lit = mix(lit, 0.10, max(max(roots, lineM), max(lineH, lineC)));
+    col = mix(col, INK, max(max(roots, lineM), max(lineH, lineC)) * 0.85);
+  } else {
+    // dark dolphin: black back cut with pale lines, grey belly
+    lit = mix(0.30, mix(0.11, 0.42, engr), cape);
+    lit = mix(lit, 0.46, engr * (1.0 - cape) * 0.6);
+    col = mix(vec3(0.38, 0.47, 0.54), vec3(0.20, 0.28, 0.35), cape);
+    col = mix(col, col * 1.25, engr);
+    float pl = max(max(roots, lineM), max(lineH, lineC));
+    lit = mix(lit, 0.78, pl);
+    col = mix(col, vec3(0.86, 0.88, 0.84), pl * 0.8);
+  }
   lit = mix(lit, 0.97, eyeW); col = mix(col, vec3(0.97, 0.95, 0.89), eyeW);
   lit = mix(lit, 0.05, max(eyeP, eyeL)); col = mix(col, INK, max(eyeP, eyeL));
   lit = mix(lit, 0.04, lineO);
@@ -194,8 +203,8 @@ void main() {
 
   // ---- far toward the centre a whole ring is smaller than a pixel: average it
   float lod = smoothstep(1.4, 3.5, 1.0 / px);
-  float meanL = 0.52;
-  vec3 meanC = vec3(0.58, 0.55, 0.52);
+  float meanL = 0.55;
+  vec3 meanC = vec3(0.58, 0.60, 0.60);
   lit = mix(meanL, lit, lod);
   col = mix(meanC, col, lod);
 
