@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Island and the Mirror</title>
+  <meta name="description" content="A cylindrical-mirror anamorphosis with a double image: an engraved island fortress on the sheet, an impossible triangle in the polished cylinder.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+  <style>
+    @media (max-width: 640px) {
+      .bar { gap: 6px; }
+      .bar > button, .seg button { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Island and the Mirror</h1>
+    <p>a cylindrical-mirror anamorphosis with a double image, after the catoptric prints of the 17th century and István Orosz</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A polished steel cylinder stands on an engraved sheet showing an island fortress in a lake. The fortress walls, bent round the cylinder, are reflected in it as an upright impossible triangle built of stone blocks."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The sheet is an engraving of an island fortress in a lake. Stand the steel cylinder on its tower and look from the marked eye point: the curved walls straighten into a stone Penrose triangle.</p>
+    <p>The triangle was drawn first, on the picture plane of the eye. Each point of it defines a ray from the eye. The ray strikes the cylinder, and because the cylinder's surface is vertical its normal is horizontal: the ray keeps its downward slope and is mirrored only sideways. Followed down to the paper, it marks where that point of the picture must be printed. Rays from low on the cylinder land close to its foot; rays from near its top travel furthest. So the picture is turned inside out round the cylinder, with its bottom edge wrapped round the foot and its top flung out towards you.</p>
+    <p>The drawing on the sheet is that map applied to every point, computed exactly. The mirror is ray-traced the same way, so turning away from the eye point shows the real, bent reflection. The fortress, lake, shores and town are drawn only where the mirror does not look. The same stones serve both pictures.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>S</kbd><span>sheet only, or back to the mirror</span>
+      <kbd>R</kbd><span>show the eye rays</span>
+      <kbd>E</kbd><span>back to the eye point</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <span>Drag</span><span>look from elsewhere</span>
+    </div>
+    <p class="credit">An homage to the catoptric anamorphoses of the 17th century (Jean-François Niceron, Simon Vouet, Hans Tröschel) and to the double-image mirror anamorphoses of István Orosz. Both pictures are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <div class="seg" role="group" aria-label="Emphasis">
+        <button id="btn-mirror" aria-pressed="true">Mirror view</button>
+        <button id="btn-sheet" aria-pressed="false">Sheet only</button>
+      </div>
+      <button id="btn-rays" class="primary" aria-pressed="false">Show rays</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to look from elsewhere · scroll to zoom · double-click to return to the eye point</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

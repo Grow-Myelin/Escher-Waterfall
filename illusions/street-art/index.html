@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Cistern Stair</title>
+  <meta name="description" content="Anamorphic pavement art: a chalk drawing computed as the exact projection of a hidden 3D cistern onto the paving, seen from the one point where it becomes a pit.">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="../shared/page.css">
+</head>
+<body>
+  <a class="back" href="../index.html">← Gallery</a>
+  <header id="masthead">
+    <h1>The Cistern Stair</h1>
+    <p>anamorphic pavement art, after the chalk illusions of Kurt Wenner, Julian Beever and Edgar Mueller</p>
+  </header>
+
+  <div id="frame">
+    <canvas id="scene" aria-label="A town square with a chalk drawing on the paving. From the marked eye point it looks like a pit opening onto a flooded cistern with steps, an arch and a broken column; from anywhere else it is a long, stretched picture lying flat on the stones."></canvas>
+    <div id="badge"></div>
+  </div>
+
+  <aside id="panel" hidden aria-labelledby="panel-title">
+    <button id="panel-close" aria-label="Close">✕</button>
+    <h2 id="panel-title">How it works</h2>
+    <p>The pit, the steps, the water and the column do not exist. They are a 3D scene built under the paving and rendered once from a single eye point, 1.65 m above the chalk footprints. That picture is then pasted onto the pavement by projecting it back from the same point.</p>
+    <p>Each point on the paving and the hidden point behind it lie on one straight line from the eye. They land on the same spot of the eye's retina, so from there the flat drawing and the 3D scene are indistinguishable. The edge of the hole lies on the ground, so it is drawn true to size. Everything below the ground lands between you and its real position. The column top, 0.8 m above the paving, is drawn where the line through it meets the ground, far behind. That is why the column becomes an 8 m smear when seen from above.</p>
+    <p>Step off the eye point and the lines no longer meet. The far end of the drawing, squeezed into a sliver from the eye, opens out to its real length, and the pit flattens into a long stretched picture on the stones. Pavement artists check their work through a camera on a tripod at the marked spot for the same reason. One eye at one point is the only place the trick works.</p>
+    <h3>Keys</h3>
+    <div class="keys">
+      <kbd>A</kbd><span>show from above, with sight lines</span>
+      <kbd>E</kbd><span>back to the eye point</span>
+      <kbd>L</kbd><span>lithograph or colour</span>
+      <kbd>Space</kbd><span>pause or play</span>
+      <span>Drag</span><span>walk round the drawing</span>
+    </div>
+    <p class="credit">An homage to the anamorphic pavement art of Kurt Wenner (from 1984), Julian Beever and Edgar Mueller. The scene and the drawing are original.</p>
+  </aside>
+
+  <footer id="controls">
+    <div class="bar">
+      <div class="seg" role="group" aria-label="Rendering style">
+        <button id="btn-litho" aria-pressed="true">Lithograph</button>
+        <button id="btn-colour" aria-pressed="false">Colour</button>
+      </div>
+      <button id="btn-above" class="primary" aria-pressed="false">Show from above</button>
+      <button id="btn-play" aria-pressed="false"><b class="icon" aria-hidden="true">❚❚</b><span>Pause</span></button>
+      <button id="btn-info" aria-expanded="false" aria-controls="panel">How it works</button>
+    </div>
+    <div id="hint">Drag to walk round the drawing · scroll to zoom · double-click to return to the eye point</div>
+  </footer>
+
+  <div id="fallback">This piece needs WebGL. Try a current version of Chrome, Edge, Firefox or Safari.</div>
+  <script>
+    (function () {
+      try {
+        var c = document.createElement('canvas');
+        if (!(c.getContext('webgl2') || c.getContext('webgl'))) throw new Error('no webgl');
+      } catch (e) { document.getElementById('fallback').style.display = 'flex'; }
+    })();
+  </script>
+  <script src="../../vendor/three.min.js"></script>
+  <script src="bundle.js"></script>
+</body>
+</html>

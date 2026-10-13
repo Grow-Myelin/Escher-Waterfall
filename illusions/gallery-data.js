@@ -234,7 +234,7 @@ window.GALLERY = [
             "subtitle": "",
             "refs": [],
             "blurb": "",
-            "ready": false
+            "ready": true
           }
         ]
       },
@@ -349,11 +349,15 @@ window.GALLERY = [
           {
             "slug": "perth-triangle",
             "href": "perth-triangle/index.html",
-            "thumb": null,
-            "title": "perth-triangle",
-            "subtitle": "",
-            "refs": [],
-            "blurb": "",
+            "thumb": "perth-triangle/thumb.jpg",
+            "title": "The Sweet Spot",
+            "subtitle": "A real, open object that is a Penrose triangle from one point in a park",
+            "refs": [
+              "Brian McKay and Ahmad Abas, Impossible Triangle, East Perth, 1999",
+              "Oscar Reutersvärd, impossible tribar, 1934",
+              "L. S. Penrose and R. Penrose, Impossible Objects: A Special Type of Visual Illusion, 1958"
+            ],
+            "blurb": "Walk round a park sculpture of three square bars that do not meet; from the bronze marker on the path they close into a perfect impossible triangle.",
             "ready": true
           },
           {
